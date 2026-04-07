@@ -1,36 +1,18 @@
-FROM node:20-alpine AS base
-
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN npm ci
-
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+RUN npm ci
 COPY . .
-
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:20-alpine
 WORKDIR /app
-
-ENV NODE_ENV=production
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
+COPY --from=builder /app/package*.json ./
+RUN npm install --legacy-peer-deps
 EXPOSE 3000
-
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
+ENV NODE_ENV=production
 CMD ["node", "server.js"]
