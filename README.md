@@ -299,6 +299,127 @@ export default function NuevaRutaPage() {
 }
 ```
 
+## Despliegue en VPS (Easypanel)
+
+### Requisitos
+- VPS con Docker
+- Easypanel instalado
+- Dominio configurado (webtenseenergy.com)
+
+### Paso 1: Clonar repositorio en el VPS
+
+```bash
+# Conectar al VPS
+ssh usuario@tu-servidor.com
+
+# Ir al directorio de apps
+cd /opt/apps
+
+# Clonar repositorio
+git clone https://github.com/webtense/webtenseenergy.git
+cd webtenseenergy
+```
+
+### Paso 2: Variables de entorno
+
+```bash
+# Crear archivo .env
+cat > .env << 'EOF'
+NODE_ENV=production
+DATABASE_URL=file:./data/webtense.db
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=webtense@gmail.com
+SMTP_PASS=caeo wstp dcit avkw
+EMAIL_FROM=info@webtenseenergy.com
+NEXT_PUBLIC_WHATSAPP=34691521367
+EOF
+```
+
+### Paso 3: Crear volumen para datos
+
+```bash
+mkdir -p /opt/apps/webtenseenergy/data
+```
+
+### Paso 4: Instalar dependencias y build
+
+```bash
+npm install
+npm run build
+```
+
+### Paso 5: Ejecutar con PM2 (recomendado)
+
+```bash
+# Instalar PM2
+npm install -g pm2
+
+# Iniciar la app
+pm2 start npm --name "webtense-energy" -- start
+
+# Guardar configuración
+pm2 save
+
+# Reiniciar al reiniciar el servidor
+pm2 startup
+```
+
+### Paso 6: Configurar Nginx como proxy reverso
+
+```bash
+# Instalar nginx
+apt install nginx
+
+# Crear configuración
+cat > /etc/nginx/sites-available/webtenseenergy << 'EOF'
+server {
+    listen 80;
+    server_name webtenseenergy.com www.webtenseenergy.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+
+# Habilitar sitio
+ln -s /etc/nginx/sites-available/webtenseenergy /etc/nginx/sites-enabled/
+nginx -t
+systemctl reload nginx
+```
+
+### Paso 7: SSL con Let's Encrypt
+
+```bash
+apt install certbot python3-certbot-nginx
+certbot --nginx -d webtenseenergy.com -d www.webtenseenergy.com
+```
+
+### Comandos útiles de gestión
+
+```bash
+# Ver logs
+pm2 logs webtense-energy
+
+# Reiniciar app
+pm2 restart webtense-energy
+
+# Ver estado
+pm2 status
+
+# Monitor en tiempo real
+pm2 monit
+```
+
 ## Roadmap
 
 - [ ] Panel de administración con NextAuth
