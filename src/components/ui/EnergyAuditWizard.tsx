@@ -88,11 +88,33 @@ export default function EnergyAuditWizard() {
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      const submitData = {
+        method: formData.method,
+        fileName: formData.file?.name,
+        kwConsumed: formData.kwConsumed,
+        habits: formData.habits,
+        contact: formData.contact,
+      };
+
+      const response = await fetch('/api/estudio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submitData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la solicitud');
+      }
+
+      setStep(5);
+    } catch (error) {
+      console.error('Error al enviar:', error);
+      alert('Hubo un error al enviar tu solicitud. Por favor, inténtalo de nuevo.');
+    } finally {
       setIsSubmitting(false);
-      setStep(5); // Success step
-    }, 1500);
+    }
   };
 
   return (

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 // Colores por categoría más vibrantes para el nuevo diseño premium
 const CATEGORY_COLORS: Record<string, { bg: string, text: string, border: string, glow: string }> = {

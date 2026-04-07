@@ -1,0 +1,44 @@
+{
+  "$schema": "https://easypanel.io/schema.json",
+  "name": "webtense-energy",
+  "node": {
+    "name": "pinsolucions",
+    "type": "docker"
+  },
+  "services": {
+    "webtense-energy": {
+      "name": "webtense-energy",
+      "image": "node:20-alpine",
+      "environment": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "file:./data/webtense.db"
+      },
+      "ports": [
+        {
+          "target": 3000,
+          "published": 3000
+        }
+      ],
+      "volumes": [
+        "./data:/app/data"
+      ],
+      "domains": [
+        {
+          "host": "webtenseenergy.com",
+          "port": 3000
+        }
+      ],
+      "build": {
+        "method": "dockerfile",
+        "dockerfile": "Dockerfile"
+      },
+      "healthCheck": {
+        "path": "/",
+        "port": 3000
+      },
+      "restartPolicy": {
+        "type": "on-failure"
+      }
+    }
+  }
+}

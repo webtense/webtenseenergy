@@ -18,7 +18,7 @@ export interface ElectricityData {
  * For this demo/future date (2026), it returns the specific data from the reference screenshot.
  * In a real scenario, this would call ESIOS or preciodelaluz.org API.
  */
-export async function getElectricityPrices(dateStr: string = "2026-03-20"): Promise<ElectricityData> {
+export async function getElectricityPrices(_dateStr: string = "2026-03-20"): Promise<ElectricityData> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
 

@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 async function importWP() {
   const xmlPath = path.join(__dirname, '../webtenseenergy.WordPress.2025-06-03.xml');
@@ -81,7 +81,7 @@ async function importWP() {
     if (dateRaw) {
         try {
             dateStr = new Date(dateRaw).toISOString().split('T')[0];
-        } catch(e){}
+        } catch { }
     }
     
     const categories = [];

@@ -17,7 +17,7 @@ export function WhatsAppWidget() {
       }`}
     >
       <a
-        href="https://wa.me/34600000000" // Placeholder phone number
+        href={process.env.NEXT_PUBLIC_WHATSAPP ? `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP.replace(/\s+/g, '')}` : "https://wa.me/34691521367"} // Placeholder phone number
         target="_blank"
         rel="noopener noreferrer"
         className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 active:scale-95 shadow-[#25D366]/30"

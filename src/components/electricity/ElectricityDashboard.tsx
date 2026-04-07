@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import styles from './ElectricityDashboard.module.css';
-import { getElectricityPrices, ElectricityData, HourlyPrice } from '@/lib/electricity-api';
+import { getElectricityPrices, ElectricityData } from '@/lib/electricity-api';
 
 export default function ElectricityDashboard() {
   const [data, setData] = useState<ElectricityData | null>(null);

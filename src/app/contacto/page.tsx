@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 
 export default function ContactoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +32,7 @@ export default function ContactoPage() {
         const errorData = await response.json();
         setError(errorData.error || "Error al enviar. Inténtalo de nuevo.");
       }
-    } catch (err) {
+    } catch {
       setError("Error de red. Asegúrate de tener conexión.");
     } finally {
       setIsSubmitting(false);

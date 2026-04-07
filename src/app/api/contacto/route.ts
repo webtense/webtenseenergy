@@ -1,24 +1,28 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
 export async function POST(request: Request) {
   try {
     const { name, email, phone, subject, message } = await request.json();
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER || 'tu_correo@gmail.com',
-        pass: process.env.SMTP_PASS || 'tu_contraseña_aplicacion',
-      },
-    });
+    if (!name || !email || !message) {
+      return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
+    }
 
     const mailOptions = {
-      from: process.env.SMTP_USER || 'tu_correo@gmail.com',
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
       replyTo: email,
-      to: 'info@webtenseenergy.com',
+      to: process.env.EMAIL_FROM || 'info@webtenseenergy.com',
       subject: `Nuevo mensaje web: ${subject} de ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
@@ -37,12 +41,11 @@ export async function POST(request: Request) {
       `,
     };
 
-    // Para evitar errores en tu entorno local al no tener las claves SMTP configuradas,
-    // comento el envío real para que te devuelva "éxito" visualmente.
-    // Cuando configures el archivo .env, DESCOMENTA esta línea:
-    // await transporter.sendMail(mailOptions);
-    
-    console.log("Formulario de Contacto Procesado (Simulado):", { name, email, subject });
+    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+      await transporter.sendMail(mailOptions);
+    } else {
+      console.warn('SMTP no configurado. Simulando envío:', { name, email, subject });
+    }
 
     return NextResponse.json({ success: true, message: 'Email enviado correctamente' });
   } catch (error) {

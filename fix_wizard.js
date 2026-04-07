@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 const filepath = '/home/asanchez/webtenseEnergy/src/components/ui/EnergyAuditWizard.tsx';
 let data = fs.readFileSync(filepath, 'utf8');
 

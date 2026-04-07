@@ -9,9 +9,9 @@ export default function ParticularesPage() {
           <p className="text-lg md:text-xl text-foreground/70 dark:text-zinc-400 mb-8 leading-relaxed">
             Consigue la máxima eficiencia en tu vivienda. Te ayudamos a optimizar tu tarifa, incorporar energía solar y aprovechar la domótica para ahorrar mes a mes.
           </p>
-          <button className="bg-primary-600 dark:bg-primary-500 text-white font-bold px-8 py-4 rounded-full hover:bg-primary-500 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary-600/20">
+          <Link href="/estudio" className="inline-block bg-primary-600 dark:bg-primary-500 text-white font-bold px-8 py-4 rounded-full hover:bg-primary-500 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary-600/20">
             Analizar mi Factura
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -35,7 +35,7 @@ export default function ParticularesPage() {
                 Comparativa mensual
               </li>
             </ul>
-            <button className="text-primary-600 dark:text-primary-400 font-bold hover:text-primary-500 transition-colors inline-flex items-center gap-2">Ver más detalles <span aria-hidden="true">→</span></button>
+            <Link href="/estudio" className="text-primary-600 dark:text-primary-400 font-bold hover:text-primary-500 transition-colors inline-flex items-center gap-2">Solicitar análisis <span aria-hidden="true">→</span></Link>
           </div>
 
           {/* Autoconsumo */}
@@ -56,7 +56,7 @@ export default function ParticularesPage() {
                 Subvenciones y ayudas
               </li>
             </ul>
-            <button className="text-amber-600 dark:text-amber-400 font-bold hover:text-amber-500 transition-colors inline-flex items-center gap-2">Ver más detalles <span aria-hidden="true">→</span></button>
+            <Link href="/contacto" className="text-amber-600 dark:text-amber-400 font-bold hover:text-amber-500 transition-colors inline-flex items-center gap-2">Solicitar presupuesto <span aria-hidden="true">→</span></Link>
           </div>
         </div>
       </section>
