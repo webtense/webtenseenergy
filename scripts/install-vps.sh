@@ -11,7 +11,7 @@ echo "🚀 Iniciando despliegue de WEBTENSE ENERGY..."
 # Variables
 APP_DIR="/app/webtense"
 REPO_URL="https://github.com/webtense/webtenseenergy.git"
-PORT=3000
+PORT=3010
 
 # 1. Crear directorio
 echo "📁 Creando directorio..."
@@ -59,5 +59,5 @@ echo ""
 echo "✅ DESPLIEGUE COMPLETADO"
 echo "============================"
 echo "La aplicación está lista para ejecutar."
-echo "Para iniciar: npm start"
+echo "Para iniciar: PORT=$PORT npm start"
 echo ""

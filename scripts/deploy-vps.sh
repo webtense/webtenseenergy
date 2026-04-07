@@ -52,6 +52,7 @@ rsync -avz --exclude='node_modules' --exclude='.git' --exclude='.next' \
 echo -e "${GREEN}⚙️  Configurando variables de entorno...${NC}"
 ssh $SSH_USER@$SERVER "cat > $APP_PATH/webtenseenergy/.env << 'EOF'
 NODE_ENV=production
+PORT=3010
 DATABASE_URL=file:./data/webtense.db
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
@@ -67,7 +68,7 @@ ssh $SSH_USER@$SERVER "cd $APP_PATH/webtenseenergy && npm install && npm run bui
 
 # Configurar PM2
 echo -e "${GREEN}🚀 Configurando PM2...${NC}"
-ssh $SSH_USER@$SERVER "cd $APP_PATH/webtenseenergy && npm install -g pm2 && pm2 start npm --name 'webtense-energy' -- start && pm2 save && pm2 startup"
+ssh $SSH_USER@$SERVER "cd $APP_PATH/webtenseenergy && npm install -g pm2 && pm2 start npm --name 'webtense-energy' -- start -- -p 3010 && pm2 save && pm2 startup"
 
 echo ""
 echo -e "${GREEN}========================================${NC}"
@@ -75,7 +76,7 @@ echo -e "${GREEN}  ✅ DESPLIEGUE COMPLETADO${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "La app está corriendo en:"
-echo -e "  ${YELLOW}http://$SERVER:3000${NC}"
+echo -e "  ${YELLOW}http://$SERVER:3010${NC}"
 echo ""
 echo -e "Para configurar dominio:"
 echo -e "  1. Configurar Nginx como proxy reverso"

@@ -15,8 +15,8 @@
       },
       "ports": [
         {
-          "target": 3000,
-          "published": 3000
+          "target": 3010,
+          "published": 3010
         }
       ],
       "volumes": [
@@ -25,7 +25,7 @@
       "domains": [
         {
           "host": "webtenseenergy.com",
-          "port": 3000
+          "port": 3010
         }
       ],
       "build": {
@@ -34,7 +34,7 @@
       },
       "healthCheck": {
         "path": "/",
-        "port": 3000
+        "port": 3010
       },
       "restartPolicy": {
         "type": "on-failure"

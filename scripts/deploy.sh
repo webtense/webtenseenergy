@@ -18,6 +18,7 @@ npm run build
 echo "⚙️  Creando configuración..."
 cat > .env.production << 'EOF'
 NODE_ENV=production
+PORT=3010
 DATABASE_URL="file:./data/webtense.db"
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT="465"
@@ -59,7 +60,7 @@ echo ""
 echo "2. En Easypanel, crea una nueva app:"
 echo "   - Name: webtense-energy"
 echo "   - Image: node:20-alpine"
-echo "   - Port: 3000"
+echo "   - Port: 3010"
 echo ""
 echo "3. Sube tu .env.production como variable de entorno"
 echo ""
