@@ -1,11 +1,29 @@
 
+"use client";
 
-export const metadata = {
-  title: "Ofertas y Chollos en Energía y Domótica",
-  description: "Canal de ofertas de componentes eléctricos, paneles solares, baterías y dispositivos domóticos al mejor precio.",
-};
+import { useState, useEffect } from "react";
 
 export default function OfertasPage() {
+  const [ofertasEnabled, setOfertasEnabled] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/public/feature-flags")
+      .then(res => res.json())
+      .then(data => setOfertasEnabled(data.ofertas !== false))
+      .catch(() => {});
+  }, []);
+
+  if (!ofertasEnabled) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-foreground mb-4">Sección en mantenimiento</h1>
+          <p className="text-foreground/60">Vuelve pronto.</p>
+        </div>
+      </div>
+    );
+  }
+
   const ofertas = [
     {
       title: "Kit Paneles Solares 400W",

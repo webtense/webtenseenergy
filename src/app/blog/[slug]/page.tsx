@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPostBySlug, allPosts, formatDate } from "@/lib/posts";
 import type { Metadata } from "next";
+import sanitizeHtml from "sanitize-html";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -57,6 +58,19 @@ export default async function BlogPostPage({ params }: PageProps) {
     .replace(/<!-- \/wp:[^>]*?-->/g, "")
     .trim();
 
+  const safeContent = sanitizeHtml(cleanContent, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "span"]),
+    allowedAttributes: {
+      a: ["href", "name", "target", "rel"],
+      img: ["src", "alt", "title", "width", "height", "loading"],
+      "*": ["class"],
+    },
+    allowedSchemes: ["http", "https", "mailto"],
+    transformTags: {
+      a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
+    },
+  });
+
   return (
     <article className="min-h-screen pb-24 bg-background">
       {/* Header del artículo */}
@@ -107,7 +121,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             prose-img:rounded-xl prose-img:shadow-lg prose-img:mx-auto
             prose-hr:border-zinc-200 dark:prose-hr:border-white/10
             prose-blockquote:border-primary-500 prose-blockquote:bg-zinc-50 dark:prose-blockquote:bg-zinc-900 prose-blockquote:rounded-r-xl prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:text-foreground/80 dark:prose-blockquote:text-zinc-300"
-          dangerouslySetInnerHTML={{ __html: cleanContent }}
+          dangerouslySetInnerHTML={{ __html: safeContent }}
         />
 
         {/* CTA interna */}

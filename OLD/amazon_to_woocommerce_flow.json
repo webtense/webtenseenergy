@@ -1,0 +1,86 @@
+{
+  "name": "Amazon \u279d WooCommerce Auto Product",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "nuevo-producto",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "webhook-producto-amazon"
+    },
+    {
+      "parameters": {
+        "functionCode": "\nconst asin = $json.asin || $json.url.split('/dp/')[1]?.split('/')[0];\nreturn {\n  asin,\n  url: `https://www.amazon.es/dp/${asin}?tag=semillasdet02-21`\n};\n"
+      },
+      "name": "Extraer ASIN",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.woo.com/wp-json/wc/v3/products",
+        "method": "POST",
+        "authentication": "predefinedCredentialType",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "\n{\n  \"name\": \"Producto importado desde Amazon\",\n  \"type\": \"external\",\n  \"regular_price\": \"22.99\",\n  \"sale_price\": \"18.99\",\n  \"description\": \"<p>Producto importado autom\u00e1ticamente desde Amazon.</p>\",\n  \"short_description\": \"Compra ahora con nuestro enlace de afiliado.\",\n  \"external_url\": {{$json[\"url\"]}},\n  \"button_text\": \"Comprar en Amazon\",\n  \"images\": [\n    {\n      \"src\": \"https://via.placeholder.com/600x600.png?text=Amazon+Product\"\n    }\n  ],\n  \"categories\": [\n    {\n      \"id\": 12\n    }\n  ]\n}\n"
+      },
+      "name": "Crear producto en Woo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "woocommerce-api"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extraer ASIN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer ASIN": {
+      "main": [
+        [
+          {
+            "node": "Crear producto en Woo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "flow-amazon-woocommerce",
+  "meta": {
+    "instanceId": "webtenseenergy",
+    "workflowId": "crear-producto-afiliado-amazon",
+    "createdAt": "2025-06-16T17:19:43.104007Z"
+  }
+}

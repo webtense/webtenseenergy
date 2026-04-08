@@ -1,0 +1,344 @@
+
+
+# Especificación detallada – CCTV\_BTR\_Mant\_Bot v2.x (Telegram + WhatsApp)
+
+## 1) Objetivo
+
+Bot de mantenimiento para servidores con CCTV (carpeta `/CAM` y servicio DVR), que:
+
+* Responde a **comandos de Telegram** (estado, limpieza, tune-up, reinicios, programación de tareas…).
+* Genera **informes y tareas programadas** vía systemd timers.
+* Envía **todas las salidas** (de comandos, informes, incidencias) **en dos canales**:
+
+  * Telegram (API Bot).
+  * WhatsApp **(Mudslide CLI vía `npx`)** al grupo configurado.
+* Incluye confirmaciones “sí/no” para acciones destructivas.
+* Aísla **notificaciones** en scripts reutilizables, con logs, timeouts y manejo de errores.
+
+> Requisito clave: *“cualquier cosa que el bot envíe a Telegram, también debe enviarse a WhatsApp”*.
+
+---
+
+## 2) Tecnologías
+
+* **Python 3.10+** con `python-telegram-bot` v20+ (modo polling).
+* **Bash** para scripts de mantenimiento y notificación.
+* **Node 20+** y **Mudslide** (`npx mudslide@latest`) para **WhatsApp**.
+* **systemd**: servicio del bot y timers para tareas programadas.
+
+---
+
+## 3) Estructura de directorios (propuesta)
+
+```
+/opt/CCTV_BTR_Mant_Bot
+├── .env
+├── bot.py                       # Bot Telegram (v2.x) – usa notify.sh para fan-out TG+WA
+├── bot.service                  # cctv-maint-bot.service (systemd)
+├── scripts/
+│   ├── notify.sh                # Agregador: recibe texto por stdin y envía a TG+WA
+│   ├── send_tg.sh               # Envío Telegram (texto, fotos, docs)
+│   ├── send_wa.sh               # Envío WhatsApp (texto y ficheros con Mudslide)
+│   ├── cctv_status_report.sh    # Informe “estado” (host, uptime, kernel, RAM, / y /CAM, servicio DVR)
+│   ├── cam_clean.sh             # Limpieza inteligente de /CAM (por edad/objetivo)
+│   ├── system_tuneup.sh         # Tune-up del sistema (tmp, journald, docker, apt…)
+│   ├── update_agentdvr.sh       # (opcional) Actualizar/reiniciar servicio DVR
+│   ├── log_bot.sh               # Helper para ver logs del bot
+│   ├── test_wa.sh               # Pruebas de sesión y envío a WhatsApp (Mudslide)
+│   └── envioTest.sh             # (tu script de recomprensión y envío a WA)
+├── timers/
+│   ├── cctv-status-report.service
+│   ├── cctv-status-report.timer
+│   ├── cam-clean.service
+│   └── cam-clean.timer
+├── README.md
+└── CHANGELOG.md
+```
+
+---
+
+## 4) Configuración (.env)
+
+Variables leídas por `bot.py` y scripts:
+
+```
+# === Telegram ===
+BOT_TOKEN=<token del bot>
+CHAT_ID=-100xxxxxxxxxx           # supergrupo destino por defecto
+AUTHORIZED_CHAT_ID=-100xxxxxxxxx # (opcional) restringe uso del bot a este chat
+
+# === WhatsApp (Mudslide) ===
+WA_GROUP_JID=120363301144923021@g.us    # JID del grupo destino
+WA_TIMEOUT_SEND=25                      # timeout por envío WA (s)
+WA_TEXT_MODE=auto                       # auto | send | send_text | file_fallback
+WA_NPX_BIN="npx -y mudslide@latest"     # permite fijar versión/flags
+
+# === CCTV / limpieza ===
+CAM_DIR=/CAM
+SERVICE_RECORDER=agentdvr.service
+THRESHOLD=90         # % para limpiar (si se usa lógica por ocupación)
+TARGET=85            # % objetivo tras limpiar
+DAYS=15              # días para borrado por antigüedad
+```
+
+> Nota WA: `WA_TEXT_MODE=auto` hace *feature-detection* del subcomando/flag soportado por tu Mudslide y si no hay envío de texto nativo, crea un `.txt` temporal y lo envía como documento.
+
+---
+
+## 5) Servicio systemd del bot (bot.service)
+
+* Arranca `bot.py` en **polling** (no webhook).
+* `ExecStartPre` valida sintaxis Python y borra webhook para evitar “Conflict: setWebhook/getUpdates”.
+* `Restart=always` para resiliencia.
+
+**Puntos resueltos por diseño:**
+
+* Evita el bug “This event loop is already running” usando API `Application.run_polling()` sin `asyncio.run()` externo.
+* Llama a `deleteWebhook` antes de iniciar polling (o con `run_polling` ya lo gestiona); de todos modos se añade un `ExecStartPre` defensivo.
+* Se añade `EnvironmentFile=/opt/CCTV_BTR_Mant_Bot/.env`.
+
+---
+
+## 6) Handlers / Comandos del bot
+
+Todos **validan** `AUTHORIZED_CHAT_ID` si está definido. Y **TODO lo que responda** pasa por `scripts/notify.sh` para duplicar en WA.
+
+* `/start` y `/help` – bienvenida y ayuda.
+* `/ping` – latencia y timestamp.
+* `/whoami` – IDs de bot y chat.
+* `/estado` – estado del sistema:
+
+  * Si existe `scripts/cctv_status_report.sh`, usa ese (preferente).
+  * Si no, ejecuta comandos inline (hostnamectl, uptime, uname, RAM, df `/` y `CAM_DIR`, `systemctl is-active` de DVR).
+  * **Salida** formateada y enviada a `notify.sh`.
+* `/limpiar` – requiere **confirmación**, llama a `cam_clean.sh` (o inline básico por antigüedad).
+* `/limpiar_emergencia` – confirmación; limpia con parámetros agresivos (porcentaje objetivo y/or días).
+* `/tuneup` – confirmación; `system_tuneup.sh`.
+* `/reiniciar_rec` – confirmación; `systemctl restart SERVICE_RECORDER`.
+* `/actualizar_agentdvr` – confirmación; ejecuta `scripts/update_agentdvr.sh` si existe.
+* `/programar_informe HH:MM` – crea/activa `cctv-status-report.timer` con OnCalendar a esa hora.
+* `/programar_limpieza hourly|HH:MM` – habilita `cam-clean.timer` (horario flexible).
+* `/log [N]` – últimas N líneas de `journalctl -u cctv-maint-bot`.
+* `/version` – versión del bot.
+* `/env` – imprime variables clave (token ofuscado).
+* `/setchat` – guarda el chat actual como `CHAT_ID` en `.env`.
+
+**Confirmaciones:** El bot guarda en memoria `PEND[chat_id] = {action, args, ts}` y solo ejecuta si el usuario responde “sí”/“si”/“s”.
+
+---
+
+## 7) Agregador de notificaciones (notify.sh)
+
+* **Entrada:** texto por `stdin` (lo que generan el bot o los scripts).
+* **Salida:** reenvía **en paralelo** a:
+
+  * `send_tg.sh` (Telegram)
+  * `send_wa.sh` (WhatsApp)
+* **Características:**
+
+  * Corta mensajes largos en **trozos** (p. ej. 3500–3800 chars para TG).
+  * **Escapa** caracteres problemáticos cuando usa Markdown.
+  * **Timeouts** independientes por canal (para que un canal lento no bloquee el otro).
+  * **Logs** (ej. `/var/log/notify.log`) con timestamp, tamaño y resultado por envío.
+  * **Código de salida**: 0 si al menos uno de los dos canales entregó; !=0 si ambos fallan.
+
+> Esto resuelve el caso que viste: si WA tarda o falla, TG igual entrega (y viceversa).
+
+---
+
+## 8) Envío a Telegram (send\_tg.sh)
+
+* Usa `curl` directo a `sendMessage` / `sendDocument` / `sendPhoto`.
+* Lee `BOT_TOKEN` y `CHAT_ID` de `.env`.
+* **Fragmentación** si supera el límite de 4096 chars (o 1024 para captions).
+* **Formateo**: por defecto envía como bloque de código triple \`\`\` para mantener tablas de texto alineadas.
+* Manejo de errores HTTP y reintentos cortos.
+
+---
+
+## 9) Envío a WhatsApp (send\_wa.sh)
+
+* Requiere **Node ≥20** y **Mudslide logueado**:
+
+  * Verifica con `npx mudslide me`.
+  * Si no hay sesión: log claro (“ejecuta `npx mudslide login`”).
+* **Texto**:
+
+  * `WA_TEXT_MODE=auto` detecta si tu versión soporta `send --message`, `send-text` o **no soporta texto**.
+  * Fallback robusto: crea `mensaje-YYYYmmdd-HHMMSS.txt` en `/tmp` y lo envía con `send-file` (así **siempre** llega algo a WA).
+* **Ficheros**:
+
+  * Usa `npx mudslide send-file "$WA_GROUP_JID" <ruta>` (vídeos/fotos/logs adjuntos).
+  * Para vídeos grandes, se recomienda pasar por `envioTest.sh` (recomprensión CRF/altura) antes de enviar.
+
+> Los errores “unknown command ‘send-text’” o “unknown option ‘--text’” quedan resueltos con el **modo auto + fallback**.
+
+---
+
+## 10) Scripts de mantenimiento
+
+### 10.1 cctv\_status\_report.sh
+
+* Obtiene: host, uptime, kernel, RAM (`free -h`), uso de `/` y de `CAM_DIR`, estado de `SERVICE_RECORDER`.
+* **NOP** de f-strings: se evita el bug histórico de Python con comillas/barra inversa en awk.
+* **Salida**: tabla de texto simple, pensada para copiar/pegar en TG/WA.
+
+### 10.2 cam\_clean.sh
+
+* Limpieza por **antigüedad** (`find ... -mtime +DAYS -delete`) y/o por **ocupación** (si se quiere llegar a `TARGET`%).
+* Modo **emergencia** con parámetros más agresivos.
+* Imprime **resumen**: ficheros borrados, antes/después, tiempo empleado.
+
+### 10.3 system\_tuneup.sh
+
+* Limpia `/tmp` viejo, `journalctl --vacuum-time=14d`, `docker system prune -af` (si hay docker).
+* `apt-get update && dist-upgrade` (si procede).
+* Mensaje final de éxito con tiempos.
+
+### 10.4 update\_agentdvr.sh (opcional)
+
+* Reinicia/actualiza el servicio DVR (`agentdvr.service`) según tu procedimiento.
+* Muestra versión/estado tras el reinicio.
+
+### 10.5 envioTest.sh (tu script existente)
+
+* Recomprensión **iterativa** con CRF y altura hasta quedar ≤ `MAX_MB`.
+* Envía a WA con barra de progreso; si falla como vídeo, reintenta como documento.
+* Bloqueo `flock`/dir-lock para evitar solapes.
+
+---
+
+## 11) Timers systemd
+
+* `cctv-status-report.timer`: lanza `cctv_status_report.sh | notify.sh` a la hora configurada (p. ej. `/programar_informe 07:45`).
+* `cam-clean.timer`: limpieza diaria o **hourly** (según `/programar_limpieza`).
+* Ambos usan `Persistent=true`.
+
+---
+
+## 12) Seguridad y robustez
+
+* **Filtro de chat** con `AUTHORIZED_CHAT_ID` para que nadie ajeno use el bot.
+* **Borrado de webhook** antes de polling para evitar `Conflict`.
+* **Permisos**: todos los scripts en `scripts/` deben ser ejecutables.
+* **Timeouts**: en `notify.sh` y `send_wa.sh` para no colgar el flujo.
+* **Logs** centralizados (bot via `journalctl`, scripts via `/var/log/*.log`).
+
+---
+
+## 13) Cabecera corporativa en archivos
+
+Todos los `.sh` y el `bot.py` llevan una cabecera estilo:
+
+```
+"""
+MÓDULO DE NOTIFICACIONES OTs - WHATSAPP
+-----------------------------------------------------------
+- Fecha de implementación: 25/08/2025
+- Versión: 2.0
+- Autor: Andrés Sánchez Serrano
+
+📌 Descripción:
+[Descripción breve del módulo/script]
+
+🔧 Mejoras implementadas:
+1) [mejora 1]
+2) [mejora 2]
+3) [mejora 3]
+-----------------------------------------------------------
+"""
+```
+
+> En bash se usa un bloque de comentarios `#` con la misma estructura.
+
+---
+
+## 14) Flujo de ejemplo
+
+### 14.1 Usuario envía `/estado` en Telegram
+
+1. `bot.py` valida chat, ejecuta `scripts/cctv_status_report.sh`.
+2. La salida **PIPEA a `scripts/notify.sh`**.
+3. `notify.sh`:
+
+   * Trocea si es largo.
+   * Lanza en **paralelo** `send_tg.sh` y `send_wa.sh`.
+   * Loguea resultado; devuelve 0 si al menos un canal entregó.
+
+### 14.2 Timer diario (07:45)
+
+1. systemd ejecuta `cctv-status-report.service` → `cctv_status_report.sh | notify.sh`.
+2. Reciben **Telegram + WhatsApp**.
+
+### 14.3 Acción peligrosa (`/limpiar_emergencia`)
+
+1. El bot **pide confirmación**.
+2. Si “sí”: llama `cam_clean.sh`, recoge el resumen y lo pasa a `notify.sh`.
+
+---
+
+## 15) Errores vistos y cómo quedan resueltos
+
+* `SyntaxError: f-string ... backslash`:
+  → En v2 se **elimina** el uso de f-strings con awk; se construyen **strings literales** y/o se delega todo a scripts bash.
+
+* `Permission denied /opt/.../send_tg.sh`:
+  → Asegurar `chmod +x scripts/*.sh` en un instalador o `Makefile`.
+
+* `unknown command 'send-text'` / `unknown option '--text'` (Mudslide):
+  → **Detección automática** del subcomando soportado y **fallback a .txt** con `send-file`.
+
+* `Conflict: terminated by setWebhook` / `other getUpdates request`:
+  → `ExecStartPre` que hace `deleteWebhook` y se garantiza **un único proceso** del bot.
+
+* *Bloqueos por lentitud de WA*:
+  → Timeouts y **envío en paralelo** para que TG no se vea afectado.
+
+---
+
+## 16) Repositorio / CI
+
+* Rama: `main`.
+* Archivos clave versionados: todo lo anterior.
+* `README.md` con:
+
+  * Requisitos (Python/Node/Systemd).
+  * Instalación (copiar archivos, `chmod +x`, `systemctl daemon-reload`, enable/start services/timers).
+  * Config `.env` de ejemplo.
+  * Tabla de comandos del bot.
+* `CHANGELOG.md` con entradas v1.7.0 → v2.0.
+* (Opcional) **pre-commit**: `shfmt`, `shellcheck`, `black`, `ruff`.
+
+---
+
+## 17) Criterios de aceptación (para Copilot/Codex)
+
+1. **/estado** responde en TG **y** llega copia a WA (aunque WA falle, TG entrega).
+2. **/limpiar**, **/tuneup**, **/reiniciar\_rec**, **/actualizar\_agentdvr** piden confirmación y envían **resumen** a ambos canales.
+3. **/programar\_informe** y **/programar\_limpieza** crean timers **persistentes** y listables con `systemctl list-timers`.
+4. `notify.sh` maneja troceo, timeouts y logs; código de salida 0 si **al menos** un canal entregó.
+5. **No hay** errores de `webhook conflict`, `event loop running`, ni `f-string`.
+6. `send_wa.sh` funciona con **cualquier** Mudslide reciente: texto con modo auto o **.txt fallback**.
+7. `scripts/*.sh` llevan cabecera corporativa, `set -Eeuo pipefail`, `trap` de limpieza y logs.
+8. `bot.service` arranca limpio, reinicia en fallo, y `journalctl -u` muestra actividad clara.
+
+---
+
+## 18) (Opcional futuro) “WA inbound”
+
+* Si se quiere **recibir** comandos desde WhatsApp, se sugiere un microservicio Node (Baileys) que:
+
+  * Escuche el grupo `WA_GROUP_JID`.
+  * Mapée mensajes “/estado, /ping, …” a **HTTP** (o STDIN) hacia `bot.py`/scripts.
+  * Devuelva salidas al grupo.
+* **Fuera del alcance** de esta fase; requiere proceso Node residente y gestión de sesión.
+
+---
+
+Con esto Copilot tienen todo lo necesario para:
+
+* Generar/ajustar `bot.py` v2.x (sin errores de event loop ni f-strings).
+* Implementar `notify.sh`, `send_tg.sh`, `send_wa.sh` con **modo auto y fallback**.
+* Completar scripts de mantenimiento y timers.
+* Añadir cabeceras, logs y permisos.
+* Dejarlo listo en `main` con README/CHANGELOG.

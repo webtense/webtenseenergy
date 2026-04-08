@@ -3,37 +3,147 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
-model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  role      String   @default("EDITOR") // ADMIN or EDITOR
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  posts     Post[]
+enum AdminRole {
+  ADMIN
+  EDITOR
+}
+
+enum Locale {
+  ES
+  CA
+}
+
+enum PostStatus {
+  DRAFT
+  REVIEW
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+}
+
+enum ScheduleType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  ONCE
+}
+
+model AdminUser {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  username    String    @unique
+  password    String
+  role        AdminRole @default(EDITOR)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  posts       Post[]
+  campaigns   Campaign[]
+  telegramLog TelegramLog[]
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  enabled     Boolean  @default(false)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  locale      Locale?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  locale       Locale   @default(ES)
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  postLinks    PostCategory[]
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  postLinks   PostTag[]
 }
 
 model Post {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  title         String
-  content       String
-  excerpt       String?
-  category      String
-  categories    String   // almacenado como JSON o string separado por comas
-  featuredImage String?
-  status        String   @default("publish")
-  date          DateTime @default(now())
-  
-  authorId      String?
-  author        User?    @relation(fields: [authorId], references: [id])
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  status          PostStatus   @default(DRAFT)
+  publishedAt     DateTime?
+  scheduledFor    DateTime?
+  featuredImage   String?
+  seoTitle        String?
+  seoDescription  String?
+  locale          Locale       @default(ES)
+  authorId        String?
+  author          AdminUser?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  translations    PostTranslation[]
+  categories      PostCategory[]
+  tags            PostTag[]
+
+  @@index([status, publishedAt])
+  @@index([locale])
+}
+
+model PostTranslation {
+  id          String   @id @default(cuid())
+  postId      String
+  locale      Locale
+  title       String
+  excerpt     String?
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, locale])
+}
+
+model PostCategory {
+  postId     String
+  categoryId String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
 }
 
 model Offer {
@@ -45,7 +155,159 @@ model Offer {
   discount  String?
   url       String
   icon      String?
-  
+  locale    Locale   @default(ES)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  source    String   @default("contacto")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudyRequest {
+  id           String   @id @default(cuid())
+  method       String
+  fileName     String?
+  fileMimeType String?
+  kwConsumed   String?
+  habits       String   @default("[]")
+  name         String
+  email        String
+  phone        String?
+  company      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  channel     String
+  destination String
+  subject     String
+  status      String
+  error       String?
+  payload     String?
+  createdAt   DateTime @default(now())
+}
+
+model Subscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  fullName     String?
+  locale       Locale   @default(ES)
+  isActive     Boolean  @default(true)
+  source       String   @default("web")
+  consentedAt  DateTime?
+  unsubscribedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  consents     Consent[]
+  events       SendEvent[]
+}
+
+model Consent {
+  id            String     @id @default(cuid())
+  subscriberId  String
+  legalText     String
+  ipAddress     String?
+  userAgent     String?
+  acceptedAt    DateTime   @default(now())
+  subscriber    Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+}
+
+model Campaign {
+  id            String         @id @default(cuid())
+  name          String
+  locale        Locale         @default(ES)
+  subject       String
+  preheader     String?
+  status        CampaignStatus @default(DRAFT)
+  scheduleType  ScheduleType?
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  authorId      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  author        AdminUser?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  blocks        CampaignBlock[]
+  jobs          SendJob[]
+}
+
+model CampaignBlock {
+  id          String   @id @default(cuid())
+  campaignId  String
+  sortOrder   Int      @default(0)
+  type        String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+model SendJob {
+  id          String   @id @default(cuid())
+  campaignId  String
+  status      String   @default("pending")
+  runAt       DateTime @default(now())
+  finishedAt  DateTime?
+  error       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  events      SendEvent[]
+
+  @@index([status, runAt])
+}
+
+model SendEvent {
+  id            String     @id @default(cuid())
+  sendJobId     String
+  subscriberId  String
+  eventType     String
+  createdAt     DateTime   @default(now())
+  sendJob       SendJob    @relation(fields: [sendJobId], references: [id], onDelete: Cascade)
+  subscriber    Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+
+  @@index([eventType, createdAt])
+}
+
+model TelegramConfig {
+  id            String   @id @default(cuid())
+  botName       String?
+  channelId     String
+  webhookUrl    String?
+  webhookSecret String?
+  isActive      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TelegramDeal {
+  id          String   @id @default(cuid())
+  offerId     String?
+  title       String
+  message     String
+  url         String?
+  status      String   @default("pending")
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TelegramLog {
+  id          String    @id @default(cuid())
+  adminUserId String?
+  action      String
+  status      String
+  detail      String?
+  createdAt   DateTime  @default(now())
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
 }

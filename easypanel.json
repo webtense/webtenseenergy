@@ -11,7 +11,7 @@
       "image": "ghcr.io/webtense/webtenseenergy/webtense-energy:latest",
       "environment": {
         "NODE_ENV": "production",
-        "DATABASE_URL": "file:./data/webtense.db"
+        "DATABASE_URL": "postgresql://webtense:change_me@postgres:5432/webtenseenergy?schema=public"
       },
       "ports": [
         {
@@ -19,9 +19,7 @@
           "published": 3010
         }
       ],
-      "volumes": [
-        "./data:/app/data"
-      ],
+      "volumes": [],
       "domains": [
         {
           "host": "webtenseenergy.com",

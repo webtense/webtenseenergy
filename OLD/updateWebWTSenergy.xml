@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+    xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
+    xmlns:content="http://purl.org/rss/1.0/modules/content/"
+    xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:wp="http://wordpress.org/export/1.2/">
+<channel>
+    <title>Webtense Energy</title>
+    <link>https://webtenseenergy.com</link>
+    <description>Gestión energética y domótica</description>
+    <pubDate>Mon, 25 Aug 2025 11:00:00 +0000</pubDate>
+    <language>es-ES</language>
+    <wp:wxr_version>1.2</wp:wxr_version>
+    <wp:base_site_url>https://webtenseenergy.com</wp:base_site_url>
+    <wp:base_blog_url>https://webtenseenergy.com</wp:base_blog_url>
+
+    <wp:author>
+        <wp:author_id>1</wp:author_id>
+        <wp:author_login>admin</wp:author_login>
+        <wp:author_email>admin@webtenseenergy.com</wp:author_email>
+        <wp:author_display_name><![CDATA[Webtense Energy]]></wp:author_display_name>
+    </wp:author>
+
+    <!-- Categorías nuevas -->
+    <wp:category>
+        <wp:term_id>2001</wp:term_id>
+        <wp:category_nicename><![CDATA[gestion-energetica]]></wp:category_nicename>
+        <wp:category_parent><![CDATA[]]></wp:category_parent>
+        <wp:cat_name><![CDATA[Gestión Energética]]></wp:cat_name>
+    </wp:category>
+    <wp:category>
+        <wp:term_id>2002</wp:term_id>
+        <wp:category_nicename><![CDATA[empresas]]></wp:category_nicename>
+        <wp:category_parent><![CDATA[]]></wp:category_parent>
+        <wp:cat_name><![CDATA[Empresas]]></wp:cat_name>
+    </wp:category>
+
+    <!-- Landing principal -->
+    <item>
+        <title><![CDATA[Partner Energético: Gestión de Energía para Hoteles y Empresas]]></title>
+        <link>https://webtenseenergy.com/gestion-energia-partner/</link>
+        <pubDate>Mon, 25 Aug 2025 11:00:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6001</guid>
+        <description><![CDATA[Nos convertimos en tu departamento de energía: independiente, medible y orientado a resultados.]]></description>
+        <content:encoded><![CDATA[
+<h1>Nos convertimos en tu departamento de energía</h1>
+<p>Independientes de comercializadoras. Datos, acciones y ahorro real para hoteles y empresas.</p>
+<h2>Qué hacemos</h2>
+<ul>
+<li>Auditoría de contratación y optimización de tarifas/potencias.</li>
+<li>Monitorización y cuadro de mando con KPIs.</li>
+<li>Plan de ahorro y eficiencia (iluminación, HVAC, ACS, FV, baterías).</li>
+<li>ISO 50001: implantación completa.</li>
+</ul>
+<h2>Por qué nosotros</h2>
+<ul>
+<li><strong>Independencia real:</strong> trabajamos para ti, no para un proveedor.</li>
+<li><strong>Transparencia:</strong> KPIs claros (kWh, €/kWh, potencia, reactiva, EUI).</li>
+<li><strong>Tecnología abierta:</strong> integraremos tus contadores y tu BI.</li>
+</ul>
+<p><a class="wp-block-button__link" href="/solicita-una-reunion/">Solicita una reunión de 30'</a></p>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Servicio B2B: tu departamento de energía externalizado.]]></excerpt:encoded>
+        <wp:post_id>6001</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:00:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:00:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:00:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:00:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[gestion-energia-partner]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- Servicios -->
+    <item>
+        <title><![CDATA[Servicios de Gestión Energética]]></title>
+        <link>https://webtenseenergy.com/servicios-gestion-energia/</link>
+        <pubDate>Mon, 25 Aug 2025 11:01:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6002</guid>
+        <description><![CDATA[Catálogo de servicios para reducir consumo y costes energéticos.]]></description>
+        <content:encoded><![CDATA[
+<h1>Servicios de Gestión Energética</h1>
+<h2>1) Auditoría de contratación</h2>
+<p>Revisión de tarifas, potencias, peajes, indexados vs. fijos, reactiva y penalizaciones. Entregable: informe, ahorro estimado y ejecución.</p>
+<h2>2) Monitorización y telemetría</h2>
+<p>Submetering eléctrico, gas y agua. Dashboard y alertas. Export a ERP/BI.</p>
+<h2>3) Plan de Ahorro y Eficiencia</h2>
+<p>Medidas priorizadas por CAPEX/OPEX: iluminación LED, HVAC, free-cooling, variadores, ACS, autoconsumo FV y baterías.</p>
+<h2>4) ISO 50001</h2>
+<p>Implantación del Sistema de Gestión de la Energía: política, línea base, EnPI, M&V e auditoría interna.</p>
+<h2>5) Subvenciones</h2>
+<p>Identificación, tramitación y justificación.</p>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[De la tarifa al tornillo: servicio integral con métricas.]]></excerpt:encoded>
+        <wp:post_id>6002</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:01:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:01:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:01:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:01:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[servicios-gestion-energia]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- ISO 50001 -->
+    <item>
+        <title><![CDATA[ISO 50001 y Sistemas de Gestión de la Energía]]></title>
+        <link>https://webtenseenergy.com/iso-50001-gestion-energia/</link>
+        <pubDate>Mon, 25 Aug 2025 11:02:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6003</guid>
+        <description><![CDATA[Preparamos tu organización para ISO 50001: política, EnPIs, línea base y mejora continua.]]></description>
+        <content:encoded><![CDATA[
+<h1>ISO 50001 y Sistemas de Gestión de la Energía</h1>
+<p>ISO 50001 es el estándar internacional para crear un SGEn que mejora el rendimiento energético de forma continua. Te acompañamos: diagnóstico, alcance, documentación, implantación, medición, auditoría interna y certificación.</p>
+<ul>
+<li>Política energética y alcance</li>
+<li>Revisión energética y línea base</li>
+<li>Indicadores de desempeño (EnPI)</li>
+<li>Plan de medición, verificación y mejora</li>
+<li>Formación y auditoría interna</li>
+</ul>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Implantación realista de ISO 50001 sin humo.]]></excerpt:encoded>
+        <wp:post_id>6003</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:02:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:02:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:02:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:02:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[iso-50001-gestion-energia]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- Sectores -->
+    <item>
+        <title><![CDATA[Sectores: Hoteles, Industria y Retail]]></title>
+        <link>https://webtenseenergy.com/sectores-gestion-energia/</link>
+        <pubDate>Mon, 25 Aug 2025 11:03:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6004</guid>
+        <description><![CDATA[Dónde aportamos más valor.]]></description>
+        <content:encoded><![CDATA[
+<h1>Sectores a los que ayudamos</h1>
+<h2>Hoteles y resorts</h2>
+<p>KPIs: €/hab, kWh/estancia, ocupación vs. consumo base, ACS/SPA, cocina y lavandería.</p>
+<h2>Industria ligera</h2>
+<p>KPIs: kWh/unidad producida, demanda pico, factor de carga, aire comprimido y hornos.</p>
+<h2>Retail y oficinas</h2>
+<p>KPIs: kWh/m², horarios y climatización, iluminación y equipos TI.</p>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Experiencia real en turismo, industria ligera y retail.]]></excerpt:encoded>
+        <wp:post_id>6004</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:03:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:03:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:03:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:03:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[sectores-gestion-energia]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- Casos -->
+    <item>
+        <title><![CDATA[Casos de éxito y resultados]]></title>
+        <link>https://webtenseenergy.com/casos-exito-energia/</link>
+        <pubDate>Mon, 25 Aug 2025 11:04:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6005</guid>
+        <description><![CDATA[Resultados medibles.]]></description>
+        <content:encoded><![CDATA[
+<h1>Casos de éxito y resultados</h1>
+<p>Publicaremos casos reales con antes/después, medidas implantadas, inversión, ROI y seguimiento M&amp;V.</p>
+<h2>[Plantilla] Hotel X</h2>
+<ul>
+<li>Situación inicial</li>
+<li>Medidas</li>
+<li>Inversión</li>
+<li>Ahorro (kWh, €) y CO₂ evitado</li>
+<li>Payback y seguimiento</li>
+</ul>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Galería de proyectos con KPIs y ROI.]]></excerpt:encoded>
+        <wp:post_id>6005</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:04:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:04:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:04:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:04:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[casos-exito-energia]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- Reunión -->
+    <item>
+        <title><![CDATA[Solicita una reunión]]></title>
+        <link>https://webtenseenergy.com/solicita-una-reunion/</link>
+        <pubDate>Mon, 25 Aug 2025 11:05:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?page_id=6006</guid>
+        <description><![CDATA[Llama o reserva 30 minutos para revisar factura y consumos.]]></description>
+        <content:encoded><![CDATA[
+<h1>Solicita una reunión</h1>
+<p>Reserva una llamada de 30 minutos para revisar tu factura y consumos. Sin humo.</p>
+<ul>
+<li>Email: <a href="mailto:contacto@webtenseenergy.com">contacto@webtenseenergy.com</a></li>
+<li>WhatsApp: <a href="https://wa.me/34999999999" rel="nofollow">+34 999 99 99 99</a></li>
+</ul>
+<p>Usas Contact Form 7: <code>[contact-form-7 id="1" title="Contacto Gestión Energética"]</code></p>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Agenda una revisión energética gratis.]]></excerpt:encoded>
+        <wp:post_id>6006</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:05:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:05:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:05:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:05:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[closed]]></wp:comment_status>
+        <wp:ping_status><![CDATA[closed]]></wp:ping_status>
+        <wp:post_name><![CDATA[solicita-una-reunion]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[page]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+    </item>
+
+    <!-- Post de lanzamiento -->
+    <item>
+        <title><![CDATA[Lanzamos el servicio de Partner Energético]]></title>
+        <link>https://webtenseenergy.com/partner-energetico-webtense-energy/</link>
+        <pubDate>Mon, 25 Aug 2025 11:06:00 +0000</pubDate>
+        <dc:creator><![CDATA[Webtense Energy]]></dc:creator>
+        <guid isPermaLink="false">https://webtenseenergy.com/?p=7001</guid>
+        <description><![CDATA[Nuevo servicio B2B de gestión energética.]]></description>
+        <content:encoded><![CDATA[
+<h1>Partner Energético: nuevo servicio de Webtense Energy</h1>
+<p>Externaliza tu departamento de energía con nosotros. Independencia real, datos fiables y acciones que se notan en la factura. Si te suena bien, <a href="/solicita-una-reunion/">reserva una llamada</a>.</p>
+        ]]></content:encoded>
+        <excerpt:encoded><![CDATA[Presentación del servicio de gestión energética.]]></excerpt:encoded>
+        <wp:post_id>7001</wp:post_id>
+        <wp:post_date><![CDATA[2025-08-25 11:06:00]]></wp:post_date>
+        <wp:post_date_gmt><![CDATA[2025-08-25 11:06:00]]></wp:post_date_gmt>
+        <wp:post_modified><![CDATA[2025-08-25 11:06:00]]></wp:post_modified>
+        <wp:post_modified_gmt><![CDATA[2025-08-25 11:06:00]]></wp:post_modified_gmt>
+        <wp:comment_status><![CDATA[open]]></wp:comment_status>
+        <wp:ping_status><![CDATA[open]]></wp:ping_status>
+        <wp:post_name><![CDATA[partner-energetico-webtense-energy]]></wp:post_name>
+        <wp:status><![CDATA[publish]]></wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type><![CDATA[post]]></wp:post_type>
+        <wp:is_sticky>0</wp:is_sticky>
+        <category domain="category" nicename="gestion-energetica"><![CDATA[Gestión Energética]]></category>
+        <category domain="category" nicename="empresas"><![CDATA[Empresas]]></category>
+    </item>
+
+</channel>
+</rss>
+

@@ -1,0 +1,141 @@
+{
+  "name": "Amazon \u279d WooCommerce Auto Product (Shortlink Ready)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "nuevo-producto",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "webhook-producto-amazon"
+    },
+    {
+      "parameters": {
+        "functionCode": "\nlet inputUrl = $json.url || '';\nlet asin = $json.asin || null;\n\nif (inputUrl.includes('amzn.to')) {\n  return {\n    shortlink: inputUrl,\n    needsRedirect: true\n  };\n}\n\nif (!asin && inputUrl.includes('/dp/')) {\n  asin = inputUrl.split('/dp/')[1]?.split('/')[0];\n}\n\nif (!asin) {\n  throw new Error(\"ASIN no detectado. Aseg\u00farate de enviar un ASIN v\u00e1lido o una URL completa de Amazon.\");\n}\n\nreturn {\n  asin,\n  url: `https://www.amazon.es/dp/${asin}?tag=semillasdet02-21`,\n  resolved: true\n};\n"
+      },
+      "name": "Detectar y extraer ASIN",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.shortlink}}",
+        "options": {
+          "followRedirect": true,
+          "fullResponse": true
+        }
+      },
+      "name": "Resolver Shortlink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        750,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "\nlet resolvedUrl = $json.responseUrl || '';\nlet asin = null;\n\nif (resolvedUrl.includes('/dp/')) {\n  asin = resolvedUrl.split('/dp/')[1]?.split('/')[0];\n}\n\nif (!asin) {\n  throw new Error(\"No se pudo extraer ASIN desde el shortlink resuelto.\");\n}\n\nreturn {\n  asin,\n  url: `https://www.amazon.es/dp/${asin}?tag=semillasdet02-21`,\n  resolved: true\n};\n"
+      },
+      "name": "Extraer desde redirecci\u00f3n",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        950,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.woo.com/wp-json/wc/v3/products",
+        "method": "POST",
+        "authentication": "predefinedCredentialType",
+        "jsonParameters": true,
+        "bodyParametersJson": "\n{\n  \"name\": \"Producto desde Amazon\",\n  \"type\": \"external\",\n  \"regular_price\": \"22.99\",\n  \"sale_price\": \"18.99\",\n  \"description\": \"<p>Descripci\u00f3n generada autom\u00e1ticamente desde Amazon.</p>\",\n  \"short_description\": \"Producto afiliado para WooCommerce.\",\n  \"external_url\": \"={{$json.url}}\",\n  \"button_text\": \"Comprar en Amazon\",\n  \"images\": [\n    {\n      \"src\": \"https://via.placeholder.com/600x600.png?text=Amazon+Product\"\n    }\n  ],\n  \"categories\": [\n    {\n      \"id\": 12\n    }\n  ]\n}\n"
+      },
+      "name": "Crear Producto en WooCommerce",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "woocommerce-api"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Detectar y extraer ASIN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detectar y extraer ASIN": {
+      "main": [
+        [
+          {
+            "node": "Crear Producto en WooCommerce",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resolver Shortlink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolver Shortlink": {
+      "main": [
+        [
+          {
+            "node": "Extraer desde redirecci\u00f3n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer desde redirecci\u00f3n": {
+      "main": [
+        [
+          {
+            "node": "Crear Producto en WooCommerce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "amazon-woocommerce-importer",
+  "meta": {
+    "instanceId": "webtenseenergy-n8n",
+    "workflowId": "auto-producto-afiliado",
+    "createdAt": "2025-06-16T17:30:05.838126Z"
+  }
+}

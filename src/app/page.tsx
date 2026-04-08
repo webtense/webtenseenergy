@@ -1,11 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getSiteSettingValue } from "@/lib/site-settings";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const heroTitle = await getSiteSettingValue(
+    "home.hero.title",
+    "ES",
+    "Eficiencia y control para tu negocio y hogar",
+  );
+  const heroSubtitle = await getSiteSettingValue(
+    "home.hero.subtitle",
+    "ES",
+    "Soluciones energeticas personalizadas. Desde auditorias y reduccion de costes B2B, hasta domotica avanzada y ahorro para particulares.",
+  );
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] w-full overflow-hidden">
+      <section className="relative h-[64vh] min-h-[450px] w-full overflow-hidden">
         <Image
           src="/images/hero_home.png"
           alt="Transición energética para hogares y empresas"
@@ -15,12 +29,12 @@ export default function Home() {
         />
         <div className="container relative z-10 mx-auto flex h-full flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-6">
-            <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-              Eficiencia y control para <span className="text-primary-400">tu negocio y hogar</span>
-            </h1>
-            <p className="max-w-xl text-base sm:text-lg text-zinc-100 sm:text-xl leading-relaxed">
-              Soluciones energéticas personalizadas. Desde auditorías y reducción de costes B2B, hasta domótica avanzada y ahorro para particulares.
-            </p>
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+                {heroTitle}
+              </h1>
+              <p className="max-w-xl text-base sm:text-lg text-zinc-100 sm:text-xl leading-relaxed">
+                {heroSubtitle}
+              </p>
             <div className="flex flex-col gap-4 sm:flex-row pt-4">
               <Link
                 href="/empresas"

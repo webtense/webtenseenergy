@@ -1,16 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArticleCard } from "@/components/blog/ArticleCard";
 import { allPosts, getAllCategories, formatDate } from "@/lib/posts";
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [blogEnabled, setBlogEnabled] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/public/feature-flags")
+      .then(res => res.json())
+      .then(data => setBlogEnabled(data.blog !== false))
+      .catch(() => {});
+  }, []);
+
   const categories = getAllCategories();
 
   const filtered = activeCategory === "Todos"
     ? allPosts
     : allPosts.filter((p) => p.categories.includes(activeCategory));
+
+  if (!blogEnabled) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-foreground mb-4">Sección en mantenimiento</h1>
+          <p className="text-foreground/60">Vuelve pronto.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen pb-24 bg-background">

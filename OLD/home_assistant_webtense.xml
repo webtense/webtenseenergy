@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss xmlns="http://purl.org/rss/1.0/modules/content/" version="2.0">
+  <channel>
+    <title>Webtense Energy</title>
+    <link>https://webtenseenergy.com</link>
+    <description>Blog de domótica, automatización y ahorro energético</description>
+    <language>es-ES</language>
+    <pubDate>Mon, 16 Jun 2025 11:53:26 +0000</pubDate>
+    <item>
+      <title>Qué es Home Assistant y qué puedes hacer en tu casa inteligente (2025)</title>
+      <link>https://webtenseenergy.com/que-es-home-assistant-2025/</link>
+      <pubDate>Mon, 16 Jun 2025 08:00:00 +0000</pubDate>
+      <guid>https://webtenseenergy.com/que-es-home-assistant-2025/</guid>
+      <description>Descubre qué es Home Assistant, sus beneficios y cómo transformar tu casa en una vivienda inteligente y eficiente.</description>
+      <encoded><![CDATA[Aquí irá el contenido completo del post 1...]]></encoded>
+    </item>
+    <item>
+      <title>Cómo Instalar Home Assistant Paso a Paso (2025)</title>
+      <link>https://webtenseenergy.com/como-instalar-home-assistant-2025/</link>
+      <pubDate>Tue, 17 Jun 2025 08:00:00 +0000</pubDate>
+      <guid>https://webtenseenergy.com/como-instalar-home-assistant-2025/</guid>
+      <description>Guía completa con todos los métodos para instalar Home Assistant: desde Raspberry Pi hasta Docker.</description>
+      <encoded><![CDATA[Aquí irá el contenido completo del post 2...]]></encoded>
+    </item>
+    <item>
+      <title>Sensores para Home Assistant: Tipos, Usos y Mejores Opciones en Amazon (2025)</title>
+      <link>https://webtenseenergy.com/sensores-home-assistant-2025/</link>
+      <pubDate>Wed, 18 Jun 2025 08:00:00 +0000</pubDate>
+      <guid>https://webtenseenergy.com/sensores-home-assistant-2025/</guid>
+      <description>Explora todos los sensores que puedes integrar con Home Assistant para automatizar y ahorrar energía.</description>
+      <encoded><![CDATA[Aquí irá el contenido completo del post 3...]]></encoded>
+    </item>
+  </channel>
+</rss>

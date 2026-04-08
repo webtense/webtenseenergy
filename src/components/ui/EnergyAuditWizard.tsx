@@ -74,14 +74,24 @@ export default function EnergyAuditWizard() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFormData((prev) => ({ ...prev, file: e.dataTransfer.files[0] }));
+      const file = e.dataTransfer.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("El archivo supera 5MB. Sube una factura mas ligera.");
+        return;
+      }
+      setFormData((prev) => ({ ...prev, file }));
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files.length > 0) {
-      setFormData((prev) => ({ ...prev, file: e.target.files![0] }));
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("El archivo supera 5MB. Sube una factura mas ligera.");
+        return;
+      }
+      setFormData((prev) => ({ ...prev, file }));
     }
   };
 
@@ -90,18 +100,22 @@ export default function EnergyAuditWizard() {
     setIsSubmitting(true);
 
     try {
-      const submitData = {
-        method: formData.method,
-        fileName: formData.file?.name,
-        kwConsumed: formData.kwConsumed,
-        habits: formData.habits,
-        contact: formData.contact,
-      };
+      const body = new FormData();
+      body.set("method", formData.method || "manual");
+      body.set("kwConsumed", formData.kwConsumed || "");
+      body.set("habits", JSON.stringify(formData.habits));
+      body.set("name", formData.contact.name);
+      body.set("email", formData.contact.email);
+      body.set("phone", formData.contact.phone);
+      body.set("company", formData.contact.company);
+
+      if (formData.file) {
+        body.set("invoice", formData.file, formData.file.name);
+      }
 
       const response = await fetch('/api/estudio', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData),
+        body,
       });
 
       if (!response.ok) {
