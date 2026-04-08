@@ -51,6 +51,50 @@ function setCachedData(data: ElectricityApiResponse): void {
   cachedAt = Date.now();
 }
 
+function buildFallbackData(now: Date): ElectricityApiResponse {
+  const prices = [
+    0.0796, 0.08957, 0.08616, 0.07926, 0.08678, 0.10176,
+    0.11121, 0.13404, 0.15049, 0.12427, 0.17237, 0.15534,
+    0.15686, 0.15317, 0.08561, 0.08754, 0.09796, 0.13033,
+    0.24084, 0.28096, 0.27663, 0.25874, 0.18902, 0.17891,
+  ];
+
+  const hourly: PriceEntry[] = prices.map((value, hour) => ({
+    hour: `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1)
+      .toString()
+      .padStart(2, '0')}:00`,
+    price: value,
+  }));
+
+  const currentHour = now.getHours();
+  const currentPrice = hourly[currentHour]?.price ?? prices[0];
+  const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  return {
+    date: now.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+    now: Math.round(currentPrice * 10000) / 10000,
+    average: Math.round(average * 10000) / 10000,
+    min: {
+      price: Math.round(minPrice * 10000) / 10000,
+      time: hourly.find((h) => h.price === minPrice)?.hour ?? '',
+    },
+    max: {
+      price: Math.round(maxPrice * 10000) / 10000,
+      time: hourly.find((h) => h.price === maxPrice)?.hour ?? '',
+    },
+    hourly,
+    source: 'fallback-local',
+    updatedAt: now.toISOString(),
+  };
+}
+
 export async function GET() {
   try {
     const cached = getCachedData();
@@ -145,10 +189,15 @@ export async function GET() {
         cacheWarning: 'Using cached data due to API error',
       });
     }
-    
-    return NextResponse.json(
-      { error: 'Failed to fetch electricity prices', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+
+    const fallback = buildFallbackData(new Date());
+    setCachedData(fallback);
+
+    return NextResponse.json({
+      ...fallback,
+      fromFallback: true,
+      fallbackWarning: 'Using local fallback data due to API error',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 }
