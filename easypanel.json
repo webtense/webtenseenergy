@@ -8,7 +8,7 @@
   "services": {
     "webtense-energy": {
       "name": "webtense-energy",
-      "image": "node:20-alpine",
+      "image": "ghcr.io/webtense/webtenseenergy/webtense-energy:latest",
       "environment": {
         "NODE_ENV": "production",
         "DATABASE_URL": "file:./data/webtense.db"
