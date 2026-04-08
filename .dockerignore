@@ -3,3 +3,7 @@ node_modules
 .next
 *.md
 .DS_Store
+.env*
+OLD/
+*.xml
+*.zip

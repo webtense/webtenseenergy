@@ -12,6 +12,26 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Additional ignores for legacy and test files:
+    "OLD/**",
+    "docs/**",
+    "scripts/**",
+    "*.md",
+    "*.txt",
+    "*.xml",
+    "*.zip",
+    "*.log",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "tsconfig.tsbuildinfo",
+    ".git/",
+    ".gitignore",
+    ".DS_Store",
+    "Thumbs.db",
+    // Env files but keep example
+    "!*.env.example",
+    ".env*",
   ]),
 ]);
 
