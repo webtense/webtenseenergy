@@ -45,7 +45,7 @@ DATABASE_URL=file:./data/webtense.db
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=webtense@gmail.com
-SMTP_PASS=caeo wstp dcit avkw
+SMTP_PASS=TU_SMTP_PASS_AQUI
 EMAIL_FROM=info@webtenseenergy.com
 NEXT_PUBLIC_WHATSAPP=34691521367
 EOF
