@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateWithOpenRouter } from "@/lib/ai/openrouter";
+import { checkRateLimit, getClientIp, hashIdentifier } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,16 @@ function fallback(topic: string, locale: "es" | "ca") {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateKey = hashIdentifier(`ai:${ip}`);
+  const rate = checkRateLimit({ key: rateKey, limit: 20, windowMs: 60_000 });
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { message: "Rate limit excedido" },
+      { status: 429, headers: { "Retry-After": rate.retryAfter.toString() } },
+    );
+  }
+
   const body = (await request.json()) as SuggestPayload;
   const locale = body.locale === "ca" ? "ca" : "es";
   const topic = body.topic?.trim() || (locale === "ca" ? "estalvi energetic" : "ahorro energetico");

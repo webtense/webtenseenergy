@@ -14,6 +14,7 @@ type UpdatePayload = {
   featuredImage?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  category?: string | null;
 };
 
 function toSlug(value: string) {
@@ -25,6 +26,10 @@ function toSlug(value: string) {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+function toCategorySlug(value: string) {
+  return toSlug(value) || "general";
 }
 
 interface Props {
@@ -43,7 +48,13 @@ export async function PUT(request: Request, { params }: Props) {
 
   try {
     const body = (await request.json()) as UpdatePayload;
-    const post = await db.post.findUnique({ where: { id }, include: { translations: true } });
+    const post = await db.post.findUnique({
+      where: { id },
+      include: {
+        translations: true,
+        categories: true,
+      },
+    });
     if (!post) {
       return NextResponse.json({ message: "Post no encontrado" }, { status: 404 });
     }
@@ -51,6 +62,22 @@ export async function PUT(request: Request, { params }: Props) {
     const locale = body.locale === "CA" ? "CA" : "ES";
     const status = body.status || post.status;
     const slug = body.slug ? toSlug(body.slug) : post.slug;
+    const categoryName = body.category?.trim();
+
+    const category = categoryName
+      ? await db.category.upsert({
+          where: { slug: toCategorySlug(categoryName) },
+          create: {
+            slug: toCategorySlug(categoryName),
+            name: categoryName,
+            locale,
+          },
+          update: {
+            name: categoryName,
+            locale,
+          },
+        })
+      : null;
 
     if (!slug) {
       return NextResponse.json({ message: "Slug invalido" }, { status: 400 });
@@ -79,10 +106,20 @@ export async function PUT(request: Request, { params }: Props) {
             : status === "ARCHIVED" || status === "DRAFT"
               ? null
               : post.publishedAt,
+        ...(category
+          ? {
+              categories: {
+                deleteMany: {},
+                create: {
+                  categoryId: category.id,
+                },
+              },
+            }
+          : {}),
       },
     });
 
-    const existingTranslation = post.translations.find((item) => item.locale === locale);
+    const existingTranslation = post.translations.find((item: { locale: string }) => item.locale === locale);
     if (existingTranslation) {
       await db.postTranslation.update({
         where: { id: existingTranslation.id },
@@ -108,6 +145,11 @@ export async function PUT(request: Request, { params }: Props) {
       where: { id },
       include: {
         translations: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     });
 

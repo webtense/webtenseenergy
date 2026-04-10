@@ -65,10 +65,18 @@ export function hashIdentifier(value: string): string {
 export function isSameOrigin(request: Request): boolean {
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
-  if (!origin || !host) return true;
+  if (!host) return false;
+
   try {
-    const originUrl = new URL(origin);
-    return originUrl.host === host;
+    if (origin) {
+      const originUrl = new URL(origin);
+      return originUrl.host === host;
+    }
+
+    const referer = request.headers.get("referer");
+    if (!referer) return false;
+    const refererUrl = new URL(referer);
+    return refererUrl.host === host;
   } catch {
     return false;
   }

@@ -12,9 +12,9 @@ type SessionPayload = {
 };
 
 function getSecret() {
-  const secret = process.env.ADMIN_SESSION_SECRET || process.env.NEXTAUTH_SECRET;
+  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_SECRET;
   if (!secret) {
-    throw new Error("ADMIN_SESSION_SECRET no configurado.");
+    throw new Error("ADMIN_SESSION_SECRET o ADMIN_SECRET no configurado.");
   }
   return secret;
 }

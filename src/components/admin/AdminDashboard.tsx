@@ -93,7 +93,7 @@ export function AdminDashboard({ user, flags, settings }: Props) {
   };
 
   return (
-    <div className="min-h-[80vh] bg-zinc-950 px-4 py-12 text-zinc-100">
+    <div className="space-y-8">
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-zinc-900 p-6 md:flex-row md:items-center md:justify-between">
           <div>

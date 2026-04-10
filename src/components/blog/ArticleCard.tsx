@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { withBasePath } from "@/lib/paths";
 
 // Colores por categoría más vibrantes para el nuevo diseño premium
 const CATEGORY_COLORS: Record<string, { bg: string, text: string, border: string, glow: string }> = {
@@ -18,9 +19,10 @@ interface ArticleCardProps {
   date: string;
   slug: string;
   featuredImage?: string | null;
+  basePath?: string;
 }
 
-export function ArticleCard({ title, excerpt, category, date, slug, featuredImage }: ArticleCardProps) {
+export function ArticleCard({ title, excerpt, category, date, slug, featuredImage, basePath = "" }: ArticleCardProps) {
   const colors = CATEGORY_COLORS[category] ?? DEFAULT_COLOR;
 
   // Icono aleatorio según categoría usando las nuevas especificaciones de color
@@ -36,7 +38,7 @@ export function ArticleCard({ title, excerpt, category, date, slug, featuredImag
 
   return (
     <Link
-      href={`/blog/${slug}`}
+      href={withBasePath(basePath, `/blog/${slug}`)}
       className={`group flex flex-col justify-between bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 h-full relative shadow-sm hover:shadow-lg ${colors.glow}`}
     >
       {/* Efecto Glow Superior */}

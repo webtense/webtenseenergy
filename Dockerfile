@@ -3,6 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
+RUN npx prisma generate
+ARG DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/webtense_energy?schema=public"
+ENV DATABASE_URL=${DATABASE_URL}
 RUN npm run build
 
 FROM node:20-alpine
