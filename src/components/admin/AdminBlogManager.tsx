@@ -19,8 +19,17 @@ type Post = {
   seoTitle: string | null;
   seoDescription: string | null;
   locale: "ES" | "CA";
+  category: string;
   translations: Translation[];
   updatedAt: string;
+};
+
+type ApiPost = Post & {
+  categories?: Array<{
+    category?: {
+      name?: string;
+    };
+  }>;
 };
 
 type Props = {
@@ -39,6 +48,7 @@ type FormState = {
   featuredImage: string;
   seoTitle: string;
   seoDescription: string;
+  category: string;
 };
 
 const EMPTY_FORM: FormState = {
@@ -52,6 +62,7 @@ const EMPTY_FORM: FormState = {
   featuredImage: "",
   seoTitle: "",
   seoDescription: "",
+  category: "",
 };
 
 function toSlug(value: string) {
@@ -70,6 +81,11 @@ export function AdminBlogManager({ initialPosts }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const normalizePost = (post: ApiPost): Post => ({
+    ...post,
+    category: post.category || post.categories?.[0]?.category?.name || "",
+  });
 
   const editing = useMemo(() => posts.find((item) => item.id === form.id), [posts, form.id]);
 
@@ -91,14 +107,15 @@ export function AdminBlogManager({ initialPosts }: Props) {
       featuredImage: post.featuredImage || "",
       seoTitle: post.seoTitle || "",
       seoDescription: post.seoDescription || "",
+      category: post.category || "",
     });
   };
 
   const loadPosts = async () => {
     const response = await fetch("/api/admin/posts");
     if (!response.ok) return;
-    const payload = (await response.json()) as { posts: Post[] };
-    setPosts(payload.posts);
+    const payload = (await response.json()) as { posts: ApiPost[] };
+    setPosts(payload.posts.map(normalizePost));
   };
 
   const submit = async () => {
@@ -117,6 +134,7 @@ export function AdminBlogManager({ initialPosts }: Props) {
         featuredImage: form.featuredImage || null,
         seoTitle: form.seoTitle || null,
         seoDescription: form.seoDescription || null,
+        category: form.category || null,
       };
 
       const response = await fetch(form.id ? `/api/admin/posts/${form.id}` : "/api/admin/posts", {
@@ -260,6 +278,12 @@ export function AdminBlogManager({ initialPosts }: Props) {
               className="rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
             />
           </div>
+          <input
+            value={form.category}
+            onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
+            placeholder="Categoria (ej. Ofertas, Domótica)"
+            className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+          />
           <input
             value={form.featuredImage}
             onChange={(event) => setForm((prev) => ({ ...prev, featuredImage: event.target.value }))}

@@ -15,6 +15,7 @@ type PostPayload = {
   featuredImage?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  category?: string | null;
 };
 
 function toSlug(value: string) {
@@ -28,6 +29,10 @@ function toSlug(value: string) {
     .replace(/-+/g, "-");
 }
 
+function toCategorySlug(value: string) {
+  return toSlug(value) || "general";
+}
+
 export async function GET() {
   const auth = await requireAdminApiUser();
   if ("error" in auth) return auth.error;
@@ -35,6 +40,11 @@ export async function GET() {
   const posts = await db.post.findMany({
     include: {
       translations: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       author: {
         select: {
           username: true,
@@ -77,6 +87,21 @@ export async function POST(request: Request) {
 
     const status = body.status || "DRAFT";
     const scheduledFor = body.scheduledFor ? new Date(body.scheduledFor) : null;
+    const categoryName = body.category?.trim() || null;
+    const category = categoryName
+      ? await db.category.upsert({
+          where: { slug: toCategorySlug(categoryName) },
+          create: {
+            slug: toCategorySlug(categoryName),
+            name: categoryName,
+            locale,
+          },
+          update: {
+            name: categoryName,
+            locale,
+          },
+        })
+      : null;
 
     const post = await db.post.create({
       data: {
@@ -97,9 +122,23 @@ export async function POST(request: Request) {
             content,
           },
         },
+        ...(category
+          ? {
+              categories: {
+                create: {
+                  categoryId: category.id,
+                },
+              },
+            }
+          : {}),
       },
       include: {
         translations: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     });
 
