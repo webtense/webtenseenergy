@@ -30,7 +30,7 @@ export function OfertasPage() {
       oldPrice: "299,00€",
       categoria: "Solar",
       discount: "-33%",
-      url: "#",
+      url: "https://www.amazon.es/s?k=kit+panel+solar+400w&tag=semillasdet02-21",
       icon: "☀️",
     },
     {
@@ -39,7 +39,7 @@ export function OfertasPage() {
       oldPrice: "89,99€",
       categoria: "Domótica",
       discount: "-50%",
-      url: "#",
+      url: "https://www.amazon.es/s?k=termostato+inteligente+wifi&tag=semillasdet02-21",
       icon: "🌡️",
     },
     {
@@ -48,7 +48,7 @@ export function OfertasPage() {
       oldPrice: "34,99€",
       categoria: "Domótica",
       discount: "-28%",
-      url: "#",
+      url: "https://www.amazon.es/s?k=enchufe+inteligente+wifi&tag=semillasdet02-21",
       icon: "🔌",
     },
     {
@@ -57,7 +57,7 @@ export function OfertasPage() {
       oldPrice: "45,00€",
       categoria: "Ahorro",
       discount: "-28%",
-      url: "#",
+      url: "https://www.amazon.es/s?k=medidor+consumo+electrico+carril+din&tag=semillasdet02-21",
       icon: "📊",
     },
   ];
