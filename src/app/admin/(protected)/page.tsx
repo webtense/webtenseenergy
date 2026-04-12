@@ -1,27 +1,15 @@
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { getAdminSession } from "@/lib/admin-auth";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminBlogManager } from "@/components/admin/AdminBlogManager";
 import { AdminDealsManager } from "@/components/admin/AdminDealsManager";
+import { AdminPipelineManager } from "@/components/admin/AdminPipelineManager";
 import { ensureAdminDefaults } from "@/lib/admin-defaults";
+import { requireAdminPageUser } from "@/server/auth/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const session = await getAdminSession();
-  if (!session) {
-    redirect("/admin/login");
-  }
-
-  const user = await db.adminUser.findUnique({
-    where: { id: session.userId },
-    select: { id: true, username: true, role: true, isActive: true },
-  });
-
-  if (!user || !user.isActive) {
-    redirect("/admin/login");
-  }
+  const user = await requireAdminPageUser();
 
   await ensureAdminDefaults();
 
@@ -39,6 +27,17 @@ export default async function AdminPage() {
     orderBy: [{ updatedAt: "desc" }],
   });
   const deals = await db.telegramDeal.findMany({ orderBy: [{ updatedAt: "desc" }] });
+  const leads = await db.lead.findMany({
+    include: {
+      notes: {
+        include: { adminUser: { select: { username: true } } },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+    orderBy: [{ createdAt: "desc" }],
+    take: 20,
+  });
+  const studies = await db.studyRequest.findMany({ orderBy: [{ createdAt: "desc" }], take: 20 });
 
   return (
     <div className="min-h-[80vh] bg-zinc-950 px-4 py-12 text-zinc-100">
@@ -79,6 +78,20 @@ export default async function AdminPage() {
             }))}
           />
         </section>
+        <AdminPipelineManager
+          initialLeads={leads.map((lead) => ({
+            ...lead,
+            createdAt: lead.createdAt.toISOString(),
+            notes: lead.notes.map((note) => ({
+              ...note,
+              createdAt: note.createdAt.toISOString(),
+            })),
+          }))}
+          initialStudies={studies.map((study) => ({
+            ...study,
+            createdAt: study.createdAt.toISOString(),
+          }))}
+        />
       </div>
     </div>
   );

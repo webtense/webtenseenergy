@@ -1,10 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
-const SESSION_COOKIE = "wt_admin_session";
+const SESSION_COOKIE = process.env.ADMIN_SESSION_COOKIE_NAME || "wt_admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
-type SessionPayload = {
+export type AdminSessionPayload = {
   userId: string;
   role: "ADMIN" | "EDITOR";
   username: string;
@@ -33,7 +33,7 @@ function sign(payload: string, secret: string) {
 
 export function createAdminSessionToken(userId: string, username: string, role: "ADMIN" | "EDITOR") {
   const secret = getSecret();
-  const body: SessionPayload = {
+  const body: AdminSessionPayload = {
     userId,
     role,
     username,
@@ -44,7 +44,7 @@ export function createAdminSessionToken(userId: string, username: string, role: 
   return `${encoded}.${signature}`;
 }
 
-export function verifyAdminSessionToken(token: string): SessionPayload | null {
+export function verifyAdminSessionToken(token: string): AdminSessionPayload | null {
   try {
     const [encoded, signature] = token.split(".");
     if (!encoded || !signature) return null;
@@ -57,7 +57,7 @@ export function verifyAdminSessionToken(token: string): SessionPayload | null {
     const isValid = timingSafeEqual(actualBuffer, expectedBuffer);
     if (!isValid) return null;
 
-    const parsed = JSON.parse(fromBase64Url(encoded)) as SessionPayload;
+    const parsed = JSON.parse(fromBase64Url(encoded)) as AdminSessionPayload;
     if (!parsed.userId || !parsed.exp || parsed.exp < Math.floor(Date.now() / 1000)) {
       return null;
     }

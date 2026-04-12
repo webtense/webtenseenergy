@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { SESSION_COOKIE } from "@/lib/admin-auth";
 import { isSameOrigin } from "@/lib/security";
+import { getAuthenticatedAdmin } from "@/server/auth/admin";
+import { createAuditLog } from "@/server/services/audit-log";
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
@@ -8,6 +10,7 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true });
+  const user = await getAuthenticatedAdmin();
   response.cookies.set({
     name: SESSION_COOKIE,
     value: "",
@@ -16,6 +19,18 @@ export async function POST(request: Request) {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
+    priority: "high",
   });
+
+  if (user) {
+    await createAuditLog({
+      adminUserId: user.id,
+      action: "admin_logout",
+      entityType: "AdminUser",
+      entityId: user.id,
+      status: "ok",
+    });
+  }
+
   return response;
 }

@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [main]
+    branches: [develop, main]
   workflow_dispatch:
 
 jobs:
@@ -36,7 +36,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha
-            type=raw,value=latest,enable=true
+            type=raw,value=staging,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -45,8 +46,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Publish deployment URL
-        run: echo "ghcr.io/${{ github.repository }}/webtense-energy:latest"
+        run: echo "ghcr.io/${{ github.repository }}/webtense-energy"

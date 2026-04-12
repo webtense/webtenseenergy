@@ -1,5 +1,10 @@
 # WEBTENSE ENERGY - Documentacion completa del proyecto
 
+> Estado: documento obsoleto. No usar como fuente principal.
+>
+> La documentacion activa y canonica esta en `docs/`, empezando por:
+> `docs/00-auditoria-inicial.md`, `docs/01-arquitectura-objetivo.md` y `docs/06-decisiones-tecnicas.md`.
+
 ## 1) Resumen del proyecto
 
 WEBTENSE ENERGY es una app web hecha con Next.js (App Router) enfocada en:

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type FeatureFlag = {
@@ -102,6 +103,17 @@ export function AdminDashboard({ user, flags, settings }: Props) {
             <p className="mt-2 text-sm text-zinc-400">
               Sesion: {user.username} ({user.role})
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              <Link href="/admin" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+                Dashboard
+              </Link>
+              <Link href="/admin/leads" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+                Leads
+              </Link>
+              <Link href="/admin/studies" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+                Studies
+              </Link>
+            </div>
           </div>
           <button
             type="button"

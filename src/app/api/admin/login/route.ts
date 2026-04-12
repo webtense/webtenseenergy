@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { createAdminSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/admin-auth";
 import { checkRateLimit, getClientIp, hashIdentifier, isSameOrigin, normalizeEmail } from "@/lib/security";
+import { createAuditLog } from "@/server/services/audit-log";
 
 export const runtime = "nodejs";
 
@@ -43,11 +44,26 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
+      await createAuditLog({
+        action: "admin_login",
+        entityType: "AdminUser",
+        status: "failed",
+        ipHash: hashIdentifier(getClientIp(request)),
+        metadata: JSON.stringify({ identifier: normalized }),
+      });
       return NextResponse.json({ message: "Usuario o clave incorrectos" }, { status: 401 });
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
+      await createAuditLog({
+        adminUserId: user.id,
+        action: "admin_login",
+        entityType: "AdminUser",
+        entityId: user.id,
+        status: "failed",
+        ipHash: hashIdentifier(getClientIp(request)),
+      });
       return NextResponse.json({ message: "Usuario o clave incorrectos" }, { status: 401 });
     }
 
@@ -61,6 +77,16 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: SESSION_MAX_AGE,
+      priority: "high",
+    });
+
+    await createAuditLog({
+      adminUserId: user.id,
+      action: "admin_login",
+      entityType: "AdminUser",
+      entityId: user.id,
+      status: "ok",
+      ipHash: hashIdentifier(getClientIp(request)),
     });
 
     return response;

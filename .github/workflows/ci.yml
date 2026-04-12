@@ -1,0 +1,47 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
+        run: npm run db:generate
+
+      - name: Lint
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
+        run: npm run lint
+
+      - name: Typecheck
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
+        run: npm run typecheck
+
+      - name: Build
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
+          NEXT_PUBLIC_SITE_URL: https://webtenseenergy.com
+          ADMIN_SESSION_SECRET: ci-build-secret
+        run: npm run build

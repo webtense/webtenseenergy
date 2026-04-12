@@ -11,7 +11,7 @@ type SiteSettingInput = {
 };
 
 export async function GET() {
-  const result = await requireAdminApiUser();
+  const result = await requireAdminApiUser("ADMIN");
   if ("error" in result) return result.error;
 
   await ensureAdminDefaults();
@@ -25,7 +25,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
   }
 
-  const result = await requireAdminApiUser();
+  const result = await requireAdminApiUser("ADMIN");
   if ("error" in result) return result.error;
 
   try {

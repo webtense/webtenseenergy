@@ -1,5 +1,9 @@
 # WEBTENSE ENERGY - Documentación del Proyecto
 
+> Estado: documento legado. Puede contener referencias historicas no alineadas con el estado real del repo.
+>
+> La documentacion activa y canonica esta en `docs/`.
+
 ## Índice
 
 1. [Visión General](#visión-general)

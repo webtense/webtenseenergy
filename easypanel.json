@@ -11,9 +11,13 @@
       "image": "ghcr.io/webtense/webtenseenergy/webtense-energy:latest",
       "environment": {
         "NODE_ENV": "production",
+        "APP_ENV": "production",
+        "PORT": "3010",
         "DATABASE_URL": "__SET_IN_EASYPANEL__",
         "NEXT_PUBLIC_SITE_URL": "https://webtenseenergy.com",
+        "APP_BASE_URL": "https://webtenseenergy.com",
         "ADMIN_SESSION_SECRET": "__SET_IN_EASYPANEL__",
+        "ADMIN_SESSION_COOKIE_NAME": "wt_admin_session",
         "ADMIN_EMAIL": "__SET_IN_EASYPANEL__",
         "ADMIN_USERNAME": "__SET_IN_EASYPANEL__",
         "ADMIN_PASSWORD": "__SET_IN_EASYPANEL__",
@@ -31,7 +35,11 @@
         "OPENROUTER_API_KEY": "__OPTIONAL__",
         "OPENROUTER_MODEL": "openrouter/auto",
         "OPENROUTER_BASE_URL": "https://openrouter.ai/api/v1",
-        "OPENROUTER_TIMEOUT_MS": "15000"
+        "OPENROUTER_TIMEOUT_MS": "15000",
+        "ESIOS_TOKEN": "__OPTIONAL__",
+        "NEWSLETTER_SENDER_NAME": "Webtense Energy",
+        "NEWSLETTER_REPLY_TO": "info@webtenseenergy.com",
+        "CRON_SECRET": "__SET_IN_EASYPANEL__"
       },
       "ports": [
         {

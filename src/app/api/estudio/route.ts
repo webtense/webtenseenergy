@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 import {
   checkRateLimit,
   escapeHtml,
@@ -9,18 +8,9 @@ import {
   normalizeEmail,
 } from "@/lib/security";
 import { scanFile } from "@/lib/antivirus";
+import { submitStudyRequest } from "@/server/services/study-service";
 
 export const runtime = "nodejs";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 const HABIT_LABELS: Record<string, string> = {
   trabajo_casa: "Trabajo desde casa",
@@ -90,7 +80,14 @@ export async function POST(request: Request) {
         ? `Subida de factura: ${hasInvoice ? escapeHtml(invoiceFile.name) : "No se adjunto archivo"}`
         : `Consumo manual: ${safeKwConsumed || "No especificado"} kWh`;
 
-    const attachments: nodemailer.SendMailOptions["attachments"] = [];
+    let invoiceData:
+      | {
+          name: string;
+          type: string;
+          size: number;
+          buffer: Buffer;
+        }
+      | null = null;
 
     if (hasInvoice && invoiceFile instanceof File) {
       const allowedMimeTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
@@ -119,61 +116,26 @@ export async function POST(request: Request) {
         );
       }
 
-      attachments.push({
-        filename: invoiceFile.name,
-        content: fileBuffer,
-        contentType: invoiceFile.type,
-      });
+      invoiceData = {
+        name: invoiceFile.name,
+        type: invoiceFile.type,
+        size: invoiceFile.size,
+        buffer: fileBuffer,
+      };
     }
-
-    const mailOptions: nodemailer.SendMailOptions = {
-      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
-      replyTo: email,
-      to: process.env.EMAIL_FROM || "info@webtenseenergy.com",
-      subject: `Nueva solicitud estudio energetico: ${name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2 style="color: #1ab775;">Nueva Solicitud de Estudio Energetico</h2>
-          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString("es-ES", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}</p>
-
-          <h3 style="margin-top: 20px; color: #0f935d;">Datos de Contacto</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Nombre:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${name}</td></tr>
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${email}</td></tr>
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Telefono:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${phone || "No indicado"}</td></tr>
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Compania actual:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${company || "No indicada"}</td></tr>
-          </table>
-
-          <h3 style="margin-top: 20px; color: #0f935d;">Analisis solicitado</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Metodo:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${analysisMethod}</td></tr>
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Habitos seleccionados:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${habitsText}</td></tr>
-            <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Factura adjunta:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${hasInvoice ? "Si" : "No"}</td></tr>
-          </table>
-
-          <div style="margin-top: 20px; padding: 15px; background: #effdf5; border-radius: 8px;">
-            <p style="margin: 0; color: #0f935d;"><strong>Prioridad:</strong> Responder en menos de 24 horas.</p>
-          </div>
-        </div>
-      `,
-      attachments,
-    };
-
-    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
-      await transporter.sendMail(mailOptions);
-    } else {
-      console.warn("SMTP no configurado. Simulando envio de estudio:", {
-        name,
-        email,
-        method,
-        hasInvoice,
-      });
-    }
+    await submitStudyRequest({
+      request,
+      method,
+      kwConsumed: safeKwConsumed,
+      habits,
+      name,
+      email,
+      phone,
+      company,
+      invoiceFile: invoiceData,
+      habitsText,
+      analysisMethod,
+    });
 
     return NextResponse.json({ success: true, message: "Solicitud enviada correctamente" });
   } catch (error) {
