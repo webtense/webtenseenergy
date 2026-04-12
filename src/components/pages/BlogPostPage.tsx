@@ -5,6 +5,8 @@ import { formatDate } from "@/lib/blog-shared";
 import { getPublishedPostBySlug, type BlogLocale } from "@/lib/content-posts";
 import { withBasePath } from "@/lib/paths";
 import { getSiteUrl, SITE_NAME } from "@/lib/seo";
+import { SectionHero } from "@/components/shared/SectionHero";
+import { ActionBanner } from "@/components/shared/ActionBanner";
 
 type BlogPostPageProps = {
   slug: string;
@@ -12,30 +14,21 @@ type BlogPostPageProps = {
   locale: BlogLocale;
 };
 
-// Colores de categoría
 const CATEGORY_COLORS: Record<string, string> = {
-  "Domótica": "text-blue-600 dark:text-blue-400",
-  "Ahorro Energético": "text-emerald-600 dark:text-green-400",
-  "Ofertas": "text-orange-600 dark:text-orange-400",
-  "Reseñas": "text-purple-600 dark:text-purple-400",
-  "Gestión Energética": "text-yellow-600 dark:text-yellow-400",
+  "Domótica": "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300",
+  "Ahorro Energético": "bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300",
+  Ofertas: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
+  Reseñas: "bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300",
+  "Gestión Energética": "bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300",
 };
 
 export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps) {
   const post = await getPublishedPostBySlug(slug, locale);
 
-  if (!post) {
-    notFound();
-  }
+  if (!post) notFound();
 
-  const categoryColor = CATEGORY_COLORS[post.category] ?? "text-primary-600 dark:text-primary-400";
-
-  // Limpiar los comentarios de bloques de Gutenberg del contenido
-  const cleanContent = post.content
-    .replace(/<!-- wp:[^>]*?-->/g, "")
-    .replace(/<!-- \/wp:[^>]*?-->/g, "")
-    .trim();
-
+  const categoryClass = CATEGORY_COLORS[post.category] ?? "bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300";
+  const cleanContent = post.content.replace(/<!-- wp:[^>]*?-->/g, "").replace(/<!-- \/wp:[^>]*?-->/g, "").trim();
   const safeContent = sanitizeHtml(cleanContent, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "span"]),
     allowedAttributes: {
@@ -52,9 +45,7 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
   const baseUrl = getSiteUrl();
   const articlePath = withBasePath(basePath, `/blog/${slug}`);
   const articleUrl = new URL(articlePath, baseUrl).toString();
-  const imageUrl = post.featuredImage && !post.featuredImage.startsWith("/images/")
-    ? post.featuredImage
-    : new URL("/images/hero_home.png", baseUrl).toString();
+  const imageUrl = post.featuredImage && !post.featuredImage.startsWith("/images/") ? post.featuredImage : new URL("/images/hero_home.png", baseUrl).toString();
 
   const articleSchema = JSON.stringify({
     "@context": "https://schema.org",
@@ -64,17 +55,11 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
     image: imageUrl,
     datePublished: post.date,
     dateModified: post.date,
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": articleUrl,
-    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
-      logo: {
-        "@type": "ImageObject",
-        url: new URL("/images/hero_home.png", baseUrl).toString(),
-      },
+      logo: { "@type": "ImageObject", url: new URL("/images/hero_home.png", baseUrl).toString() },
     },
   });
 
@@ -82,100 +67,73 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Blog",
-        item: new URL(withBasePath(basePath, "/blog"), baseUrl).toString(),
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: post.title,
-        item: articleUrl,
-      },
+      { "@type": "ListItem", position: 1, name: "Blog", item: new URL(withBasePath(basePath, "/blog"), baseUrl).toString() },
+      { "@type": "ListItem", position: 2, name: post.title, item: articleUrl },
     ],
   });
 
   return (
-    <article className="min-h-screen pb-24 bg-background">
+    <article className="min-h-screen bg-background pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleSchema }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema }} />
-      {/* Header del artículo */}
-      <header className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-white/5 py-16 md:py-24">
-        <div className="container mx-auto px-4 max-w-3xl text-center">
-          <div className="mb-6 flex items-center justify-center gap-4 text-sm font-medium">
-            <span className={`font-bold ${categoryColor}`}>{post.category}</span>
-            <span className="text-foreground/40 dark:text-zinc-600">•</span>
-            <span className="text-foreground/60 dark:text-zinc-400">{formatDate(post.date)}</span>
+
+      <SectionHero
+        eyebrow="Artículo"
+        title={post.title}
+        subtitle={post.excerpt || "Una guía práctica pensada para entender mejor la energía, la domótica y las decisiones que realmente mueven ahorro."}
+        compact
+        align="center"
+      />
+
+      <section className="section-shell-tight">
+        <div className="section-inner max-w-6xl">
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-sm">
+            <span className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.14em] ${categoryClass}`}>{post.category}</span>
+            <span className="text-foreground/40">•</span>
+            <span className="text-foreground/55">{formatDate(post.date)}</span>
           </div>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-8 leading-tight">
-            {post.title}
-          </h1>
-          {post.excerpt && (
-            <p className="text-lg text-foreground/70 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto">{post.excerpt}</p>
-          )}
-        </div>
-      </header>
 
-      {/* Imagen destacada */}
-      {post.featuredImage && !post.featuredImage.startsWith("/images/") && (
-        <div className="container mx-auto px-4 max-w-3xl -mt-6 sm:-mt-10 relative z-10">
-          <div className="rounded-2xl overflow-hidden shadow-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-white/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.featuredImage} alt={post.title} className="w-full max-h-[500px] object-cover" />
+          {post.featuredImage && !post.featuredImage.startsWith("/images/") ? (
+            <div className="surface-panel overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={post.featuredImage} alt={post.title} className="max-h-[560px] w-full object-cover" />
+            </div>
+          ) : null}
+
+          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+            <div
+              className="prose prose-zinc dark:prose-invert max-w-none prose-lg prose-p:text-foreground/80 dark:prose-p:text-zinc-300 prose-p:leading-relaxed prose-headings:text-foreground dark:prose-headings:text-white prose-headings:font-heading prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-a:text-primary-600 dark:prose-a:text-primary-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground dark:prose-strong:text-white prose-li:text-foreground/80 dark:prose-li:text-zinc-300 prose-img:rounded-[1.4rem] prose-img:shadow-xl prose-blockquote:border-primary-500 prose-blockquote:bg-zinc-50 dark:prose-blockquote:bg-white/5 prose-blockquote:rounded-r-2xl prose-blockquote:px-6 prose-blockquote:py-4"
+              dangerouslySetInnerHTML={{ __html: safeContent }}
+            />
+
+            <aside className="space-y-4 lg:sticky lg:top-24">
+              <div className="surface-panel-soft p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">En esta guía</p>
+                <p className="mt-3 text-sm leading-7 text-foreground/70">Una lectura enfocada a entender mejor el contexto, evaluar opciones y enlazar el contenido con una siguiente acción práctica.</p>
+              </div>
+              <div className="surface-panel-soft p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">Siguiente paso</p>
+                <p className="mt-3 text-sm leading-7 text-foreground/70">Si quieres aterrizar estas ideas sobre tu caso real, la mejor vía sigue siendo partir de tu factura o tu consumo.</p>
+                <Link href={withBasePath(basePath, "/estudio")} className="cta-primary mt-5 w-full">Pedir estudio</Link>
+              </div>
+            </aside>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Contenido del artículo */}
-      <div className="container mx-auto px-4 max-w-3xl mt-12">
-        <div
-          className="prose prose-zinc dark:prose-invert prose-lg max-w-none
-            prose-p:text-foreground/80 dark:prose-p:text-zinc-300 prose-p:leading-relaxed
-            prose-headings:text-foreground dark:prose-headings:text-white prose-headings:font-heading
-            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-            prose-a:text-primary-600 dark:prose-a:text-primary-400 hover:prose-a:text-primary-500 dark:hover:prose-a:text-primary-300 prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-foreground dark:prose-strong:text-white
-            prose-li:text-foreground/80 dark:prose-li:text-zinc-300
-            prose-ul:space-y-1
-            prose-img:rounded-xl prose-img:shadow-lg prose-img:mx-auto
-            prose-hr:border-zinc-200 dark:prose-hr:border-white/10
-            prose-blockquote:border-primary-500 prose-blockquote:bg-zinc-50 dark:prose-blockquote:bg-zinc-900 prose-blockquote:rounded-r-xl prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:text-foreground/80 dark:prose-blockquote:text-zinc-300"
-          dangerouslySetInnerHTML={{ __html: safeContent }}
-        />
-
-        {/* CTA interna */}
-        <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 p-6 sm:p-8 rounded-2xl my-16 shadow-sm">
-          <h3 className="text-foreground dark:text-white font-bold text-xl mb-3">¿Necesitas ayuda para reducir tu factura?</h3>
-          <p className="text-foreground/70 dark:text-zinc-400 text-base mb-6">
-            En Webtense Energy analizamos tu contrato de luz de forma gratuita y te decimos exactamente cuánto podrías ahorrar.
-          </p>
-          <Link
-            href={withBasePath(basePath, "/estudio")}
-            className="inline-flex items-center bg-primary-600 dark:bg-primary-500 text-white font-bold px-6 py-3 rounded-full hover:bg-primary-500 dark:hover:bg-primary-400 transition-colors shadow-lg shadow-primary-600/20 active:scale-95"
-          >
-            Solicitar estudio gratuito →
-          </Link>
+      <section className="section-shell-tight pb-12">
+        <div className="section-inner max-w-6xl">
+          <ActionBanner
+            title="Convierte la lectura en una decisión concreta"
+            description="Analizamos tu contrato de luz o tu escenario energético y te devolvemos una recomendación accionable, clara y sin compromiso."
+            action={<Link href={withBasePath(basePath, "/estudio")} className="cta-primary">Solicitar estudio gratuito</Link>}
+          />
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 text-sm dark:border-white/10 sm:flex-row">
+            <Link href={withBasePath(basePath, "/blog")} className="font-semibold text-foreground/65 hover:text-primary-600 dark:hover:text-primary-300">← Volver al blog</Link>
+            <Link href={withBasePath(basePath, "/contacto")} className="text-foreground/50 hover:text-foreground/75">¿Prefieres hablar con el equipo?</Link>
+          </div>
         </div>
-
-        {/* Navegación */}
-        <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link
-            href={withBasePath(basePath, "/blog")}
-            className="inline-flex items-center text-foreground/60 dark:text-zinc-400 hover:text-foreground dark:hover:text-white transition-colors font-medium gap-2"
-          >
-            ← Volver al blog
-          </Link>
-          <Link
-            href={withBasePath(basePath, "/contacto")}
-            className="text-foreground/50 dark:text-zinc-500 hover:text-foreground/80 dark:hover:text-zinc-300 text-sm transition-colors"
-          >
-            ¿Dudas? Contáctanos
-          </Link>
-        </div>
-      </div>
+      </section>
     </article>
   );
 }
