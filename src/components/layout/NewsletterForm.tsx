@@ -58,11 +58,10 @@ export function NewsletterForm() {
   };
 
   return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-400">Newsletter en lanzamiento</p>
+    <div className="mt-8 rounded-[1.6rem] border border-white/10 bg-white/5 p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-400">Boletín Webtense</p>
       <p className="mt-2 text-sm text-zinc-300">
-        Estamos activando la newsletter con envios diarios, semanales y mensuales. Si te registras ahora,
-        te avisaremos cuando quede operativa.
+        Recibe ideas prácticas sobre ahorro, precio de la luz, domótica y recomendaciones seleccionadas. Sin ruido y con baja en un clic.
       </p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
         <input
@@ -87,7 +86,7 @@ export function NewsletterForm() {
           disabled={status === "loading"}
           className="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-500 disabled:opacity-60"
         >
-          {status === "loading" ? "Suscribiendo..." : "Quiero apuntarme"}
+          {status === "loading" ? "Suscribiendo..." : "Quiero recibirlo"}
         </button>
       </form>
       {message && (

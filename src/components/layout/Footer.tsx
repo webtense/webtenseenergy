@@ -19,9 +19,9 @@ const footerLinks = {
       { name: "Contacto Rápido", href: "/contacto" },
     ],
     legal: [
-      { name: "Privacidad", href: "#" },
-      { name: "Cookies", href: "#" },
-      { name: "Aviso Legal", href: "#" },
+      { name: "Privacidad", href: "/privacidad" },
+      { name: "Cookies", href: "/cookies" },
+      { name: "Aviso Legal", href: "/aviso-legal" },
     ],
     headings: {
       explorar: "Explorar",
@@ -45,9 +45,9 @@ const footerLinks = {
       { name: "Contacte Ràpid", href: "/contacto" },
     ],
     legal: [
-      { name: "Privadesa", href: "#" },
-      { name: "Cookies", href: "#" },
-      { name: "Avís Legal", href: "#" },
+      { name: "Privadesa", href: "/privacidad" },
+      { name: "Cookies", href: "/cookies" },
+      { name: "Avís Legal", href: "/aviso-legal" },
     ],
     headings: {
       explorar: "Explorar",
@@ -67,13 +67,12 @@ export function Footer() {
   const localeLinks = footerLinks[locale];
 
   return (
-    <footer className="w-full relative overflow-hidden bg-[#020610] mt-auto">
-      {/* Elementos decorativos */}
+    <footer className="relative mt-auto overflow-hidden bg-[#04111b] text-white">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent"></div>
-      <div className="absolute -top-24 left-1/4 w-96 h-96 bg-primary-900/20 blur-[100px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-900/20 blur-[100px] rounded-full pointer-events-none"></div>
+      <div className="absolute -top-20 left-[12%] h-72 w-72 rounded-full bg-primary-500/12 blur-[110px]"></div>
+      <div className="absolute bottom-0 right-[10%] h-80 w-80 rounded-full bg-brand-500/12 blur-[120px]"></div>
 
-      <div className="container relative z-10 mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="section-inner relative z-10 px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-1 sm:col-span-2 lg:col-span-2">
             <Link href={withBasePath(basePath, "/")} className="inline-block group">
@@ -85,7 +84,7 @@ export function Footer() {
               {localeLinks.description}
             </p>
             <div className="mt-8 flex gap-4">
-              <a href="mailto:info@webtenseenergy.com" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-primary-500/20 hover:text-primary-400 hover:border-primary-500/30 transition-all">
+              <a href="mailto:info@webtenseenergy.com" className="w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-primary-500/20 hover:text-primary-400 hover:border-primary-500/30 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               </a>
             </div>
@@ -149,7 +148,7 @@ export function Footer() {
             <span className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(26,183,117,1)] relative">
                 <span className="absolute inset-0 rounded-full bg-primary-500 animate-ping opacity-75"></span>
             </span>
-            Sistemas Operativos
+            Plataforma operativa
           </div>
         </div>
       </div>

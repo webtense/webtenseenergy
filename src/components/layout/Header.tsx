@@ -18,22 +18,22 @@ const labels = {
   es: {
     empresas: "Empresas",
     particulares: "Particulares",
-    precio: "Precio Luz",
+    precio: "Precio luz",
     blog: "Blog",
     ofertas: "Ofertas",
     contacto: "Contacto",
-    estudio: "Estudio Gratuito",
-    telegram: "Telegram Deals",
+    estudio: "Estudio gratuito",
+    telegram: "Canal Telegram",
   },
   ca: {
     empresas: "Empreses",
     particulares: "Particulars",
-    precio: "Preu Llum",
+    precio: "Preu llum",
     blog: "Blog",
     ofertas: "Ofertes",
     contacto: "Contacte",
-    estudio: "Estudi Gratuit",
-    telegram: "Telegram Deals",
+    estudio: "Estudi gratuit",
+    telegram: "Canal Telegram",
   },
 };
 
@@ -45,94 +45,100 @@ export function Header() {
   const localeLabels = labels[locale];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-white/10 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
-          <Link href={withBasePath(basePath, "/")} className="flex items-center space-x-2">
-            <span className="font-heading text-xl font-bold tracking-tight text-primary-600 dark:text-primary-500">
-              WEBTENSE<span className="text-foreground">ENERGY</span>
+    <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-background/85 backdrop-blur-xl dark:border-white/8">
+      <div className="section-inner flex h-16 items-center justify-between px-4 sm:h-[4.5rem] sm:px-6 lg:px-8">
+        <div className="flex items-center gap-10">
+          <Link href={withBasePath(basePath, "/")} className="flex items-center gap-2">
+            <span className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-xl">
+              WEBTENSE<span className="text-primary-600 dark:text-primary-400">ENERGY</span>
             </span>
           </Link>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                href={withBasePath(basePath, item.href)}
-                className="transition-colors text-foreground/80 hover:text-primary-600 dark:hover:text-primary-400"
-              >
-                {localeLabels[item.key as keyof typeof localeLabels]}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-foreground/65">
+            {navigation.map((item) => {
+              const href = withBasePath(basePath, item.href);
+              const isActive = pathname === href || (href !== withBasePath(basePath, "/") && pathname.startsWith(`${href}/`));
+
+              return (
+                <Link
+                  key={item.href}
+                  href={href}
+                  className={isActive ? "text-foreground" : "transition-colors hover:text-primary-600 dark:hover:text-primary-400"}
+                >
+                  {localeLabels[item.key as keyof typeof localeLabels]}
+                </Link>
+              );
+            })}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-          <Link
-            href={withBasePath(basePath, "/estudio")}
-            className="hidden sm:inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-600/25"
-          >
-            {localeLabels.estudio}
-          </Link>
+
+        <div className="hidden sm:flex items-center gap-3">
           <Link
             href="https://t.me/webtenseenergy"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-600/25"
+            className="hidden xl:inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:border-brand-400/30 dark:hover:text-brand-300"
           >
             {localeLabels.telegram}
           </Link>
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2 text-foreground active:scale-95 transition-transform"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileMenuOpen ? (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            )}
-          </button>
+          <Link href={withBasePath(basePath, "/estudio")} className="cta-primary text-sm px-5 py-2.5">
+            {localeLabels.estudio}
+          </Link>
         </div>
+
+        <button
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-zinc-200/90 bg-white/80 text-foreground shadow-sm transition active:scale-95 lg:hidden dark:border-white/10 dark:bg-white/5"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Abrir menu"
+        >
+          {isMobileMenuOpen ? (
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16m-16 5h10" />
+            </svg>
+          )}
+        </button>
       </div>
-      
-      {/* Mobile Menu Content */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-white/10 bg-background px-4 py-4 space-y-4 shadow-xl">
-          <nav className="flex flex-col space-y-3">
-            {navigation.map((item) => (
+
+      {isMobileMenuOpen ? (
+        <div className="border-t border-zinc-200 bg-background/95 px-4 pb-6 pt-4 shadow-2xl backdrop-blur-xl lg:hidden dark:border-white/8">
+          <div className="mx-auto max-w-3xl space-y-4">
+            <div className="surface-panel-soft p-3">
+              <nav className="grid gap-2">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={withBasePath(basePath, item.href)}
+                    className="rounded-2xl px-4 py-3 text-base font-semibold text-foreground/80 transition hover:bg-zinc-100 hover:text-primary-600 dark:hover:bg-white/5 dark:hover:text-primary-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {localeLabels[item.key as keyof typeof localeLabels]}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
               <Link
-                key={item.href}
-                href={withBasePath(basePath, item.href)}
-                className="text-base font-medium text-foreground hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                href={withBasePath(basePath, "/estudio")}
+                className="cta-primary"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {localeLabels[item.key as keyof typeof localeLabels]}
+                {localeLabels.estudio}
               </Link>
-            ))}
-          </nav>
-          <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 dark:border-white/10">
-            <Link
-              href={withBasePath(basePath, "/estudio")}
-              className="inline-flex w-full items-center justify-center rounded-full bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-md active:scale-95 transition-transform"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {localeLabels.estudio}
-            </Link>
-            <Link
-              href="https://t.me/webtenseenergy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center rounded-full bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-md active:scale-95 transition-transform"
-            >
-              {localeLabels.telegram}
-            </Link>
+              <Link
+                href="https://t.me/webtenseenergy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cta-secondary"
+              >
+                {localeLabels.telegram}
+              </Link>
+            </div>
           </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }

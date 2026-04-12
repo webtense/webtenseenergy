@@ -1,6 +1,8 @@
 import ElectricityDashboard from "@/components/electricity/ElectricityDashboard";
 import Link from "next/link";
 import { withBasePath } from "@/lib/paths";
+import { SectionHero } from "@/components/shared/SectionHero";
+import { ActionBanner } from "@/components/shared/ActionBanner";
 
 type PrecioLuzHoyPageProps = {
   basePath: string;
@@ -8,39 +10,33 @@ type PrecioLuzHoyPageProps = {
 
 export function PrecioLuzHoyPage({ basePath }: PrecioLuzHoyPageProps) {
   return (
-    <main className="min-h-screen pt-24 pb-12 bg-background border-b border-zinc-200 dark:border-white/5">
-      <div className="container mx-auto px-4">
-        {/* Breadcrumb-ish or Back link */}
-        <div className="mb-8">
-          <Link
-            href={withBasePath(basePath, "/")}
-            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium flex items-center gap-2 transition-colors"
-          >
-            <span>←</span> Volver a Inicio
-          </Link>
-        </div>
+    <main className="min-h-screen bg-background pb-16">
+      <SectionHero
+        eyebrow="Panel diario"
+        title={<>Precio de la luz hoy, <span className="text-primary-600 dark:text-primary-300">sin interpretaciones raras</span></>}
+        subtitle="Consulta tramos horarios, precio actual, medias y extremos del día para mover consumos con más criterio."
+        compact
+        actions={<Link href={withBasePath(basePath, "/estudio")} className="cta-primary">Quiero optimizar mi factura</Link>}
+      />
 
-        <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 md:p-12 shadow-xl dark:shadow-none shadow-zinc-200/60 border border-zinc-200 dark:border-white/10">
+      <section className="section-shell-tight">
+        <div className="section-inner mb-6">
+          <Link href={withBasePath(basePath, "/")} className="text-sm font-semibold text-primary-600 dark:text-primary-300">← Volver al inicio</Link>
+        </div>
+        <div className="section-inner surface-panel overflow-hidden p-4 md:p-8">
           <ElectricityDashboard />
         </div>
+      </section>
 
-        {/* Informative Footer Section */}
-        <div className="mt-12 max-w-4xl mx-auto text-center space-y-4 pt-10">
-          <h3 className="text-xl font-bold font-heading text-foreground">¿Cómo ahorrar con el precio de la luz hoy?</h3>
-          <p className="text-foreground/70 dark:text-zinc-400 leading-relaxed">
-            El precio de la luz varía cada hora según la oferta y la demanda. Utilizar tus electrodomésticos en las horas con precios más bajos (valles)
-            puede suponer un ahorro de hasta el 40% en tu factura mensual. En Webtense Energy te ayudamos a automatizar estos procesos.
-          </p>
-          <div className="flex justify-center pt-8">
-            <Link
-              href={withBasePath(basePath, "/estudio")}
-              className="bg-primary-600 dark:bg-primary-500 text-white px-8 py-3 rounded-full font-bold hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/20"
-            >
-              Solicitar estudio de factura gratis
-            </Link>
-          </div>
+      <section className="section-shell-tight pb-24">
+        <div className="section-inner">
+          <ActionBanner
+            title="Mirar el precio es útil. Entender tu factura completa, mucho más"
+            description="Si quieres saber cuánto puedes ahorrar de verdad, no basta con ver el pool: hay que leer potencia, hábitos, tarifa y distribución real del consumo."
+            action={<Link href={withBasePath(basePath, "/estudio")} className="cta-primary">Solicitar estudio</Link>}
+          />
         </div>
-      </div>
+      </section>
     </main>
   );
 }

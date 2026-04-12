@@ -1,9 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { SectionHero } from "@/components/shared/SectionHero";
+
+type OfertaCategoria = "Todos" | "Solar" | "Domótica" | "Medición" | "Climatización";
+type OfertaSort = "descuento" | "precio";
+
+type Oferta = {
+  title: string;
+  price: number;
+  oldPrice: number;
+  categoria: Exclude<OfertaCategoria, "Todos">;
+  url: string;
+  icon: string;
+  rating: number;
+  tag?: string;
+};
+
+const OFERTAS: Oferta[] = [
+  { title: "Kit Paneles Solares 400W", price: 199, oldPrice: 299, categoria: "Solar", url: "https://www.amazon.es/s?k=kit+panel+solar+400w&tag=semillasdet02-21", icon: "☀️", rating: 4.6, tag: "Mejor ahorro" },
+  { title: "Termostato Inteligente WiFi", price: 45.5, oldPrice: 89.99, categoria: "Climatización", url: "https://www.amazon.es/s?k=termostato+inteligente+wifi&tag=semillasdet02-21", icon: "🌡️", rating: 4.5, tag: "Top invierno" },
+  { title: "Pack 4 Enchufes Inteligentes", price: 24.99, oldPrice: 34.99, categoria: "Domótica", url: "https://www.amazon.es/s?k=enchufe+inteligente+wifi&tag=semillasdet02-21", icon: "🔌", rating: 4.4 },
+  { title: "Medidor Consumo Eléctrico Carril DIN", price: 32.15, oldPrice: 45, categoria: "Medición", url: "https://www.amazon.es/s?k=medidor+consumo+electrico+carril+din&tag=semillasdet02-21", icon: "📊", rating: 4.3, tag: "Control" },
+];
 
 export function OfertasPage() {
   const [ofertasEnabled, setOfertasEnabled] = useState(true);
+  const [categoria, setCategoria] = useState<OfertaCategoria>("Todos");
+  const [sort, setSort] = useState<OfertaSort>("descuento");
+
+  const filtered = useMemo(() => {
+    const selected = categoria === "Todos" ? OFERTAS : OFERTAS.filter((offer) => offer.categoria === categoria);
+    return [...selected].sort((a, b) => {
+      if (sort === "precio") return a.price - b.price;
+      const aDiscount = a.oldPrice - a.price;
+      const bDiscount = b.oldPrice - b.price;
+      return bDiscount - aDiscount;
+    });
+  }, [categoria, sort]);
+
+  const categories: OfertaCategoria[] = ["Todos", "Solar", "Domótica", "Medición", "Climatización"];
 
   useEffect(() => {
     fetch("/api/public/feature-flags")
@@ -23,125 +60,84 @@ export function OfertasPage() {
     );
   }
 
-  const ofertas = [
-    {
-      title: "Kit Paneles Solares 400W",
-      price: "199,00€",
-      oldPrice: "299,00€",
-      categoria: "Solar",
-      discount: "-33%",
-      url: "https://www.amazon.es/s?k=kit+panel+solar+400w&tag=semillasdet02-21",
-      icon: "☀️",
-    },
-    {
-      title: "Termostato Inteligente WiFi",
-      price: "45,50€",
-      oldPrice: "89,99€",
-      categoria: "Domótica",
-      discount: "-50%",
-      url: "https://www.amazon.es/s?k=termostato+inteligente+wifi&tag=semillasdet02-21",
-      icon: "🌡️",
-    },
-    {
-      title: "Pack 4 Enchufes Inteligentes",
-      price: "24,99€",
-      oldPrice: "34,99€",
-      categoria: "Domótica",
-      discount: "-28%",
-      url: "https://www.amazon.es/s?k=enchufe+inteligente+wifi&tag=semillasdet02-21",
-      icon: "🔌",
-    },
-    {
-      title: "Medidor Consumo Eléctrico Carril DIN",
-      price: "32,15€",
-      oldPrice: "45,00€",
-      categoria: "Ahorro",
-      discount: "-28%",
-      url: "https://www.amazon.es/s?k=medidor+consumo+electrico+carril+din&tag=semillasdet02-21",
-      icon: "📊",
-    },
-  ];
-
   return (
-    <div className="flex flex-col bg-background min-h-screen">
-      {/* Hero Premium Ofertas */}
-      <section className="relative pt-32 pb-20 overflow-hidden border-b border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-transparent">
-        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] bg-brand-100 dark:bg-brand-600/20 blur-[130px] rounded-full pointer-events-none transform translate-x-1/3 -translate-y-1/2"></div>
-        <div className="container relative z-10 mx-auto px-4 text-center mt-10">
-          <div className="inline-block px-5 py-2 mb-6 rounded-full bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 backdrop-blur-md shadow-sm dark:shadow-2xl animate-pulse">
-            <span className="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-widest flex items-center gap-2">
-              <span>🔥</span> Precios Mínimos Históricos
-            </span>
-          </div>
-          <h1 className="font-heading text-5xl md:text-7xl font-extrabold text-foreground mb-6 tracking-tight">
-            Chollos en <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 drop-shadow-sm">Energía</span>
-          </h1>
-          <p className="max-w-2xl mx-auto text-xl text-foreground/70 dark:text-zinc-300/80 mb-10 leading-relaxed font-light">
-            Seleccionamos y verificamos a diario las mejores ofertas en tecnología para el hogar inteligente y componentes de eficiencia energética.
-          </p>
+    <div className="flex flex-col min-h-screen bg-background pb-24">
+      <SectionHero
+        eyebrow="Selección curada"
+        title={<>Ofertas que sí encajan con un hogar <span className="text-brand-600 dark:text-brand-300">más eficiente</span></>}
+        subtitle="No buscamos parecer un marketplace. Filtramos productos de energía, control y domótica para que encuentres referencias útiles sin perder tiempo." 
+        align="center"
+        compact
+        actions={
+          <Link href="https://t.me/webtenseenergy" target="_blank" rel="noopener noreferrer" className="cta-primary">
+            Unirme al canal de Telegram
+          </Link>
+        }
+      />
 
-          <a
-            href="https://t.me/webtenseenergy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex relative group overflow-hidden rounded-full font-bold text-white transition-all shadow-[0_0_30px_rgba(42,171,238,0.3)] bg-[#2AABEE] px-8 py-4"
-          >
-            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-            <span className="relative z-10 flex items-center justify-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.94z" />
-              </svg>
-              Únete a nuestro Canal de Telegram
-            </span>
-          </a>
+      <section className="section-shell-tight border-b border-zinc-200/80 bg-zinc-50/80 dark:border-white/5 dark:bg-white/[0.02]">
+        <div className="section-inner flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((item) => (
+              <button
+                key={item}
+                onClick={() => setCategoria(item)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  categoria === item
+                    ? "bg-primary-600 text-white"
+                    : "border border-zinc-200 bg-white text-foreground/65 hover:border-primary-300 dark:border-white/10 dark:bg-white/5"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-foreground/55">Ordenar por</span>
+            <select value={sort} onChange={(event) => setSort(event.target.value as OfertaSort)} className="rounded-full border border-zinc-200 bg-white px-4 py-2 font-semibold text-foreground dark:border-white/10 dark:bg-white/5">
+              <option value="descuento">Mayor ahorro</option>
+              <option value="precio">Menor precio</option>
+            </select>
+          </div>
         </div>
       </section>
 
-      {/* Grid de Ofertas */}
-      <section className="container mx-auto px-4 py-16 pb-32 relative z-10">
-        <h2 className="text-2xl font-bold text-foreground mb-8 border-b border-zinc-200 dark:border-white/10 pb-4">Destacados de hoy</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {ofertas.map((oferta) => (
-            <div
-              key={oferta.title}
-              className="group flex flex-col bg-white dark:bg-[#0a0f1c] border border-zinc-200 dark:border-white/5 hover:border-brand-500/50 rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:hover:shadow-[0_10px_40px_rgba(59,130,246,0.15)] relative"
-            >
-              <div className="absolute top-3 left-3 z-10">
-                <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">{oferta.discount}</div>
-              </div>
-              <div className="absolute top-3 right-3 z-10">
-                <div className="bg-zinc-100/80 dark:bg-white/10 backdrop-blur-md text-foreground/80 dark:text-zinc-300 text-xs font-bold px-3 py-1.5 rounded-full border border-zinc-200 dark:border-white/10">
-                  {oferta.categoria}
+      <section className="section-shell">
+        <div className="section-inner grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {filtered.map((oferta) => {
+            const discount = Math.round(((oferta.oldPrice - oferta.price) / oferta.oldPrice) * 100);
+            return (
+              <div key={oferta.title} className="surface-panel-soft flex flex-col overflow-hidden p-5 transition hover:-translate-y-1 hover:border-brand-300 dark:hover:border-brand-500/20">
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 dark:bg-red-500/10 dark:text-red-300">-{discount}%</span>
+                  <span className="rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/65 dark:bg-white/10 dark:text-zinc-300">{oferta.categoria}</span>
+                  {oferta.tag ? <span className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">{oferta.tag}</span> : null}
                 </div>
-              </div>
-
-              <div className="h-48 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-[#0a0f1c] flex items-center justify-center p-8 group-hover:scale-105 transition-transform duration-500">
-                <span className="text-7xl drop-shadow-md dark:drop-shadow-2xl opacity-80">{oferta.icon}</span>
-              </div>
-
-              <div className="p-6 flex flex-col flex-1 border-t border-zinc-100 dark:border-white/5 bg-gradient-to-b from-transparent to-zinc-50 dark:to-[#050810]">
-                <h3 className="font-bold text-lg text-foreground mb-4 line-clamp-2 leading-tight group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                  {oferta.title}
-                </h3>
-                <div className="mt-auto flex items-end justify-between">
+                <div className="mt-5 flex h-40 items-center justify-center rounded-[1.5rem] bg-[radial-gradient(circle_at_top_left,rgba(26,183,117,0.12),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(59,118,246,0.16),transparent_34%)] text-6xl">
+                  {oferta.icon}
+                </div>
+                <h3 className="mt-5 font-heading text-2xl font-bold tracking-tight text-foreground">{oferta.title}</h3>
+                <div className="mt-4 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-300">
+                  <span>{"★".repeat(Math.floor(oferta.rating))}</span>
+                  <span className="text-foreground/50">{oferta.rating.toFixed(1)}</span>
+                </div>
+                <div className="mt-5 flex items-end justify-between gap-4">
                   <div>
-                    <div className="text-foreground/50 dark:text-zinc-500 text-sm line-through decoration-red-500/50 mb-1">{oferta.oldPrice}</div>
-                    <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">{oferta.price}</div>
+                    <p className="text-sm text-foreground/40 line-through">{oferta.oldPrice.toFixed(2)} €</p>
+                    <p className="text-3xl font-bold tracking-tight text-brand-600 dark:text-brand-300">{oferta.price.toFixed(2)} €</p>
                   </div>
-                   <a
-                     href={oferta.url}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-white shadow-md transition-colors group-hover:bg-brand-500 dark:shadow-lg"
-                   >
-                     <svg className="w-5 h-5 -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                     </svg>
-                   </a>
-                 </div>
-               </div>
-             </div>
-          ))}
+                </div>
+                <a href={oferta.url} target="_blank" rel="noopener noreferrer" className="cta-primary mt-6 w-full">
+                  Ver producto
+                </a>
+              </div>
+            );
+          })}
+        </div>
+        <div className="section-inner mt-10">
+          <p className="text-center text-xs leading-6 text-foreground/50">
+            Selección editorial con enlaces de afiliación. Priorizamos productos útiles para control, ahorro y domótica aplicada, no volumen sin criterio.
+          </p>
         </div>
       </section>
     </div>
