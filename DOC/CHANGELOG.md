@@ -1,5 +1,14 @@
 # Registro de Cambios - CHANGELOG
 
+## [3.2.1] - 2026-04-19
+
+### Corregido
+- Respuesta publica de `feature flags` alineada entre `features[]` y los booleanos expuestos
+- Render del formulario de newsletter ajustado para no mostrar contenido mientras el flag publico sigue desactivado
+- Compatibilidad de build en produccion al retirar la dependencia de `next/font/google` dentro de la imagen Docker
+
+---
+
 ## [3.2.0] - 2026-04-19
 
 ### Anadido

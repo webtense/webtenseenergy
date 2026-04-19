@@ -7,7 +7,7 @@ export function NewsletterForm() {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [message, setMessage] = useState("");
-  const [newsletterEnabled, setNewsletterEnabled] = useState(true);
+  const [newsletterEnabled, setNewsletterEnabled] = useState<boolean | null>(null);
   const [copy, setCopy] = useState({
     title: "Boletin Webtense",
     subtitle:
@@ -21,7 +21,7 @@ export function NewsletterForm() {
     fetch("/api/public/feature-flags")
       .then(res => res.json())
       .then(data => setNewsletterEnabled(data.newsletter === true))
-      .catch(() => {});
+      .catch(() => setNewsletterEnabled(false));
 
     fetch(`/api/public/site-settings?locale=${locale}`)
       .then((res) => res.json())
@@ -40,7 +40,7 @@ export function NewsletterForm() {
       .catch(() => {});
   }, []);
 
-  if (!newsletterEnabled) {
+  if (newsletterEnabled !== true) {
     return null;
   }
 
