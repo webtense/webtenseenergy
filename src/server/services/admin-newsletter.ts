@@ -24,6 +24,20 @@ type CampaignBlockInput = {
   content: string;
 };
 
+type AudienceRules = {
+  locale: "ALL" | "ES" | "CA";
+  sources: string[];
+  requireConsent: boolean;
+  activeWithinDays: number | null;
+};
+
+const DEFAULT_AUDIENCE_RULES: AudienceRules = {
+  locale: "ALL",
+  sources: [],
+  requireConsent: true,
+  activeWithinDays: null,
+};
+
 function getBaseUrl() {
   if (process.env.APP_BASE_URL) return process.env.APP_BASE_URL;
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -57,12 +71,64 @@ function parseJsonObject(value: string) {
   }
 }
 
+function normalizeAudienceRules(value: unknown): AudienceRules {
+  const parsed = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  const locale = parsed.locale === "ES" || parsed.locale === "CA" ? parsed.locale : "ALL";
+  const sources = Array.isArray(parsed.sources) ? parsed.sources.map((entry) => String(entry).trim()).filter(Boolean) : [];
+  const requireConsent = parsed.requireConsent !== false;
+  const activeWithinDays = typeof parsed.activeWithinDays === "number" && Number.isFinite(parsed.activeWithinDays) && parsed.activeWithinDays > 0
+    ? parsed.activeWithinDays
+    : null;
+
+  return { locale, sources, requireConsent, activeWithinDays };
+}
+
+function parseAudienceRules(blocks: CampaignBlock[]): AudienceRules {
+  const block = blocks.find((item) => item.type === "audience");
+  if (!block) return DEFAULT_AUDIENCE_RULES;
+  return normalizeAudienceRules(parseJsonObject(block.content));
+}
+
+function matchesAudienceRules(params: {
+  subscriber: Subscriber & { events?: Array<{ createdAt: Date }> };
+  rules: AudienceRules;
+}) {
+  const { subscriber, rules } = params;
+
+  if (rules.locale !== "ALL" && subscriber.locale !== rules.locale) {
+    return false;
+  }
+
+  if (rules.sources.length > 0 && !rules.sources.includes(subscriber.source)) {
+    return false;
+  }
+
+  if (rules.requireConsent && !subscriber.consentedAt) {
+    return false;
+  }
+
+  if (rules.activeWithinDays) {
+    const threshold = Date.now() - rules.activeWithinDays * 24 * 60 * 60 * 1000;
+    const lastEventAt = subscriber.events?.[0]?.createdAt?.getTime() || 0;
+    const createdAt = subscriber.createdAt.getTime();
+    if (Math.max(lastEventAt, createdAt) < threshold) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 async function renderCampaignBlocks(blocks: CampaignBlock[]) {
   const baseUrl = getBaseUrl();
   const sortedBlocks = [...blocks].sort((left, right) => left.sortOrder - right.sortOrder);
   const sections: string[] = [];
 
   for (const block of sortedBlocks) {
+    if (block.type === "audience") {
+      continue;
+    }
+
     if (block.type === "intro" || block.type === "text") {
       sections.push(`<section style="margin:0 0 24px;"><p style="margin:0;color:#334155;font-size:15px;line-height:1.7;">${escapeHtml(block.content).replace(/\n/g, "<br />")}</p></section>`);
       continue;
@@ -325,9 +391,21 @@ export async function sendCampaignNow(params: { campaignId: string; adminUserId?
     throw new Error("Campana no encontrada");
   }
 
-  const subscribers = await db.subscriber.findMany({ where: { isActive: true }, orderBy: [{ createdAt: "asc" }] });
-  if (!subscribers.length) {
-    throw new Error("No hay suscriptores activos");
+  const audience = parseAudienceRules(campaign.blocks);
+
+  const subscribers = await db.subscriber.findMany({
+    where: { isActive: true },
+    include: {
+      events: {
+        orderBy: [{ createdAt: "desc" }],
+        take: 1,
+      },
+    },
+    orderBy: [{ createdAt: "asc" }],
+  });
+  const targetSubscribers = subscribers.filter((subscriber) => matchesAudienceRules({ subscriber, rules: audience }));
+  if (!targetSubscribers.length) {
+    throw new Error("No hay suscriptores que encajen con el segmento seleccionado");
   }
 
   const html = await renderCampaignHtml(campaign);
@@ -350,7 +428,7 @@ export async function sendCampaignNow(params: { campaignId: string; adminUserId?
 
   let delivered = 0;
   let failed = 0;
-  for (const subscriber of subscribers) {
+  for (const subscriber of targetSubscribers) {
     const result = await sendOneCampaignEmail({ subscriber, campaign, html, sendJobId: job.id });
     if (result.ok) {
       delivered += 1;
@@ -382,8 +460,8 @@ export async function sendCampaignNow(params: { campaignId: string; adminUserId?
     entityType: "Campaign",
     entityId: campaign.id,
     status: delivered > 0 ? "ok" : "failed",
-    metadata: JSON.stringify({ delivered, failed, sendJobId: job.id }),
+    metadata: JSON.stringify({ delivered, failed, sendJobId: job.id, audience }),
   });
 
-  return { delivered, failed, sendJobId: job.id };
+  return { delivered, failed, sendJobId: job.id, selected: targetSubscribers.length, audience };
 }

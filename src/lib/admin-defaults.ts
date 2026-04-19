@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 
-const DEFAULT_FLAGS = [
+export const DEFAULT_FLAGS = [
   { key: "blog", enabled: true, description: "Activa el modulo de blog publico." },
   { key: "ofertas", enabled: true, description: "Activa la pagina y gestion de ofertas." },
   { key: "newsletter", enabled: false, description: "Activa suscripcion y campanas de newsletter." },
   { key: "telegram", enabled: false, description: "Activa publicacion de deals en Telegram." },
 ];
 
-const DEFAULT_SETTINGS: Array<{ key: string; value: string; locale: "ES" | "CA" }> = [
+export const DEFAULT_SETTINGS: Array<{ key: string; value: string; locale: "ES" | "CA" }> = [
   {
     key: "home.hero.title",
     locale: "ES",
@@ -71,6 +71,18 @@ const DEFAULT_SETTINGS: Array<{ key: string; value: string; locale: "ES" | "CA" 
     value: "Transformem la manera com llars i empreses consumeixen energia. Analisi tecnica, domotica avancada i eficiencia real.",
   },
 ];
+
+export function getDefaultSettingValue(key: string, locale: "ES" | "CA") {
+  return DEFAULT_SETTINGS.find((setting) => setting.key === key && setting.locale === locale)?.value || "";
+}
+
+export function getDefaultSettingRecord(key: string, locale: "ES" | "CA") {
+  return {
+    key: `${key}:${locale}`,
+    locale,
+    value: getDefaultSettingValue(key, locale),
+  };
+}
 
 export async function ensureAdminDefaults() {
   for (const flag of DEFAULT_FLAGS) {

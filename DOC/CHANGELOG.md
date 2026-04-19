@@ -1,5 +1,18 @@
 # Registro de Cambios - CHANGELOG
 
+## [3.2.0] - 2026-04-19
+
+### Anadido
+- Panel de `Personas` con consolidacion por email y timeline comercial unificado a partir de leads, estudios, suscriptores y actividad email/newsletter
+- Segmentacion operativa en newsletter por locale, fuente, consentimiento y altas recientes sin necesidad de migracion adicional
+
+### Mejorado
+- Bootstrap robusto de `feature flags` y `site settings` publicos para no depender de una visita previa al admin
+- Backoffice orientado a conversion y operacion, con mejor lectura del estado real de audiencia y contactos
+- Version canonica actualizada a `v3.2.0`
+
+---
+
 ## [3.1.0] - 2026-04-19
 
 ### Anadido

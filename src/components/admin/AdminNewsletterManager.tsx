@@ -22,6 +22,13 @@ type JobItem = { id: string; status: string; runAt: string; finishedAt: string |
 type EventItem = { id: string; eventType: string; createdAt: string; subscriber: { id: string; email: string; fullName: string | null; locale: "ES" | "CA"; isActive: boolean; source: string; consentedAt: string | null; unsubscribedAt: string | null; createdAt: string; updatedAt: string }; sendJob: JobItem };
 type LogItem = { id: string; destination: string; subject: string; status: string; error: string | null; createdAt: string; sentAt: string | null; channel: string; entityType: string | null; entityId: string | null; providerMessageId: string | null; payload: string | null };
 
+type AudienceRules = {
+  locale: "ALL" | "ES" | "CA";
+  sources: string[];
+  requireConsent: boolean;
+  activeWithinDays: number | null;
+};
+
 type Props = {
   initialCampaigns: CampaignItem[];
   initialSubscribers: SubscriberItem[];
@@ -42,9 +49,64 @@ type Draft = {
   blocks: Array<{ id?: string; sortOrder: number; type: string; content: string }>;
 };
 
+const DEFAULT_AUDIENCE: AudienceRules = {
+  locale: "ALL",
+  sources: [],
+  requireConsent: true,
+  activeWithinDays: null,
+};
+
 function formatDate(value: string | null) {
   if (!value) return "-";
   return new Intl.DateTimeFormat("es-ES", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+}
+
+function parseAudience(value: string | undefined): AudienceRules {
+  if (!value) return DEFAULT_AUDIENCE;
+
+  try {
+    const parsed = JSON.parse(value) as Partial<AudienceRules>;
+    return {
+      locale: parsed.locale === "ES" || parsed.locale === "CA" ? parsed.locale : "ALL",
+      sources: Array.isArray(parsed.sources) ? parsed.sources.map((entry) => String(entry).trim()).filter(Boolean) : [],
+      requireConsent: parsed.requireConsent !== false,
+      activeWithinDays: typeof parsed.activeWithinDays === "number" && parsed.activeWithinDays > 0 ? parsed.activeWithinDays : null,
+    };
+  } catch {
+    return DEFAULT_AUDIENCE;
+  }
+}
+
+function ensureAudienceBlock(blocks: Draft["blocks"], nextAudience?: AudienceRules) {
+  const audience = nextAudience || parseAudience(blocks.find((block) => block.type === "audience")?.content);
+  const payload = JSON.stringify(audience);
+  const existing = blocks.find((block) => block.type === "audience");
+
+  if (existing) {
+    return blocks.map((block) => block.type === "audience" ? { ...block, sortOrder: 0, content: payload } : block);
+  }
+
+  return [{ sortOrder: 0, type: "audience", content: payload }, ...blocks];
+}
+
+function getAudienceFromDraft(blocks: Draft["blocks"]) {
+  return parseAudience(blocks.find((block) => block.type === "audience")?.content);
+}
+
+function estimateRecipients(subscribers: SubscriberItem[], audience: AudienceRules) {
+  const now = Date.now();
+
+  return subscribers.filter((subscriber) => {
+    if (!subscriber.isActive) return false;
+    if (audience.locale !== "ALL" && subscriber.locale !== audience.locale) return false;
+    if (audience.sources.length > 0 && !audience.sources.includes(subscriber.source)) return false;
+    if (audience.requireConsent && !subscriber.consentedAt) return false;
+    if (audience.activeWithinDays) {
+      const threshold = now - audience.activeWithinDays * 24 * 60 * 60 * 1000;
+      if (new Date(subscriber.createdAt).getTime() < threshold) return false;
+    }
+    return true;
+  }).length;
 }
 
 function emptyDraft(): Draft {
@@ -56,12 +118,12 @@ function emptyDraft(): Draft {
     status: "DRAFT",
     scheduleType: null,
     scheduledFor: "",
-    blocks: [
+    blocks: ensureAudienceBlock([
       { sortOrder: 1, type: "intro", content: "Resumen breve de la newsletter." },
       { sortOrder: 2, type: "posts", content: "[]" },
       { sortOrder: 3, type: "offers", content: "[]" },
       { sortOrder: 4, type: "cta", content: '{"label":"Abrir web","url":"https://webtenseenergy.com"}' },
-    ],
+    ]),
   };
 }
 
@@ -77,7 +139,7 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
     status: initialCampaigns[0].status,
     scheduleType: initialCampaigns[0].scheduleType,
     scheduledFor: initialCampaigns[0].scheduledFor ? initialCampaigns[0].scheduledFor.slice(0, 16) : "",
-    blocks: initialCampaigns[0].blocks.map((block) => ({ id: block.id, sortOrder: block.sortOrder, type: block.type, content: block.content })),
+    blocks: ensureAudienceBlock(initialCampaigns[0].blocks.map((block) => ({ id: block.id, sortOrder: block.sortOrder, type: block.type, content: block.content }))),
   } : emptyDraft());
   const [jobs] = useState(initialJobs);
   const [events] = useState(initialEvents);
@@ -87,6 +149,9 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
   const [message, setMessage] = useState("");
 
   const selectedCampaign = useMemo(() => campaigns.find((campaign) => campaign.id === selectedId) || null, [campaigns, selectedId]);
+  const audience = useMemo(() => getAudienceFromDraft(draft.blocks), [draft.blocks]);
+  const sourceOptions = useMemo(() => Array.from(new Set(initialSubscribers.map((subscriber) => subscriber.source))).sort((left, right) => left.localeCompare(right, "es")), [initialSubscribers]);
+  const estimatedRecipients = useMemo(() => estimateRecipients(initialSubscribers, audience), [initialSubscribers, audience]);
 
   const loadCampaign = (campaign: CampaignItem) => {
     setSelectedId(campaign.id);
@@ -99,9 +164,13 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
       status: campaign.status,
       scheduleType: campaign.scheduleType,
       scheduledFor: campaign.scheduledFor ? campaign.scheduledFor.slice(0, 16) : "",
-      blocks: campaign.blocks.map((block) => ({ id: block.id, sortOrder: block.sortOrder, type: block.type, content: block.content })),
+      blocks: ensureAudienceBlock(campaign.blocks.map((block) => ({ id: block.id, sortOrder: block.sortOrder, type: block.type, content: block.content }))),
     });
     setMessage("");
+  };
+
+  const updateAudience = (nextAudience: AudienceRules) => {
+    setDraft((current) => ({ ...current, blocks: ensureAudienceBlock(current.blocks, nextAudience) }));
   };
 
   const saveCampaign = async () => {
@@ -188,6 +257,16 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
           <div className="rounded-2xl border border-white/10 bg-zinc-950 p-4"><p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Ultimos jobs</p><p className="mt-2 text-3xl font-bold text-white">{jobs.length}</p></div>
         </div>
         {message && <p className="mt-4 rounded-2xl border border-primary-500/30 bg-primary-500/10 px-4 py-3 text-sm text-primary-100">{message}</p>}
+        <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-emerald-300">Segmento actual</p>
+          <p className="mt-2 text-sm text-zinc-200">
+            {audience.locale === "ALL" ? "Todos los idiomas" : `Locale ${audience.locale}`}
+            {audience.sources.length ? ` · fuentes: ${audience.sources.join(", ")}` : " · todas las fuentes"}
+            {audience.requireConsent ? " · solo consentidos" : " · sin exigir consentimiento"}
+            {audience.activeWithinDays ? ` · altas recientes (${audience.activeWithinDays} dias)` : " · sin recorte de antiguedad"}
+          </p>
+          <p className="mt-2 text-sm font-semibold text-emerald-200">Estimacion rapida: {estimatedRecipients} destinatarios</p>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
@@ -214,8 +293,56 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
               <select value={draft.scheduleType || ""} onChange={(event) => setDraft((current) => ({ ...current, scheduleType: (event.target.value || null) as Draft["scheduleType"] }))} className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none"><option value="">Sin programacion</option><option value="ONCE">ONCE</option><option value="DAILY">DAILY</option><option value="WEEKLY">WEEKLY</option><option value="MONTHLY">MONTHLY</option></select>
               <input type="datetime-local" value={draft.scheduledFor} onChange={(event) => setDraft((current) => ({ ...current, scheduledFor: event.target.value }))} className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none" />
             </div>
+            <div className="mt-6 rounded-2xl border border-white/10 bg-zinc-950 p-4">
+              <p className="text-sm font-semibold text-white">Segmentacion del envio</p>
+              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-zinc-500">Locale</label>
+                  <select value={audience.locale} onChange={(event) => updateAudience({ ...audience, locale: event.target.value as AudienceRules["locale"] })} className="w-full rounded-2xl border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none">
+                    <option value="ALL">Todos</option>
+                    <option value="ES">ES</option>
+                    <option value="CA">CA</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-zinc-500">Fuente</label>
+                  <select value="" onChange={(event) => {
+                    const nextSource = event.target.value;
+                    if (!nextSource || audience.sources.includes(nextSource)) return;
+                    updateAudience({ ...audience, sources: [...audience.sources, nextSource] });
+                  }} className="w-full rounded-2xl border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none">
+                    <option value="">Todas</option>
+                    {sourceOptions.map((source) => <option key={source} value={source}>{source}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-zinc-500">Altas recientes</label>
+                  <select value={audience.activeWithinDays?.toString() || ""} onChange={(event) => updateAudience({ ...audience, activeWithinDays: event.target.value ? Number(event.target.value) : null })} className="w-full rounded-2xl border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none">
+                    <option value="">Sin filtro</option>
+                    <option value="7">Ultimos 7 dias</option>
+                    <option value="30">Ultimos 30 dias</option>
+                    <option value="90">Ultimos 90 dias</option>
+                  </select>
+                </div>
+                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-zinc-200">
+                  <input type="checkbox" checked={audience.requireConsent} onChange={(event) => updateAudience({ ...audience, requireConsent: event.target.checked })} className="h-4 w-4 rounded border-white/20 bg-zinc-950" />
+                  Solo consentidos
+                </label>
+              </div>
+              {audience.sources.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {audience.sources.map((source) => (
+                    <button key={source} type="button" onClick={() => updateAudience({ ...audience, sources: audience.sources.filter((entry) => entry !== source) })} className="rounded-full border border-primary-500/30 bg-primary-500/10 px-3 py-1 text-xs font-semibold text-primary-200">
+                      {source} ×
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="mt-6 space-y-4">
-              {draft.blocks.map((block, index) => (
+              {draft.blocks.map((block, index) => {
+                if (block.type === "audience") return null;
+                return (
                 <div key={`${block.id || "new"}-${index}`} className="rounded-2xl border border-white/10 bg-zinc-950 p-4">
                   <div className="grid gap-3 md:grid-cols-[100px_160px_minmax(0,1fr)_80px]">
                     <input type="number" value={block.sortOrder} onChange={(event) => setDraft((current) => ({ ...current, blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? { ...item, sortOrder: Number(event.target.value) } : item) }))} className="rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none" />
@@ -232,7 +359,8 @@ export function AdminNewsletterManager({ initialCampaigns, initialSubscribers, i
                     <button type="button" onClick={() => setDraft((current) => ({ ...current, blocks: current.blocks.filter((_, itemIndex) => itemIndex !== index) }))} className="rounded-xl border border-red-500/30 px-3 py-2 text-sm text-red-300 hover:border-red-400">Quitar</button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
               <button type="button" onClick={() => setDraft((current) => ({ ...current, blocks: [...current.blocks, { sortOrder: current.blocks.length + 1, type: "text", content: "" }] }))} className="rounded-2xl border border-white/10 px-4 py-3 text-sm font-semibold text-zinc-200 hover:border-primary-500 hover:text-primary-300">Anadir bloque</button>
             </div>
             <div className="mt-6 flex flex-col gap-3 md:flex-row">
