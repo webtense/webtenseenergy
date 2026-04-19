@@ -1,0 +1,149 @@
+{
+  "name": "webtense",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "meta": {
+    "template": true,
+    "description": "Workflow versionado para ejecutar la automatizacion diaria de Webtense Energy sin secretos hardcodeados en el nodo HTTP y cubriendo ofertas, blog, newsletter y pipeline.",
+    "credentialRequirement": {
+      "name": "webtense-cron-secret",
+      "type": "httpHeaderAuth",
+      "headerName": "Authorization",
+      "headerValue": "Bearer <CRON_SECRET>"
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-webtense",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-webtense",
+      "name": "Daily 08:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "path": "webtense-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-trigger-webtense",
+      "name": "Test Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        500
+      ],
+      "webhookId": "webtense-test"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webtenseenergy.com/api/automation/daily",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"dryRun\": false,\n  \"forceNewsletter\": false\n}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-webtense-daily-automation",
+      "name": "Run Webtense Daily Automation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        620,
+        340
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "__SET_IN_N8N__",
+          "name": "webtense-cron-secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# webtense\n\nEjecuta `POST /api/automation/daily` cada dia a las 08:00 Europe/Madrid.\n\nCobertura actual:\n- refresco y envio de ofertas a Telegram\n- envio de posts publicados del blog a Telegram\n- newsletter automatica\n- resumen de leads y estudios\n\nAntes de activar:\n1. Crear credencial `httpHeaderAuth` llamada `webtense-cron-secret`.\n2. Configurar `Authorization: Bearer <CRON_SECRET>`.\n3. Asignar esa credencial al nodo HTTP Request.\n\nPruebas:\n- Manual Trigger para ejecucion ad hoc.\n- Webhook `webtense-test` para smoke test remoto.\n- El backend acepta `dryRun` y `forceNewsletter`."
+      },
+      "id": "sticky-note-webtense",
+      "name": "Notas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run Webtense Daily Automation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 08:00": {
+      "main": [
+        [
+          {
+            "node": "Run Webtense Daily Automation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Webhook": {
+      "main": [
+        [
+          {
+            "node": "Run Webtense Daily Automation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
