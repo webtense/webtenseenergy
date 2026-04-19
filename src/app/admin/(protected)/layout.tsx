@@ -1,7 +1,8 @@
+import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdminPageUser } from "@/server/auth/admin";
 
 export default async function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
-  await requireAdminPageUser();
+  const user = await requireAdminPageUser();
 
-  return <>{children}</>;
+  return <AdminShell user={{ username: user.username, role: user.role }}>{children}</AdminShell>;
 }

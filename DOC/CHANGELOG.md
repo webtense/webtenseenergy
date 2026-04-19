@@ -1,5 +1,20 @@
 # Registro de Cambios - CHANGELOG
 
+## [3.1.0] - 2026-04-19
+
+### Anadido
+- Backoffice v3.1 por dominios: resumen, contenido, ofertas y Telegram, contactos, newsletter, ajustes y sistema
+- Hub unificado de contactos con leads, estudios, suscriptores y exportacion CSV
+- Newsletter manager con campanas manuales, bloques editables, envio de prueba y envio real
+- Ajustes ampliados para home, newsletter publica y footer
+- Footer versionado con `v3.1.0`
+
+### Mejorado
+- Reorganizacion del panel admin para cargar cada area por separado
+- Visibilidad operativa de auditoria, email errors y configuracion Telegram
+
+---
+
 ## [1.0.0] - 2026-04-09
 
 ### Añadido

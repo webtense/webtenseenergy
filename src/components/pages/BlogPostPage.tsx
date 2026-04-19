@@ -17,6 +17,7 @@ type BlogPostPageProps = {
 const CATEGORY_COLORS: Record<string, string> = {
   "Domótica": "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300",
   "Ahorro Energético": "bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300",
+  "Home Assistant": "bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300",
   Ofertas: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
   Reseñas: "bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300",
   "Gestión Energética": "bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BLOG_EDITORIAL_CATEGORIES } from "@/lib/blog-shared";
 
 type Translation = {
   id: string;
@@ -51,6 +52,24 @@ type FormState = {
   category: string;
 };
 
+type GeneratorState = {
+  locale: "ES" | "CA";
+  prompt: string;
+  audience: string;
+  objective: string;
+  tone: string;
+  points: string;
+  cta: string;
+  category: string;
+};
+
+type GeneratedDraft = Pick<
+  FormState,
+  "locale" | "title" | "slug" | "excerpt" | "content" | "seoTitle" | "seoDescription" | "category"
+> & {
+  status: "REVIEW";
+};
+
 const EMPTY_FORM: FormState = {
   locale: "ES",
   title: "",
@@ -63,6 +82,17 @@ const EMPTY_FORM: FormState = {
   seoTitle: "",
   seoDescription: "",
   category: "",
+};
+
+const EMPTY_GENERATOR: GeneratorState = {
+  locale: "ES",
+  prompt: "",
+  audience: "",
+  objective: "",
+  tone: "",
+  points: "",
+  cta: "",
+  category: "Home Assistant",
 };
 
 function toSlug(value: string) {
@@ -79,8 +109,10 @@ function toSlug(value: string) {
 export function AdminBlogManager({ initialPosts }: Props) {
   const [posts, setPosts] = useState(initialPosts);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [generator, setGenerator] = useState<GeneratorState>(EMPTY_GENERATOR);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const normalizePost = (post: ApiPost): Post => ({
     ...post,
@@ -91,6 +123,21 @@ export function AdminBlogManager({ initialPosts }: Props) {
 
   const resetForm = () => {
     setForm(EMPTY_FORM);
+  };
+
+  const applyGeneratedDraft = (draft: GeneratedDraft) => {
+    setForm({
+      ...EMPTY_FORM,
+      locale: draft.locale,
+      title: draft.title,
+      slug: draft.slug,
+      excerpt: draft.excerpt,
+      content: draft.content,
+      status: draft.status,
+      seoTitle: draft.seoTitle,
+      seoDescription: draft.seoDescription,
+      category: draft.category,
+    });
   };
 
   const fillForm = (post: Post) => {
@@ -155,6 +202,35 @@ export function AdminBlogManager({ initialPosts }: Props) {
       setStatus(error instanceof Error ? error.message : "No se pudo guardar.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const generateDraft = async () => {
+    setGenerating(true);
+    setStatus("");
+
+    try {
+      const response = await fetch("/api/admin/posts/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(generator),
+      });
+
+      const data = (await response.json()) as { message?: string; draft?: GeneratedDraft; fallback?: boolean };
+      if (!response.ok || !data.draft) {
+        throw new Error(data.message || "No se pudo generar el borrador.");
+      }
+
+      applyGeneratedDraft(data.draft);
+      setStatus(
+        data.fallback
+          ? "Se ha generado un borrador base sin IA externa. Revísalo antes de guardar."
+          : "Borrador generado. Revísalo, ajústalo si hace falta y guárdalo cuando esté listo.",
+      );
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "No se pudo generar el borrador.");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -225,6 +301,81 @@ export function AdminBlogManager({ initialPosts }: Props) {
       <section className="rounded-2xl border border-white/10 bg-zinc-900 p-6">
         <h2 className="text-xl font-semibold text-zinc-100">{editing ? "Editar post" : "Crear post"}</h2>
         <div className="mt-4 space-y-3">
+          <div className="rounded-2xl border border-primary-500/20 bg-zinc-950/80 p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-300">Generar artículo</p>
+                <p className="mt-2 text-sm text-zinc-400">
+                  Describe qué quieres explicar y el sistema te deja un borrador en estado `REVIEW` listo para edición.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              <select
+                value={generator.locale}
+                onChange={(event) =>
+                  setGenerator((prev) => ({ ...prev, locale: event.target.value as "ES" | "CA" }))
+                }
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+              >
+                <option value="ES">Generar en castellano</option>
+                <option value="CA">Generar en catalán</option>
+              </select>
+              <textarea
+                value={generator.prompt}
+                onChange={(event) => setGenerator((prev) => ({ ...prev, prompt: event.target.value }))}
+                placeholder="Ejemplo: quiero explicar cómo montar un dashboard de Home Assistant para controlar consumos, placas y climatización sin depender de la app del fabricante"
+                className="h-24 w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <input
+                  value={generator.audience}
+                  onChange={(event) => setGenerator((prev) => ({ ...prev, audience: event.target.value }))}
+                  placeholder="Público objetivo"
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                />
+                <input
+                  value={generator.objective}
+                  onChange={(event) => setGenerator((prev) => ({ ...prev, objective: event.target.value }))}
+                  placeholder="Objetivo del artículo"
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                />
+                <input
+                  value={generator.tone}
+                  onChange={(event) => setGenerator((prev) => ({ ...prev, tone: event.target.value }))}
+                  placeholder="Tono"
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                />
+                <input
+                  list="blog-editorial-categories"
+                  value={generator.category}
+                  onChange={(event) => setGenerator((prev) => ({ ...prev, category: event.target.value }))}
+                  placeholder="Categoría sugerida"
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+                />
+              </div>
+              <textarea
+                value={generator.points}
+                onChange={(event) => setGenerator((prev) => ({ ...prev, points: event.target.value }))}
+                placeholder="Puntos a cubrir, uno por línea o separados por comas"
+                className="h-20 w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+              />
+              <input
+                value={generator.cta}
+                onChange={(event) => setGenerator((prev) => ({ ...prev, cta: event.target.value }))}
+                placeholder="CTA final"
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
+              />
+              <button
+                type="button"
+                disabled={generating}
+                onClick={generateDraft}
+                className="w-full rounded-xl border border-primary-500/40 bg-primary-500/10 px-4 py-3 text-sm font-bold text-primary-200 hover:bg-primary-500/20 disabled:opacity-60"
+              >
+                {generating ? "Generando borrador..." : "Generar borrador con IA"}
+              </button>
+            </div>
+          </div>
           <select
             value={form.locale}
             onChange={(event) => setForm((prev) => ({ ...prev, locale: event.target.value as "ES" | "CA" }))}
@@ -279,11 +430,17 @@ export function AdminBlogManager({ initialPosts }: Props) {
             />
           </div>
           <input
+            list="blog-editorial-categories"
             value={form.category}
             onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
-            placeholder="Categoria (ej. Ofertas, Domótica)"
+            placeholder="Categoria (ej. Home Assistant, Ofertas, Domótica)"
             className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
           />
+          <datalist id="blog-editorial-categories">
+            {BLOG_EDITORIAL_CATEGORIES.map((category) => (
+              <option key={category} value={category} />
+            ))}
+          </datalist>
           <input
             value={form.featuredImage}
             onChange={(event) => setForm((prev) => ({ ...prev, featuredImage: event.target.value }))}

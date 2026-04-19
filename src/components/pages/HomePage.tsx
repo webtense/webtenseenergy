@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { APP_VERSION } from "@/lib/app-version";
 import { getSiteSettingValue } from "@/lib/site-settings";
 import { withBasePath } from "@/lib/paths";
 import { SectionHero } from "@/components/shared/SectionHero";
@@ -134,7 +135,7 @@ export async function HomePage({ locale, basePath }: HomePageProps) {
           <SectionIntro
             eyebrow="Herramientas útiles"
             title="Menos promesas abstractas, más utilidades que ayudan a decidir"
-            description="La v3.1 pone el foco en herramientas concretas: consultar, estimar, comparar y actuar."
+            description={`La v${APP_VERSION} pone el foco en herramientas concretas: consultar, estimar, comparar y actuar.`}
             align="center"
           />
           <div className="mt-12">

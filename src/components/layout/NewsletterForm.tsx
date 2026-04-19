@@ -8,11 +8,35 @@ export function NewsletterForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [message, setMessage] = useState("");
   const [newsletterEnabled, setNewsletterEnabled] = useState(true);
+  const [copy, setCopy] = useState({
+    title: "Boletin Webtense",
+    subtitle:
+      "Recibe ideas practicas sobre ahorro, precio de la luz, domotica y recomendaciones seleccionadas. Sin ruido y con baja en un clic.",
+    legal: "Acepto recibir comunicaciones de Webtense Energy y puedo darme de baja en cualquier momento.",
+  });
 
   useEffect(() => {
+    const locale = window.location.pathname.startsWith("/ca") ? "ca" : "es";
+
     fetch("/api/public/feature-flags")
       .then(res => res.json())
       .then(data => setNewsletterEnabled(data.newsletter === true))
+      .catch(() => {});
+
+    fetch(`/api/public/site-settings?locale=${locale}`)
+      .then((res) => res.json())
+      .then((data: { settings?: Array<{ key: string; value: string }> }) => {
+        const settings = data.settings || [];
+        setCopy({
+          title: settings.find((item) => item.key.startsWith("newsletter.title:"))?.value || "Boletin Webtense",
+          subtitle:
+            settings.find((item) => item.key.startsWith("newsletter.subtitle:"))?.value ||
+            "Recibe ideas practicas sobre ahorro, precio de la luz, domotica y recomendaciones seleccionadas. Sin ruido y con baja en un clic.",
+          legal:
+            settings.find((item) => item.key.startsWith("newsletter.legal:"))?.value ||
+            "Acepto recibir comunicaciones de Webtense Energy y puedo darme de baja en cualquier momento.",
+        });
+      })
       .catch(() => {});
   }, []);
 
@@ -59,9 +83,9 @@ export function NewsletterForm() {
 
   return (
     <div className="mt-8 rounded-[1.6rem] border border-white/10 bg-white/5 p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-400">Boletín Webtense</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-400">{copy.title}</p>
       <p className="mt-2 text-sm text-zinc-300">
-        Recibe ideas prácticas sobre ahorro, precio de la luz, domótica y recomendaciones seleccionadas. Sin ruido y con baja en un clic.
+        {copy.subtitle}
       </p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
         <input
@@ -79,7 +103,7 @@ export function NewsletterForm() {
             onChange={(event) => setConsent(event.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-zinc-600 bg-zinc-900"
           />
-          Acepto recibir comunicaciones de Webtense Energy y puedo darme de baja en cualquier momento.
+          {copy.legal}
         </label>
         <button
           type="submit"

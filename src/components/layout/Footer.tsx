@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
+import { APP_VERSION } from "@/lib/app-version";
 import { withBasePath } from "@/lib/paths";
 
 const footerLinks = {
@@ -65,6 +67,17 @@ export function Footer() {
   const locale = pathname.startsWith("/ca") ? "ca" : "es";
   const basePath = pathname.startsWith("/ca") ? "/ca" : pathname.startsWith("/es") ? "/es" : "";
   const localeLinks = footerLinks[locale];
+  const [description, setDescription] = useState(localeLinks.description);
+
+  useEffect(() => {
+    fetch(`/api/public/site-settings?locale=${locale}`)
+      .then((res) => res.json())
+      .then((data: { settings?: Array<{ key: string; value: string }> }) => {
+        const next = data.settings?.find((item) => item.key.startsWith("footer.description:"))?.value;
+        if (next) setDescription(next);
+      })
+      .catch(() => {});
+  }, [locale]);
 
   return (
     <footer className="relative mt-auto overflow-hidden bg-[#04111b] text-white">
@@ -81,7 +94,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-6 max-w-sm text-base text-zinc-400 leading-relaxed font-light">
-              {localeLinks.description}
+              {description}
             </p>
             <div className="mt-8 flex gap-4">
               <a href="mailto:info@webtenseenergy.com" className="w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:bg-primary-500/20 hover:text-primary-400 hover:border-primary-500/30 transition-all">
@@ -142,7 +155,7 @@ export function Footer() {
         
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-sm text-zinc-500 font-light">
-            &copy; {new Date().getFullYear()} WEBTENSE ENERGY. {localeLinks.headings.footer}
+            &copy; 2026 WEBTENSE ENERGY. {localeLinks.headings.footer} · v{APP_VERSION}
           </p>
           <div className="flex items-center gap-2 text-sm text-zinc-500">
             <span className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(26,183,117,1)] relative">
