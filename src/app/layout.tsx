@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
 import { buildOrganizationSchema, buildWebsiteSchema, getSiteUrl, SITE_NAME } from "@/lib/seo";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
 
 const siteUrl = getSiteUrl();
 
@@ -58,7 +47,7 @@ export default function RootLayout({
   const websiteSchema = JSON.stringify(buildWebsiteSchema());
 
   return (
-    <html lang="es" className={`${inter.variable} ${outfit.variable} h-full antialiased`}>
+    <html lang="es" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground selection:bg-primary-500/30">
         <script
           type="application/ld+json"
