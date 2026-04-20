@@ -12,6 +12,13 @@
 - [x] Vista unificada de `Personas` con timeline por email
 - [x] Versión canónica actualizada a `3.2.0`
 
+## v3.2.1 - Coherencia pública y build reproducible
+
+- [x] Respuesta pública de `feature flags` alineada entre `features[]` y los booleanos expuestos
+- [x] Render estable del formulario de newsletter cuando el flag público está desactivado
+- [x] Compatibilidad de build en producción sin dependencia de `next/font/google` dentro de Docker
+- [ ] Cierre completo del despliegue Docker de `v3.2.1` y verificación final en producción
+
 ## Próximo bloque recomendado: v3.2.x
 
 ### Seguridad y operación
