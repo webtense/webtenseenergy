@@ -1,1 +1,1 @@
-export { requireAdminApiUser } from "@/server/auth/admin";
+export { requireAdminApiUser } from '@/server/auth/admin';

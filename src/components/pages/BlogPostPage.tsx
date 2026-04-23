@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import sanitizeHtml from "sanitize-html";
-import { formatDate } from "@/lib/blog-shared";
-import { getPublishedPostBySlug, type BlogLocale } from "@/lib/content-posts";
-import { withBasePath } from "@/lib/paths";
-import { getSiteUrl, SITE_NAME } from "@/lib/seo";
-import { SectionHero } from "@/components/shared/SectionHero";
-import { ActionBanner } from "@/components/shared/ActionBanner";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import sanitizeHtml from 'sanitize-html';
+import { formatDate } from '@/lib/blog-shared';
+import { getPublishedPostBySlug, type BlogLocale } from '@/lib/content-posts';
+import { withBasePath } from '@/lib/paths';
+import { getSiteUrl, SITE_NAME } from '@/lib/seo';
+import { SectionHero } from '@/components/shared/SectionHero';
+import { ActionBanner } from '@/components/shared/ActionBanner';
 
 type BlogPostPageProps = {
   slug: string;
@@ -15,12 +15,13 @@ type BlogPostPageProps = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Domótica": "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300",
-  "Ahorro Energético": "bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300",
-  "Home Assistant": "bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300",
-  Ofertas: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
-  Reseñas: "bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300",
-  "Gestión Energética": "bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300",
+  Domótica: 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300',
+  'Ahorro Energético':
+    'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300',
+  'Home Assistant': 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300',
+  Ofertas: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
+  Reseñas: 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300',
+  'Gestión Energética': 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
 };
 
 export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps) {
@@ -28,48 +29,61 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
 
   if (!post) notFound();
 
-  const categoryClass = CATEGORY_COLORS[post.category] ?? "bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300";
-  const cleanContent = post.content.replace(/<!-- wp:[^>]*?-->/g, "").replace(/<!-- \/wp:[^>]*?-->/g, "").trim();
+  const categoryClass =
+    CATEGORY_COLORS[post.category] ??
+    'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300';
+  const cleanContent = post.content
+    .replace(/<!-- wp:[^>]*?-->/g, '')
+    .replace(/<!-- \/wp:[^>]*?-->/g, '')
+    .trim();
   const safeContent = sanitizeHtml(cleanContent, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "span"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'h3', 'span']),
     allowedAttributes: {
-      a: ["href", "name", "target", "rel"],
-      img: ["src", "alt", "title", "width", "height", "loading"],
-      "*": ["class"],
+      a: ['href', 'name', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
+      '*': ['class'],
     },
-    allowedSchemes: ["http", "https", "mailto"],
+    allowedSchemes: ['http', 'https', 'mailto'],
     transformTags: {
-      a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
+      a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer' }),
     },
   });
 
   const baseUrl = getSiteUrl();
   const articlePath = withBasePath(basePath, `/blog/${slug}`);
   const articleUrl = new URL(articlePath, baseUrl).toString();
-  const imageUrl = post.featuredImage && !post.featuredImage.startsWith("/images/") ? post.featuredImage : new URL("/images/hero_home.png", baseUrl).toString();
+  const imageUrl =
+    post.featuredImage && !post.featuredImage.startsWith('/images/')
+      ? post.featuredImage
+      : new URL('/images/hero_home.png', baseUrl).toString();
 
   const articleSchema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
     image: imageUrl,
     datePublished: post.date,
     dateModified: post.date,
-    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': articleUrl },
     publisher: {
-      "@type": "Organization",
+      '@type': 'Organization',
       name: SITE_NAME,
-      logo: { "@type": "ImageObject", url: new URL("/images/hero_home.png", baseUrl).toString() },
+      logo: { '@type': 'ImageObject', url: new URL('/images/hero_home.png', baseUrl).toString() },
     },
   });
 
   const breadcrumbSchema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Blog", item: new URL(withBasePath(basePath, "/blog"), baseUrl).toString() },
-      { "@type": "ListItem", position: 2, name: post.title, item: articleUrl },
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Blog',
+        item: new URL(withBasePath(basePath, '/blog'), baseUrl).toString(),
+      },
+      { '@type': 'ListItem', position: 2, name: post.title, item: articleUrl },
     ],
   });
 
@@ -81,7 +95,10 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
       <SectionHero
         eyebrow="Artículo"
         title={post.title}
-        subtitle={post.excerpt || "Una guía práctica pensada para entender mejor la energía, la domótica y las decisiones que realmente mueven ahorro."}
+        subtitle={
+          post.excerpt ||
+          'Una guía práctica pensada para entender mejor la energía, la domótica y las decisiones que realmente mueven ahorro.'
+        }
         compact
         align="center"
       />
@@ -89,15 +106,23 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
       <section className="section-shell-tight">
         <div className="section-inner max-w-6xl">
           <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-sm">
-            <span className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.14em] ${categoryClass}`}>{post.category}</span>
+            <span
+              className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.14em] ${categoryClass}`}
+            >
+              {post.category}
+            </span>
             <span className="text-foreground/40">•</span>
             <span className="text-foreground/55">{formatDate(post.date)}</span>
           </div>
 
-          {post.featuredImage && !post.featuredImage.startsWith("/images/") ? (
+          {post.featuredImage && !post.featuredImage.startsWith('/images/') ? (
             <div className="surface-panel overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.featuredImage} alt={post.title} className="max-h-[560px] w-full object-cover" />
+              <img
+                src={post.featuredImage}
+                alt={post.title}
+                className="max-h-[560px] w-full object-cover"
+              />
             </div>
           ) : null}
 
@@ -109,13 +134,25 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
 
             <aside className="space-y-4 lg:sticky lg:top-24">
               <div className="surface-panel-soft p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">En esta guía</p>
-                <p className="mt-3 text-sm leading-7 text-foreground/70">Una lectura enfocada a entender mejor el contexto, evaluar opciones y enlazar el contenido con una siguiente acción práctica.</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
+                  En esta guía
+                </p>
+                <p className="mt-3 text-sm leading-7 text-foreground/70">
+                  Una lectura enfocada a entender mejor el contexto, evaluar opciones y enlazar el
+                  contenido con una siguiente acción práctica.
+                </p>
               </div>
               <div className="surface-panel-soft p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">Siguiente paso</p>
-                <p className="mt-3 text-sm leading-7 text-foreground/70">Si quieres aterrizar estas ideas sobre tu caso real, la mejor vía sigue siendo partir de tu factura o tu consumo.</p>
-                <Link href={withBasePath(basePath, "/estudio")} className="cta-primary mt-5 w-full">Pedir estudio</Link>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
+                  Siguiente paso
+                </p>
+                <p className="mt-3 text-sm leading-7 text-foreground/70">
+                  Si quieres aterrizar estas ideas sobre tu caso real, la mejor vía sigue siendo
+                  partir de tu factura o tu consumo.
+                </p>
+                <Link href={withBasePath(basePath, '/estudio')} className="cta-primary mt-5 w-full">
+                  Pedir estudio
+                </Link>
               </div>
             </aside>
           </div>
@@ -127,11 +164,25 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
           <ActionBanner
             title="Convierte la lectura en una decisión concreta"
             description="Analizamos tu contrato de luz o tu escenario energético y te devolvemos una recomendación accionable, clara y sin compromiso."
-            action={<Link href={withBasePath(basePath, "/estudio")} className="cta-primary">Solicitar estudio gratuito</Link>}
+            action={
+              <Link href={withBasePath(basePath, '/estudio')} className="cta-primary">
+                Solicitar estudio gratuito
+              </Link>
+            }
           />
           <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 text-sm dark:border-white/10 sm:flex-row">
-            <Link href={withBasePath(basePath, "/blog")} className="font-semibold text-foreground/65 hover:text-primary-600 dark:hover:text-primary-300">← Volver al blog</Link>
-            <Link href={withBasePath(basePath, "/contacto")} className="text-foreground/50 hover:text-foreground/75">¿Prefieres hablar con el equipo?</Link>
+            <Link
+              href={withBasePath(basePath, '/blog')}
+              className="font-semibold text-foreground/65 hover:text-primary-600 dark:hover:text-primary-300"
+            >
+              ← Volver al blog
+            </Link>
+            <Link
+              href={withBasePath(basePath, '/contacto')}
+              className="text-foreground/50 hover:text-foreground/75"
+            >
+              ¿Prefieres hablar con el equipo?
+            </Link>
           </div>
         </div>
       </section>

@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { AdminTopbar } from "@/components/admin/AdminTopbar";
+import { ReactNode } from 'react';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminTopbar } from '@/components/admin/AdminTopbar';
 
 type Props = {
   user: {
     username: string;
-    role: "ADMIN" | "EDITOR";
+    role: 'ADMIN' | 'EDITOR';
   };
   children: ReactNode;
 };

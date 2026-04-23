@@ -7,7 +7,9 @@ const imageHosts = (process.env.NEXT_IMAGE_HOSTS || "webtenseenergy.com,images.u
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+  // unsafe-inline requerido por Tailwind CSS v4 (estilos inline en runtime).
+  // unsafe-eval eliminado para reducir superficie XSS.
+  "script-src 'self' 'unsafe-inline' https:",
   "style-src 'self' 'unsafe-inline' https:",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",

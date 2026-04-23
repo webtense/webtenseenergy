@@ -1,18 +1,33 @@
-import { db } from "@/lib/db";
-import { AdminNewsletterManager } from "@/components/admin/AdminNewsletterManager";
-import { requireAdminPageUser } from "@/server/auth/admin";
+import { db } from '@/lib/db';
+import { AdminNewsletterManager } from '@/components/admin/AdminNewsletterManager';
+import { requireAdminPageUser } from '@/server/auth/admin';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function AdminNewsletterPage() {
-  await requireAdminPageUser("ADMIN");
+  await requireAdminPageUser('ADMIN');
 
   const [campaigns, subscribers, jobs, events, logs] = await Promise.all([
-    db.campaign.findMany({ include: { blocks: { orderBy: { sortOrder: "asc" } } }, orderBy: [{ updatedAt: "desc" }] }),
-    db.subscriber.findMany({ orderBy: [{ createdAt: "desc" }], take: 50 }),
-    db.sendJob.findMany({ include: { campaign: true }, orderBy: [{ createdAt: "desc" }], take: 100 }),
-    db.sendEvent.findMany({ include: { subscriber: true, sendJob: { include: { campaign: true } } }, orderBy: [{ createdAt: "desc" }], take: 100 }),
-    db.emailLog.findMany({ where: { entityType: "Campaign" }, orderBy: [{ createdAt: "desc" }], take: 100 }),
+    db.campaign.findMany({
+      include: { blocks: { orderBy: { sortOrder: 'asc' } } },
+      orderBy: [{ updatedAt: 'desc' }],
+    }),
+    db.subscriber.findMany({ orderBy: [{ createdAt: 'desc' }], take: 50 }),
+    db.sendJob.findMany({
+      include: { campaign: true },
+      orderBy: [{ createdAt: 'desc' }],
+      take: 100,
+    }),
+    db.sendEvent.findMany({
+      include: { subscriber: true, sendJob: { include: { campaign: true } } },
+      orderBy: [{ createdAt: 'desc' }],
+      take: 100,
+    }),
+    db.emailLog.findMany({
+      where: { entityType: 'Campaign' },
+      orderBy: [{ createdAt: 'desc' }],
+      take: 100,
+    }),
   ]);
 
   return (

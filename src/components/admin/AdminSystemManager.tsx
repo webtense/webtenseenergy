@@ -1,7 +1,49 @@
-type UserItem = { id: string; email: string; username: string; role: "ADMIN" | "EDITOR"; isActive: boolean; createdAt: string; updatedAt: string };
-type AuditItem = { id: string; action: string; entityType: string; entityId: string | null; status: string; ipHash: string | null; userAgent: string | null; metadata: string | null; createdAt: string; adminUserId: string | null; adminUser: { username: string; email: string } | null };
-type TelegramConfigItem = { id: string; botName: string | null; channelId: string; webhookUrl: string | null; webhookSecret: string | null; isActive: boolean; createdAt: string; updatedAt: string } | null;
-type EmailErrorItem = { id: string; destination: string; subject: string; status: string; error: string | null; createdAt: string; sentAt: string | null; channel: string; entityType: string | null; entityId: string | null; providerMessageId: string | null; payload: string | null };
+type UserItem = {
+  id: string;
+  email: string;
+  username: string;
+  role: 'ADMIN' | 'EDITOR';
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+type AuditItem = {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  status: string;
+  ipHash: string | null;
+  userAgent: string | null;
+  metadata: string | null;
+  createdAt: string;
+  adminUserId: string | null;
+  adminUser: { username: string; email: string } | null;
+};
+type TelegramConfigItem = {
+  id: string;
+  botName: string | null;
+  channelId: string;
+  webhookUrl: string | null;
+  webhookSecret: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+} | null;
+type EmailErrorItem = {
+  id: string;
+  destination: string;
+  subject: string;
+  status: string;
+  error: string | null;
+  createdAt: string;
+  sentAt: string | null;
+  channel: string;
+  entityType: string | null;
+  entityId: string | null;
+  providerMessageId: string | null;
+  payload: string | null;
+};
 
 type Props = {
   users: UserItem[];
@@ -11,8 +53,10 @@ type Props = {
 };
 
 function formatDate(value: string | null) {
-  if (!value) return "-";
-  return new Intl.DateTimeFormat("es-ES", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+  if (!value) return '-';
+  return new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' }).format(
+    new Date(value)
+  );
 }
 
 export function AdminSystemManager({ users, auditLogs, telegramConfig, recentEmailErrors }: Props) {
@@ -21,14 +65,20 @@ export function AdminSystemManager({ users, auditLogs, telegramConfig, recentEma
       <section className="grid gap-6 xl:grid-cols-3">
         <article className="rounded-3xl border border-white/10 bg-zinc-900/90 p-6 xl:col-span-2">
           <p className="text-xs uppercase tracking-[0.2em] text-primary-400">Sistema</p>
-          <h2 className="mt-2 text-2xl font-bold text-white">Admins, auditoria y salud operativa</h2>
-          <p className="mt-2 text-sm text-zinc-400">Vista de supervision del backoffice, trazabilidad y errores recientes.</p>
+          <h2 className="mt-2 text-2xl font-bold text-white">
+            Admins, auditoria y salud operativa
+          </h2>
+          <p className="mt-2 text-sm text-zinc-400">
+            Vista de supervision del backoffice, trazabilidad y errores recientes.
+          </p>
         </article>
         <article className="rounded-3xl border border-white/10 bg-zinc-900/90 p-6">
           <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Telegram</p>
-          <p className="mt-2 text-xl font-bold text-white">{telegramConfig?.isActive ? "Activo" : "Sin configurar"}</p>
-          <p className="mt-2 text-sm text-zinc-400">Canal: {telegramConfig?.channelId || "-"}</p>
-          <p className="mt-1 text-sm text-zinc-500">Bot: {telegramConfig?.botName || "-"}</p>
+          <p className="mt-2 text-xl font-bold text-white">
+            {telegramConfig?.isActive ? 'Activo' : 'Sin configurar'}
+          </p>
+          <p className="mt-2 text-sm text-zinc-400">Canal: {telegramConfig?.channelId || '-'}</p>
+          <p className="mt-1 text-sm text-zinc-500">Bot: {telegramConfig?.botName || '-'}</p>
         </article>
       </section>
 
@@ -37,10 +87,15 @@ export function AdminSystemManager({ users, auditLogs, telegramConfig, recentEma
           <h3 className="text-xl font-semibold text-white">Usuarios admin</h3>
           <div className="mt-4 space-y-3">
             {users.map((user) => (
-              <div key={user.id} className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3">
+              <div
+                key={user.id}
+                className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3"
+              >
                 <p className="font-semibold text-zinc-100">{user.username}</p>
                 <p className="mt-1 text-sm text-zinc-400">{user.email}</p>
-                <p className="mt-2 text-xs text-zinc-500">{user.role} · {user.isActive ? "activo" : "inactivo"}</p>
+                <p className="mt-2 text-xs text-zinc-500">
+                  {user.role} · {user.isActive ? 'activo' : 'inactivo'}
+                </p>
               </div>
             ))}
           </div>
@@ -49,10 +104,13 @@ export function AdminSystemManager({ users, auditLogs, telegramConfig, recentEma
           <h3 className="text-xl font-semibold text-white">Errores recientes de email</h3>
           <div className="mt-4 space-y-3">
             {recentEmailErrors.map((log) => (
-              <div key={log.id} className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3">
+              <div
+                key={log.id}
+                className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3"
+              >
                 <p className="font-semibold text-zinc-100">{log.destination}</p>
                 <p className="mt-1 text-sm text-zinc-400">{log.subject}</p>
-                <p className="mt-2 text-xs text-red-300">{log.error || "Sin detalle"}</p>
+                <p className="mt-2 text-xs text-red-300">{log.error || 'Sin detalle'}</p>
                 <p className="mt-2 text-xs text-zinc-500">{formatDate(log.createdAt)}</p>
               </div>
             ))}
@@ -78,7 +136,9 @@ export function AdminSystemManager({ users, auditLogs, telegramConfig, recentEma
                 <tr key={log.id}>
                   <td className="px-4 py-3 text-zinc-200">{log.action}</td>
                   <td className="px-4 py-3 text-zinc-400">{log.entityType}</td>
-                  <td className="px-4 py-3 text-zinc-400">{log.adminUser?.username || "sistema"}</td>
+                  <td className="px-4 py-3 text-zinc-400">
+                    {log.adminUser?.username || 'sistema'}
+                  </td>
                   <td className="px-4 py-3 text-zinc-400">{log.status}</td>
                   <td className="px-4 py-3 text-zinc-500">{formatDate(log.createdAt)}</td>
                 </tr>

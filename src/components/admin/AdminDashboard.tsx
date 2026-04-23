@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 type FeatureFlag = {
   id: string;
@@ -14,13 +14,13 @@ type SiteSetting = {
   id: string;
   key: string;
   value: string;
-  locale: "ES" | "CA" | null;
+  locale: 'ES' | 'CA' | null;
 };
 
 type Props = {
   user: {
     username: string;
-    role: "ADMIN" | "EDITOR";
+    role: 'ADMIN' | 'EDITOR';
   };
   flags: FeatureFlag[];
   settings: SiteSetting[];
@@ -29,68 +29,72 @@ type Props = {
 export function AdminDashboard({ user, flags, settings }: Props) {
   const [localFlags, setLocalFlags] = useState(flags);
   const [localSettings, setLocalSettings] = useState(settings);
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<string>('');
 
   const heroES = useMemo(
-    () => localSettings.find((item) => item.key === "home.hero.title:ES")?.value || "",
-    [localSettings],
+    () => localSettings.find((item) => item.key === 'home.hero.title:ES')?.value || '',
+    [localSettings]
   );
   const heroCA = useMemo(
-    () => localSettings.find((item) => item.key === "home.hero.title:CA")?.value || "",
-    [localSettings],
+    () => localSettings.find((item) => item.key === 'home.hero.title:CA')?.value || '',
+    [localSettings]
   );
 
-  const setHeroValue = (key: "home.hero.title:ES" | "home.hero.title:CA", value: string) => {
+  const setHeroValue = (key: 'home.hero.title:ES' | 'home.hero.title:CA', value: string) => {
     setLocalSettings((prev) =>
       prev.map((item) => {
         if (item.key === key) return { ...item, value };
         return item;
-      }),
+      })
     );
   };
 
   const toggleFlag = async (flag: FeatureFlag) => {
     const nextEnabled = !flag.enabled;
-    setLocalFlags((prev) => prev.map((item) => (item.id === flag.id ? { ...item, enabled: nextEnabled } : item)));
+    setLocalFlags((prev) =>
+      prev.map((item) => (item.id === flag.id ? { ...item, enabled: nextEnabled } : item))
+    );
 
-    const response = await fetch("/api/admin/feature-flags", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/admin/feature-flags', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: flag.key, enabled: nextEnabled }),
     });
 
     if (!response.ok) {
-      setLocalFlags((prev) => prev.map((item) => (item.id === flag.id ? { ...item, enabled: flag.enabled } : item)));
-      setStatus("No se pudo guardar el modulo.");
+      setLocalFlags((prev) =>
+        prev.map((item) => (item.id === flag.id ? { ...item, enabled: flag.enabled } : item))
+      );
+      setStatus('No se pudo guardar el modulo.');
       return;
     }
 
-    setStatus(`Modulo ${flag.key} ${nextEnabled ? "activado" : "desactivado"}.`);
+    setStatus(`Modulo ${flag.key} ${nextEnabled ? 'activado' : 'desactivado'}.`);
   };
 
   const saveHeroTitles = async () => {
-    const response = await fetch("/api/admin/site-settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/admin/site-settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         items: [
-          { key: "home.hero.title", locale: "ES", value: heroES },
-          { key: "home.hero.title", locale: "CA", value: heroCA },
+          { key: 'home.hero.title', locale: 'ES', value: heroES },
+          { key: 'home.hero.title', locale: 'CA', value: heroCA },
         ],
       }),
     });
 
     if (!response.ok) {
-      setStatus("No se pudieron guardar los textos.");
+      setStatus('No se pudieron guardar los textos.');
       return;
     }
 
-    setStatus("Textos del hero guardados correctamente.");
+    setStatus('Textos del hero guardados correctamente.');
   };
 
   const logout = async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
-    window.location.href = "/admin/login";
+    await fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
   };
 
   return (
@@ -104,13 +108,22 @@ export function AdminDashboard({ user, flags, settings }: Props) {
               Sesion: {user.username} ({user.role})
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              <Link href="/admin" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+              <Link
+                href="/admin"
+                className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300"
+              >
                 Dashboard
               </Link>
-              <Link href="/admin/leads" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+              <Link
+                href="/admin/leads"
+                className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300"
+              >
                 Leads
               </Link>
-              <Link href="/admin/studies" className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300">
+              <Link
+                href="/admin/studies"
+                className="rounded-full border border-white/10 px-3 py-1 text-zinc-300 hover:border-primary-500 hover:text-primary-300"
+              >
                 Studies
               </Link>
             </div>
@@ -126,7 +139,9 @@ export function AdminDashboard({ user, flags, settings }: Props) {
 
         <section className="rounded-2xl border border-white/10 bg-zinc-900 p-6">
           <h2 className="text-xl font-semibold">Modulos</h2>
-          <p className="mt-1 text-sm text-zinc-400">Activa o desactiva blog, ofertas, newsletter y telegram.</p>
+          <p className="mt-1 text-sm text-zinc-400">
+            Activa o desactiva blog, ofertas, newsletter y telegram.
+          </p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {localFlags.map((flag) => (
               <button
@@ -137,10 +152,12 @@ export function AdminDashboard({ user, flags, settings }: Props) {
               >
                 <div>
                   <p className="font-semibold">{flag.key}</p>
-                  <p className="text-xs text-zinc-500">{flag.description || "Sin descripcion"}</p>
+                  <p className="text-xs text-zinc-500">{flag.description || 'Sin descripcion'}</p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs ${flag.enabled ? "bg-primary-600 text-white" : "bg-zinc-700"}`}>
-                  {flag.enabled ? "ON" : "OFF"}
+                <span
+                  className={`rounded-full px-3 py-1 text-xs ${flag.enabled ? 'bg-primary-600 text-white' : 'bg-zinc-700'}`}
+                >
+                  {flag.enabled ? 'ON' : 'OFF'}
                 </span>
               </button>
             ))}
@@ -152,18 +169,22 @@ export function AdminDashboard({ user, flags, settings }: Props) {
           <p className="mt-1 text-sm text-zinc-400">Edicion inicial del titulo hero por idioma.</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.15em] text-zinc-400">Castellano (ES)</label>
+              <label className="mb-2 block text-xs uppercase tracking-[0.15em] text-zinc-400">
+                Castellano (ES)
+              </label>
               <textarea
                 value={heroES}
-                onChange={(event) => setHeroValue("home.hero.title:ES", event.target.value)}
+                onChange={(event) => setHeroValue('home.hero.title:ES', event.target.value)}
                 className="h-24 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.15em] text-zinc-400">Catala (CA)</label>
+              <label className="mb-2 block text-xs uppercase tracking-[0.15em] text-zinc-400">
+                Catala (CA)
+              </label>
               <textarea
                 value={heroCA}
-                onChange={(event) => setHeroValue("home.hero.title:CA", event.target.value)}
+                onChange={(event) => setHeroValue('home.hero.title:CA', event.target.value)}
                 className="h-24 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-primary-500 focus:outline-none"
               />
             </div>
@@ -177,7 +198,11 @@ export function AdminDashboard({ user, flags, settings }: Props) {
           </button>
         </section>
 
-        {status && <p className="rounded-xl border border-primary-500/30 bg-primary-500/10 px-4 py-3 text-sm">{status}</p>}
+        {status && (
+          <p className="rounded-xl border border-primary-500/30 bg-primary-500/10 px-4 py-3 text-sm">
+            {status}
+          </p>
+        )}
       </div>
     </div>
   );

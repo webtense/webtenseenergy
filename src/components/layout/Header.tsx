@@ -1,54 +1,54 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { withBasePath } from "@/lib/paths";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { withBasePath } from '@/lib/paths';
 
 const navigation = [
-  { key: "empresas", href: "/empresas" },
-  { key: "particulares", href: "/particulares" },
-  { key: "precio", href: "/luz/precio-hoy" },
-  { key: "blog", href: "/blog" },
-  { key: "ofertas", href: "/ofertas" },
-  { key: "contacto", href: "/contacto" },
+  { key: 'empresas', href: '/empresas' },
+  { key: 'particulares', href: '/particulares' },
+  { key: 'precio', href: '/luz/precio-hoy' },
+  { key: 'blog', href: '/blog' },
+  { key: 'ofertas', href: '/ofertas' },
+  { key: 'contacto', href: '/contacto' },
 ];
 
 const labels = {
   es: {
-    empresas: "Empresas",
-    particulares: "Particulares",
-    precio: "Precio luz",
-    blog: "Blog",
-    ofertas: "Ofertas",
-    contacto: "Contacto",
-    estudio: "Estudio gratuito",
-    telegram: "Canal Telegram",
+    empresas: 'Empresas',
+    particulares: 'Particulares',
+    precio: 'Precio luz',
+    blog: 'Blog',
+    ofertas: 'Ofertas',
+    contacto: 'Contacto',
+    estudio: 'Estudio gratuito',
+    telegram: 'Canal Telegram',
   },
   ca: {
-    empresas: "Empreses",
-    particulares: "Particulars",
-    precio: "Preu llum",
-    blog: "Blog",
-    ofertas: "Ofertes",
-    contacto: "Contacte",
-    estudio: "Estudi gratuit",
-    telegram: "Canal Telegram",
+    empresas: 'Empreses',
+    particulares: 'Particulars',
+    precio: 'Preu llum',
+    blog: 'Blog',
+    ofertas: 'Ofertes',
+    contacto: 'Contacte',
+    estudio: 'Estudi gratuit',
+    telegram: 'Canal Telegram',
   },
 };
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname() || "/";
-  const locale = pathname.startsWith("/ca") ? "ca" : "es";
-  const basePath = pathname.startsWith("/ca") ? "/ca" : pathname.startsWith("/es") ? "/es" : "";
+  const pathname = usePathname() || '/';
+  const locale = pathname.startsWith('/ca') ? 'ca' : 'es';
+  const basePath = pathname.startsWith('/ca') ? '/ca' : pathname.startsWith('/es') ? '/es' : '';
   const localeLabels = labels[locale];
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-background/85 backdrop-blur-xl dark:border-white/8">
       <div className="section-inner flex h-16 items-center justify-between px-4 sm:h-[4.5rem] sm:px-6 lg:px-8">
         <div className="flex items-center gap-10">
-          <Link href={withBasePath(basePath, "/")} className="flex items-center gap-2">
+          <Link href={withBasePath(basePath, '/')} className="flex items-center gap-2">
             <span className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-xl">
               WEBTENSE<span className="text-primary-600 dark:text-primary-400">ENERGY</span>
             </span>
@@ -56,13 +56,19 @@ export function Header() {
           <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-foreground/65">
             {navigation.map((item) => {
               const href = withBasePath(basePath, item.href);
-              const isActive = pathname === href || (href !== withBasePath(basePath, "/") && pathname.startsWith(`${href}/`));
+              const isActive =
+                pathname === href ||
+                (href !== withBasePath(basePath, '/') && pathname.startsWith(`${href}/`));
 
               return (
                 <Link
                   key={item.href}
                   href={href}
-                  className={isActive ? "text-foreground" : "transition-colors hover:text-primary-600 dark:hover:text-primary-400"}
+                  className={
+                    isActive
+                      ? 'text-foreground'
+                      : 'transition-colors hover:text-primary-600 dark:hover:text-primary-400'
+                  }
                 >
                   {localeLabels[item.key as keyof typeof localeLabels]}
                 </Link>
@@ -80,7 +86,10 @@ export function Header() {
           >
             {localeLabels.telegram}
           </Link>
-          <Link href={withBasePath(basePath, "/estudio")} className="cta-primary text-sm px-5 py-2.5">
+          <Link
+            href={withBasePath(basePath, '/estudio')}
+            className="cta-primary text-sm px-5 py-2.5"
+          >
             {localeLabels.estudio}
           </Link>
         </div>
@@ -92,11 +101,21 @@ export function Header() {
         >
           {isMobileMenuOpen ? (
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           ) : (
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16m-16 5h10" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 7h16M4 12h16m-16 5h10"
+              />
             </svg>
           )}
         </button>
@@ -121,7 +140,7 @@ export function Header() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link
-                href={withBasePath(basePath, "/estudio")}
+                href={withBasePath(basePath, '/estudio')}
                 className="cta-primary"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

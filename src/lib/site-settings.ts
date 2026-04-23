@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
+import { db } from '@/lib/db';
 
-export async function getSiteSettingValue(key: string, locale: "ES" | "CA", fallback: string) {
+export async function getSiteSettingValue(key: string, locale: 'ES' | 'CA', fallback: string) {
   try {
     const fullKey = `${key}:${locale}`;
     const setting = await db.siteSetting.findUnique({

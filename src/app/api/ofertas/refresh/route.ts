@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { buildOfferCatalogFromDatabase, writeOfferCatalog } from "@/lib/offers-cache";
+import { NextResponse } from 'next/server';
+import { buildOfferCatalogFromDatabase, writeOfferCatalog } from '@/lib/offers-cache';
 
 export async function GET(request: Request) {
-  const auth = request.headers.get("authorization");
+  const auth = request.headers.get('authorization');
   const expected = process.env.CRON_SECRET ? `Bearer ${process.env.CRON_SECRET}` : null;
 
   if (!expected || auth !== expected) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   const catalog = await buildOfferCatalogFromDatabase();

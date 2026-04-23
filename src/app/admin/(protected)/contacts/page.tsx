@@ -1,9 +1,9 @@
-import { db } from "@/lib/db";
-import { AdminContactsManager } from "@/components/admin/AdminContactsManager";
-import { AdminPeoplePanel } from "@/components/admin/AdminPeoplePanel";
-import { requireAdminPageUser } from "@/server/auth/admin";
+import { db } from '@/lib/db';
+import { AdminContactsManager } from '@/components/admin/AdminContactsManager';
+import { AdminPeoplePanel } from '@/components/admin/AdminPeoplePanel';
+import { requireAdminPageUser } from '@/server/auth/admin';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type LeadWithNotes = {
   id: string;
@@ -13,7 +13,7 @@ type LeadWithNotes = {
   subject: string | null;
   message: string;
   source: string;
-  locale: "ES" | "CA";
+  locale: 'ES' | 'CA';
   status: string;
   createdAt: Date;
   notes: Array<{
@@ -32,7 +32,7 @@ type StudyForPeople = {
   method: string;
   kwConsumed: string | null;
   source: string;
-  locale: "ES" | "CA";
+  locale: 'ES' | 'CA';
   status: string;
   createdAt: Date;
 };
@@ -41,7 +41,7 @@ type SubscriberForPeople = {
   id: string;
   email: string;
   fullName: string | null;
-  locale: "ES" | "CA";
+  locale: 'ES' | 'CA';
   isActive: boolean;
   source: string;
   consentedAt: Date | null;
@@ -78,22 +78,25 @@ function buildPeopleSummary(params: {
   subscribers: SubscriberForPeople[];
   emailLogs: EmailLogForPeople[];
 }) {
-  const people = new Map<string, {
-    id: string;
-    email: string;
-    displayName: string;
-    phones: Set<string>;
-    companies: Set<string>;
-    locales: Set<string>;
-    sources: Set<string>;
-    leadCount: number;
-    studyCount: number;
-    hasSubscriber: boolean;
-    subscriberStatus: "ACTIVE" | "INACTIVE" | "NONE";
-    consentedAt: string | null;
-    lastActivityAt: string;
-    timeline: Array<{ id: string; type: string; title: string; detail: string; at: string }>;
-  }>();
+  const people = new Map<
+    string,
+    {
+      id: string;
+      email: string;
+      displayName: string;
+      phones: Set<string>;
+      companies: Set<string>;
+      locales: Set<string>;
+      sources: Set<string>;
+      leadCount: number;
+      studyCount: number;
+      hasSubscriber: boolean;
+      subscriberStatus: 'ACTIVE' | 'INACTIVE' | 'NONE';
+      consentedAt: string | null;
+      lastActivityAt: string;
+      timeline: Array<{ id: string; type: string; title: string; detail: string; at: string }>;
+    }
+  >();
 
   const ensurePerson = (email: string, fallbackName: string) => {
     const normalizedEmail = email.trim().toLowerCase();
@@ -111,7 +114,7 @@ function buildPeopleSummary(params: {
       leadCount: 0,
       studyCount: 0,
       hasSubscriber: false,
-      subscriberStatus: "NONE" as const,
+      subscriberStatus: 'NONE' as const,
       consentedAt: null,
       lastActivityAt: new Date(0).toISOString(),
       timeline: [],
@@ -121,7 +124,10 @@ function buildPeopleSummary(params: {
     return created;
   };
 
-  const pushTimeline = (person: ReturnType<typeof ensurePerson>, item: { id: string; type: string; title: string; detail: string; at: string }) => {
+  const pushTimeline = (
+    person: ReturnType<typeof ensurePerson>,
+    item: { id: string; type: string; title: string; detail: string; at: string }
+  ) => {
     person.timeline.push(item);
     if (item.at > person.lastActivityAt) {
       person.lastActivityAt = item.at;
@@ -137,7 +143,7 @@ function buildPeopleSummary(params: {
     person.leadCount += 1;
     pushTimeline(person, {
       id: `lead-${lead.id}`,
-      type: "lead",
+      type: 'lead',
       title: `Lead ${lead.status}`,
       detail: lead.subject || lead.message.slice(0, 140),
       at: lead.createdAt.toISOString(),
@@ -146,8 +152,8 @@ function buildPeopleSummary(params: {
     for (const note of lead.notes) {
       pushTimeline(person, {
         id: `lead-note-${note.id}`,
-        type: "note",
-        title: "Nota comercial",
+        type: 'note',
+        title: 'Nota comercial',
         detail: note.body,
         at: note.createdAt.toISOString(),
       });
@@ -164,9 +170,9 @@ function buildPeopleSummary(params: {
     person.studyCount += 1;
     pushTimeline(person, {
       id: `study-${study.id}`,
-      type: "study",
+      type: 'study',
       title: `Solicitud ${study.status}`,
-      detail: `${study.method}${study.kwConsumed ? ` · ${study.kwConsumed}` : ""}`,
+      detail: `${study.method}${study.kwConsumed ? ` · ${study.kwConsumed}` : ''}`,
       at: study.createdAt.toISOString(),
     });
   }
@@ -179,13 +185,13 @@ function buildPeopleSummary(params: {
     person.locales.add(subscriber.locale);
     person.sources.add(subscriber.source);
     person.hasSubscriber = true;
-    person.subscriberStatus = subscriber.isActive ? "ACTIVE" : "INACTIVE";
+    person.subscriberStatus = subscriber.isActive ? 'ACTIVE' : 'INACTIVE';
     person.consentedAt = subscriber.consentedAt?.toISOString() || person.consentedAt;
 
     pushTimeline(person, {
       id: `subscriber-${subscriber.id}`,
-      type: "subscriber",
-      title: subscriber.isActive ? "Suscriptor activo" : "Suscriptor inactivo",
+      type: 'subscriber',
+      title: subscriber.isActive ? 'Suscriptor activo' : 'Suscriptor inactivo',
       detail: `Alta en newsletter desde ${subscriber.source}`,
       at: subscriber.createdAt.toISOString(),
     });
@@ -193,8 +199,8 @@ function buildPeopleSummary(params: {
     for (const consent of subscriber.consents) {
       pushTimeline(person, {
         id: `consent-${consent.id}`,
-        type: "consent",
-        title: "Consentimiento registrado",
+        type: 'consent',
+        title: 'Consentimiento registrado',
         detail: consent.legalText,
         at: consent.acceptedAt.toISOString(),
       });
@@ -203,7 +209,7 @@ function buildPeopleSummary(params: {
     for (const event of subscriber.events) {
       pushTimeline(person, {
         id: `event-${event.id}`,
-        type: "newsletter",
+        type: 'newsletter',
         title: `Evento ${event.eventType}`,
         detail: event.sendJob.campaign.name,
         at: event.createdAt.toISOString(),
@@ -217,7 +223,7 @@ function buildPeopleSummary(params: {
     const person = people.get(email)!;
     pushTimeline(person, {
       id: `emaillog-${log.id}`,
-      type: "email",
+      type: 'email',
       title: `Email ${log.status}`,
       detail: log.subject,
       at: (log.sentAt || log.createdAt).toISOString(),
@@ -231,36 +237,42 @@ function buildPeopleSummary(params: {
       companies: Array.from(person.companies),
       locales: Array.from(person.locales),
       sources: Array.from(person.sources),
-      timeline: [...person.timeline].sort((left, right) => right.at.localeCompare(left.at)).slice(0, 20),
+      timeline: [...person.timeline]
+        .sort((left, right) => right.at.localeCompare(left.at))
+        .slice(0, 20),
     }))
     .sort((left, right) => right.lastActivityAt.localeCompare(left.lastActivityAt));
 }
 
 export default async function AdminContactsPage() {
-  await requireAdminPageUser("ADMIN");
+  await requireAdminPageUser('ADMIN');
 
   const [leads, studies, subscribers, campaigns, emailLogs] = await Promise.all([
     db.lead.findMany({
       include: {
         notes: {
           include: { adminUser: { select: { username: true } } },
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 200,
     }),
-    db.studyRequest.findMany({ orderBy: [{ createdAt: "desc" }], take: 200 }),
+    db.studyRequest.findMany({ orderBy: [{ createdAt: 'desc' }], take: 200 }),
     db.subscriber.findMany({
       include: {
-        consents: { orderBy: { acceptedAt: "desc" }, take: 5 },
-        events: { orderBy: { createdAt: "desc" }, take: 10, include: { sendJob: { include: { campaign: true } } } },
+        consents: { orderBy: { acceptedAt: 'desc' }, take: 5 },
+        events: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          include: { sendJob: { include: { campaign: true } } },
+        },
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 200,
     }),
-    db.campaign.findMany({ orderBy: [{ updatedAt: "desc" }], take: 20 }),
-    db.emailLog.findMany({ orderBy: [{ createdAt: "desc" }], take: 40 }),
+    db.campaign.findMany({ orderBy: [{ updatedAt: 'desc' }], take: 20 }),
+    db.emailLog.findMany({ orderBy: [{ createdAt: 'desc' }], take: 40 }),
   ]);
 
   const people = buildPeopleSummary({ leads, studies, subscribers, emailLogs });

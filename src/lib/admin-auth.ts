@@ -1,12 +1,12 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { cookies } from "next/headers";
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { cookies } from 'next/headers';
 
-const SESSION_COOKIE = process.env.ADMIN_SESSION_COOKIE_NAME || "wt_admin_session";
+const SESSION_COOKIE = process.env.ADMIN_SESSION_COOKIE_NAME || 'wt_admin_session';
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
 export type AdminSessionPayload = {
   userId: string;
-  role: "ADMIN" | "EDITOR";
+  role: 'ADMIN' | 'EDITOR';
   username: string;
   exp: number;
 };
@@ -14,24 +14,28 @@ export type AdminSessionPayload = {
 function getSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_SECRET;
   if (!secret) {
-    throw new Error("ADMIN_SESSION_SECRET o ADMIN_SECRET no configurado.");
+    throw new Error('ADMIN_SESSION_SECRET o ADMIN_SECRET no configurado.');
   }
   return secret;
 }
 
 function toBase64Url(value: string) {
-  return Buffer.from(value).toString("base64url");
+  return Buffer.from(value).toString('base64url');
 }
 
 function fromBase64Url(value: string) {
-  return Buffer.from(value, "base64url").toString("utf8");
+  return Buffer.from(value, 'base64url').toString('utf8');
 }
 
 function sign(payload: string, secret: string) {
-  return createHmac("sha256", secret).update(payload).digest("base64url");
+  return createHmac('sha256', secret).update(payload).digest('base64url');
 }
 
-export function createAdminSessionToken(userId: string, username: string, role: "ADMIN" | "EDITOR") {
+export function createAdminSessionToken(
+  userId: string,
+  username: string,
+  role: 'ADMIN' | 'EDITOR'
+) {
   const secret = getSecret();
   const body: AdminSessionPayload = {
     userId,
@@ -46,7 +50,7 @@ export function createAdminSessionToken(userId: string, username: string, role: 
 
 export function verifyAdminSessionToken(token: string): AdminSessionPayload | null {
   try {
-    const [encoded, signature] = token.split(".");
+    const [encoded, signature] = token.split('.');
     if (!encoded || !signature) return null;
 
     const secret = getSecret();

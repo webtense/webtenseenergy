@@ -1,18 +1,30 @@
+import logger from '@/lib/logger';
 import { NextResponse } from 'next/server';
-import { checkRateLimit, escapeHtml, getClientIp, hashIdentifier, isValidEmail, normalizeEmail } from '@/lib/security';
+import {
+  checkRateLimit,
+  escapeHtml,
+  getClientIp,
+  hashIdentifier,
+  isValidEmail,
+  normalizeEmail,
+} from '@/lib/security';
 import { submitContactRequest } from '@/server/services/contact-service';
 
 export async function POST(request: Request) {
   try {
     const { name, email, phone, subject, message } = await request.json();
 
-    const rate = checkRateLimit({
-      key: `contacto:${hashIdentifier(getClientIp(request))}`,
+    const rate = await checkRateLimit({
+      key: hashIdentifier(getClientIp(request)),
+      endpoint: 'contacto',
       limit: 10,
       windowMs: 10 * 60 * 1000,
     });
     if (!rate.allowed) {
-      return NextResponse.json({ error: 'Demasiadas solicitudes, prueba en unos minutos.' }, { status: 429 });
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes, prueba en unos minutos.' },
+        { status: 429 }
+      );
     }
 
     if (!name || !email || !message) {
@@ -34,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, message: 'Email enviado correctamente' });
   } catch (error) {
-    console.error('Error procesando el formulario:', error);
+    logger.error({ err: error }, 'Error procesando el formulario');
     return NextResponse.json({ error: 'Hubo un error al enviar el correo' }, { status: 500 });
   }
 }

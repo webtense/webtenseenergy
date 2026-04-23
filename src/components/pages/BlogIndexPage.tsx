@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { ArticleCard } from "@/components/blog/ArticleCard";
-import { formatDate, getAllCategories, type BlogListItem } from "@/lib/blog-shared";
-import { SectionHero } from "@/components/shared/SectionHero";
-import { SectionIntro } from "@/components/shared/SectionIntro";
+import { useState, useEffect } from 'react';
+import { ArticleCard } from '@/components/blog/ArticleCard';
+import { formatDate, getAllCategories, type BlogListItem } from '@/lib/blog-shared';
+import { SectionHero } from '@/components/shared/SectionHero';
+import { SectionIntro } from '@/components/shared/SectionIntro';
 
 type BlogIndexPageProps = {
   basePath: string;
@@ -12,11 +12,11 @@ type BlogIndexPageProps = {
 };
 
 export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
-  const [activeCategory, setActiveCategory] = useState("Todos");
+  const [activeCategory, setActiveCategory] = useState('Todos');
   const [blogEnabled, setBlogEnabled] = useState(true);
 
   useEffect(() => {
-    fetch("/api/public/feature-flags")
+    fetch('/api/public/feature-flags')
       .then((res) => res.json())
       .then((data) => setBlogEnabled(data.blog !== false))
       .catch(() => {});
@@ -24,7 +24,8 @@ export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
 
   const categories = getAllCategories(posts);
   const featured = posts.slice(0, 3);
-  const filtered = activeCategory === "Todos" ? posts : posts.filter((p) => p.categories.includes(activeCategory));
+  const filtered =
+    activeCategory === 'Todos' ? posts : posts.filter((p) => p.categories.includes(activeCategory));
 
   if (!blogEnabled) {
     return (
@@ -41,7 +42,12 @@ export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
     <div className="flex flex-col min-h-screen bg-background pb-24">
       <SectionHero
         eyebrow="Centro de conocimiento"
-        title={<>Conocimiento para decidir <span className="text-primary-600 dark:text-primary-300">mejor</span></>}
+        title={
+          <>
+            Conocimiento para decidir{' '}
+            <span className="text-primary-600 dark:text-primary-300">mejor</span>
+          </>
+        }
         subtitle="Guías prácticas, comparativas de domótica, herramientas y contexto para entender la energía sin lenguaje opaco."
         align="center"
         compact
@@ -49,7 +55,11 @@ export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
 
       <section className="section-shell-tight">
         <div className="section-inner">
-          <SectionIntro eyebrow="Destacados" title="Empieza por las piezas que mejor explican el producto" align="center" />
+          <SectionIntro
+            eyebrow="Destacados"
+            title="Empieza por las piezas que mejor explican el producto"
+            align="center"
+          />
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
             {featured[0] ? (
               <ArticleCard
@@ -92,12 +102,18 @@ export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
                   onClick={() => setActiveCategory(cat)}
                   className={`flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition ${
                     isActive
-                      ? "bg-primary-600 text-white shadow-lg shadow-primary-600/20"
-                      : "border border-zinc-200 bg-white text-foreground/65 hover:border-primary-300 hover:text-primary-700 dark:border-white/10 dark:bg-white/5 dark:hover:border-primary-500/20"
+                      ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20'
+                      : 'border border-zinc-200 bg-white text-foreground/65 hover:border-primary-300 hover:text-primary-700 dark:border-white/10 dark:bg-white/5 dark:hover:border-primary-500/20'
                   }`}
                 >
                   {cat}
-                  {cat !== "Todos" ? <span className={`rounded-full px-2 py-0.5 text-[10px] ${isActive ? "bg-black/15 text-white" : "bg-zinc-100 dark:bg-white/10"}`}>{count}</span> : null}
+                  {cat !== 'Todos' ? (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] ${isActive ? 'bg-black/15 text-white' : 'bg-zinc-100 dark:bg-white/10'}`}
+                    >
+                      {count}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}
@@ -111,7 +127,9 @@ export function BlogIndexPage({ basePath, posts }: BlogIndexPageProps) {
             <div className="surface-panel-soft py-20 text-center">
               <span className="block text-5xl">🏜️</span>
               <h3 className="mt-5 text-2xl font-bold text-foreground">Sin resultados</h3>
-              <p className="mt-2 text-sm text-foreground/60">No hay artículos en esta categoría todavía.</p>
+              <p className="mt-2 text-sm text-foreground/60">
+                No hay artículos en esta categoría todavía.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">

@@ -11,11 +11,11 @@ export type BlogListItem = {
 };
 
 export const BLOG_EDITORIAL_CATEGORIES = [
-  "Ahorro Energético",
-  "Domótica",
-  "Home Assistant",
-  "Ofertas",
-  "Reseñas",
+  'Ahorro Energético',
+  'Domótica',
+  'Home Assistant',
+  'Ofertas',
+  'Reseñas',
 ];
 
 export function getAllCategories(posts: BlogListItem[]): string[] {
@@ -32,20 +32,20 @@ export function getAllCategories(posts: BlogListItem[]): string[] {
 
   const remaining = Array.from(categories)
     .filter((category) => !BLOG_EDITORIAL_CATEGORIES.includes(category))
-    .sort((left, right) => left.localeCompare(right, "es"));
+    .sort((left, right) => left.localeCompare(right, 'es'));
 
-  return ["Todos", ...BLOG_EDITORIAL_CATEGORIES, ...remaining];
+  return ['Todos', ...BLOG_EDITORIAL_CATEGORIES, ...remaining];
 }
 
 export function formatDate(dateStr: string): string {
-  if (!dateStr) return "";
+  if (!dateStr) return '';
 
   try {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   } catch {
     return dateStr;

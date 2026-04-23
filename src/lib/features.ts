@@ -1,5 +1,5 @@
-import { db } from "@/lib/db";
-import { DEFAULT_FLAGS } from "@/lib/admin-defaults";
+import { db } from '@/lib/db';
+import { DEFAULT_FLAGS } from '@/lib/admin-defaults';
 
 export type PublicFeatureState = {
   features: string[];
@@ -68,9 +68,9 @@ export async function getPublicFeatureState(): Promise<PublicFeatureState> {
 
   return {
     features,
-    blog: defaults.get("blog") === true,
-    ofertas: defaults.get("ofertas") === true,
-    newsletter: defaults.get("newsletter") === true,
-    telegram: defaults.get("telegram") === true,
+    blog: defaults.get('blog') === true,
+    ofertas: defaults.get('ofertas') === true,
+    newsletter: defaults.get('newsletter') === true,
+    telegram: defaults.get('telegram') === true,
   };
 }

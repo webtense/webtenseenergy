@@ -1,6 +1,6 @@
-export type TarifaMode = "regulada" | "libre" | "plana";
+export type TarifaMode = 'regulada' | 'libre' | 'plana';
 
-export type PerfilConsumo = "normal" | "diurno" | "nocturno" | "fin";
+export type PerfilConsumo = 'normal' | 'diurno' | 'nocturno' | 'fin';
 
 export interface CalculadoraInputs {
   consumo: number;

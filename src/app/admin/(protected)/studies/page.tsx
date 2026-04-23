@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function AdminStudiesPage() {
-  redirect("/admin/contacts?tab=studies");
+  redirect('/admin/contacts?tab=studies');
 }

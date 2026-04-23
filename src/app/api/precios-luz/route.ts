@@ -1,3 +1,4 @@
+import logger from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
 const ESIOS_TOKEN = process.env.ESIOS_TOKEN;
@@ -53,16 +54,13 @@ function setCachedData(data: ElectricityApiResponse): void {
 
 function buildFallbackData(now: Date): ElectricityApiResponse {
   const prices = [
-    0.0796, 0.08957, 0.08616, 0.07926, 0.08678, 0.10176,
-    0.11121, 0.13404, 0.15049, 0.12427, 0.17237, 0.15534,
-    0.15686, 0.15317, 0.08561, 0.08754, 0.09796, 0.13033,
-    0.24084, 0.28096, 0.27663, 0.25874, 0.18902, 0.17891,
+    0.0796, 0.08957, 0.08616, 0.07926, 0.08678, 0.10176, 0.11121, 0.13404, 0.15049, 0.12427,
+    0.17237, 0.15534, 0.15686, 0.15317, 0.08561, 0.08754, 0.09796, 0.13033, 0.24084, 0.28096,
+    0.27663, 0.25874, 0.18902, 0.17891,
   ];
 
   const hourly: PriceEntry[] = prices.map((value, hour) => ({
-    hour: `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1)
-      .toString()
-      .padStart(2, '0')}:00`,
+    hour: `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`,
     price: value,
   }));
 
@@ -106,7 +104,7 @@ export async function GET() {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    
+
     const startDateStr = `${year}-${month}-${day}T00:00:00`;
     const endDateStr = `${year}-${month}-${day}T23:59:59`;
 
@@ -134,7 +132,7 @@ export async function GET() {
     const priceIndicator = indicators.find(
       (indicator) => indicator.attributes?.title === 'PVPC (€/kWh)'
     );
-    
+
     if (!priceIndicator) {
       throw new Error('No price data found in ESIOS response');
     }
@@ -144,7 +142,7 @@ export async function GET() {
     if (!Array.isArray(prices) || prices.length === 0) {
       throw new Error('Price values are missing in ESIOS response');
     }
-    
+
     const hourly: PriceEntry[] = prices.map((entry) => {
       const datetime = new Date(entry.datetime);
       const hour = datetime.getHours();
@@ -156,7 +154,7 @@ export async function GET() {
 
     const currentHour = now.getHours();
     const currentPrice = hourly[currentHour]?.price || 0;
-    
+
     const priceValues = hourly.map((h: PriceEntry) => h.price);
     const minPrice = Math.min(...priceValues);
     const maxPrice = Math.max(...priceValues);
@@ -165,7 +163,12 @@ export async function GET() {
     const average = priceValues.reduce((a: number, b: number) => a + b, 0) / priceValues.length;
 
     const result = {
-      date: now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      date: now.toLocaleDateString('es-ES', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
       now: Math.round(currentPrice * 10000) / 10000,
       average: Math.round(average * 10000) / 10000,
       min: { price: Math.round(minPrice * 10000) / 10000, time: minHourObj?.hour || '' },
@@ -179,8 +182,8 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error fetching electricity prices from ESIOS:', error);
-    
+    logger.error({ err: error }, 'Error fetching electricity prices from ESIOS');
+
     const cached = getCachedData();
     if (cached) {
       return NextResponse.json({

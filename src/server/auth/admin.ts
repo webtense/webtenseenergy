@@ -1,9 +1,9 @@
-import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { getAdminSession, type AdminSessionPayload } from "@/lib/admin-auth";
+import { redirect } from 'next/navigation';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { getAdminSession, type AdminSessionPayload } from '@/lib/admin-auth';
 
-export type AdminRole = "ADMIN" | "EDITOR";
+export type AdminRole = 'ADMIN' | 'EDITOR';
 
 export type AuthenticatedAdmin = {
   id: string;
@@ -13,7 +13,9 @@ export type AuthenticatedAdmin = {
   isActive: boolean;
 };
 
-async function loadAdminUser(session: AdminSessionPayload | null): Promise<AuthenticatedAdmin | null> {
+async function loadAdminUser(
+  session: AdminSessionPayload | null
+): Promise<AuthenticatedAdmin | null> {
   if (!session) return null;
 
   const user = await db.adminUser.findUnique({
@@ -32,8 +34,8 @@ async function loadAdminUser(session: AdminSessionPayload | null): Promise<Authe
 }
 
 export function hasRequiredRole(role: AdminRole, requiredRole: AdminRole) {
-  if (requiredRole === "EDITOR") return role === "EDITOR" || role === "ADMIN";
-  return role === "ADMIN";
+  if (requiredRole === 'EDITOR') return role === 'EDITOR' || role === 'ADMIN';
+  return role === 'ADMIN';
 }
 
 export async function getAuthenticatedAdmin() {
@@ -41,23 +43,23 @@ export async function getAuthenticatedAdmin() {
   return loadAdminUser(session);
 }
 
-export async function requireAdminPageUser(requiredRole: AdminRole = "EDITOR") {
+export async function requireAdminPageUser(requiredRole: AdminRole = 'EDITOR') {
   const user = await getAuthenticatedAdmin();
   if (!user || !hasRequiredRole(user.role, requiredRole)) {
-    redirect("/admin/login");
+    redirect('/admin/login');
   }
 
   return user;
 }
 
-export async function requireAdminApiUser(requiredRole: AdminRole = "EDITOR") {
+export async function requireAdminApiUser(requiredRole: AdminRole = 'EDITOR') {
   const user = await getAuthenticatedAdmin();
   if (!user) {
-    return { error: NextResponse.json({ message: "No autenticado" }, { status: 401 }) };
+    return { error: NextResponse.json({ message: 'No autenticado' }, { status: 401 }) };
   }
 
   if (!hasRequiredRole(user.role, requiredRole)) {
-    return { error: NextResponse.json({ message: "Permisos insuficientes" }, { status: 403 }) };
+    return { error: NextResponse.json({ message: 'Permisos insuficientes' }, { status: 403 }) };
   }
 
   return { user };

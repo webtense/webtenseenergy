@@ -1,8 +1,8 @@
-import postsData from "@/data/posts.json";
-import { db } from "@/lib/db";
-import type { BlogListItem } from "@/lib/blog-shared";
+import postsData from '@/data/posts.json';
+import { db } from '@/lib/db';
+import type { BlogListItem } from '@/lib/blog-shared';
 
-export type BlogLocale = "ES" | "CA";
+export type BlogLocale = 'ES' | 'CA';
 
 type LegacyPost = {
   title: string;
@@ -38,7 +38,9 @@ type DbPostWithRelations = {
 
 function mapLegacyPosts(): BlogListItem[] {
   return (postsData as LegacyPost[])
-    .filter((post) => post.slug && post.title && (post.status === "publish" || post.status === "pending"))
+    .filter(
+      (post) => post.slug && post.title && (post.status === 'publish' || post.status === 'pending')
+    )
     .map((post) => ({
       id: post.slug,
       slug: post.slug,
@@ -46,32 +48,33 @@ function mapLegacyPosts(): BlogListItem[] {
       excerpt: post.excerpt,
       content: post.content,
       date: post.date,
-      category: post.category || post.categories?.[0] || "General",
-      categories: post.categories?.length ? post.categories : [post.category || "General"],
+      category: post.category || post.categories?.[0] || 'General',
+      categories: post.categories?.length ? post.categories : [post.category || 'General'],
       featuredImage: post.featuredImage,
     }));
 }
 
 function mapDbPost(post: DbPostWithRelations, locale: BlogLocale): BlogListItem {
-  const translation = post.translations.find((item) => item.locale === locale) || post.translations[0];
+  const translation =
+    post.translations.find((item) => item.locale === locale) || post.translations[0];
   const categories = post.categories.map((item) => item.category.name);
 
   return {
     id: post.id,
     slug: post.slug,
     title: translation?.title || post.slug,
-    excerpt: translation?.excerpt || "",
-    content: translation?.content || "",
+    excerpt: translation?.excerpt || '',
+    content: translation?.content || '',
     date: (post.publishedAt || post.updatedAt || post.createdAt).toISOString(),
-    category: categories[0] || "General",
-    categories: categories.length ? categories : ["General"],
+    category: categories[0] || 'General',
+    categories: categories.length ? categories : ['General'],
     featuredImage: post.featuredImage,
   };
 }
 
 async function getDbPublishedPosts(locale: BlogLocale): Promise<BlogListItem[]> {
   const posts = await db.post.findMany({
-    where: { status: "PUBLISHED" },
+    where: { status: 'PUBLISHED' },
     include: {
       translations: true,
       categories: {
@@ -80,7 +83,7 @@ async function getDbPublishedPosts(locale: BlogLocale): Promise<BlogListItem[]> 
         },
       },
     },
-    orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }],
+    orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
   });
 
   return posts.map((post) => mapDbPost(post, locale));
@@ -99,7 +102,10 @@ export async function getPublishedPosts(locale: BlogLocale): Promise<BlogListIte
   return mapLegacyPosts();
 }
 
-export async function getPublishedPostBySlug(slug: string, locale: BlogLocale): Promise<BlogListItem | null> {
+export async function getPublishedPostBySlug(
+  slug: string,
+  locale: BlogLocale
+): Promise<BlogListItem | null> {
   try {
     const post = await db.post.findUnique({
       where: { slug },
@@ -113,7 +119,7 @@ export async function getPublishedPostBySlug(slug: string, locale: BlogLocale): 
       },
     });
 
-    if (post?.status === "PUBLISHED") {
+    if (post?.status === 'PUBLISHED') {
       return mapDbPost(post, locale);
     }
   } catch {

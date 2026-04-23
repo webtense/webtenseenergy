@@ -76,19 +76,19 @@
   right: 0;
   bottom: 0;
   background-color: var(--border-light);
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 34px;
 }
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 18px;
   width: 18px;
   left: 4px;
   bottom: 4px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
@@ -153,8 +153,12 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
-.priceGreen { color: var(--primary-green); }
-.priceRed { color: var(--primary-red); }
+.priceGreen {
+  color: var(--primary-green);
+}
+.priceRed {
+  color: var(--primary-red);
+}
 
 .detailGrid {
   display: grid;

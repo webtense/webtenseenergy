@@ -1,11 +1,18 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
-import { createAdminSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/admin-auth";
-import { checkRateLimit, getClientIp, hashIdentifier, isSameOrigin, normalizeEmail } from "@/lib/security";
-import { createAuditLog } from "@/server/services/audit-log";
+import logger from '@/lib/logger';
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { db } from '@/lib/db';
+import { createAdminSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/admin-auth';
+import {
+  checkRateLimit,
+  getClientIp,
+  hashIdentifier,
+  isSameOrigin,
+  normalizeEmail,
+} from '@/lib/security';
+import { createAuditLog } from '@/server/services/audit-log';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 interface LoginPayload {
   identifier?: string;
@@ -15,23 +22,23 @@ interface LoginPayload {
 export async function POST(request: Request) {
   try {
     if (!isSameOrigin(request)) {
-      return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+      return NextResponse.json({ message: 'Origen no permitido' }, { status: 403 });
     }
 
     const body = (await request.json()) as LoginPayload;
     const identifier = body.identifier?.trim();
-    const password = body.password || "";
+    const password = body.password || '';
 
     if (!identifier || !password) {
-      return NextResponse.json({ message: "Credenciales incompletas" }, { status: 400 });
+      return NextResponse.json({ message: 'Credenciales incompletas' }, { status: 400 });
     }
 
-    const rateKey = `admin-login:${hashIdentifier(`${getClientIp(request)}:${identifier}`)}`;
-    const rate = checkRateLimit({ key: rateKey, limit: 8, windowMs: 10 * 60 * 1000 });
+    const rateKey = hashIdentifier(`${getClientIp(request)}:${identifier}`);
+    const rate = await checkRateLimit({ key: rateKey, endpoint: 'admin-login', limit: 8, windowMs: 10 * 60 * 1000 });
     if (!rate.allowed) {
       return NextResponse.json(
-        { message: "Demasiados intentos. Intenta de nuevo mas tarde." },
-        { status: 429, headers: { "Retry-After": String(rate.retryAfter) } },
+        { message: 'Demasiados intentos. Intenta de nuevo mas tarde.' },
+        { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } }
       );
     }
 
@@ -45,26 +52,26 @@ export async function POST(request: Request) {
 
     if (!user) {
       await createAuditLog({
-        action: "admin_login",
-        entityType: "AdminUser",
-        status: "failed",
+        action: 'admin_login',
+        entityType: 'AdminUser',
+        status: 'failed',
         ipHash: hashIdentifier(getClientIp(request)),
         metadata: JSON.stringify({ identifier: normalized }),
       });
-      return NextResponse.json({ message: "Usuario o clave incorrectos" }, { status: 401 });
+      return NextResponse.json({ message: 'Usuario o clave incorrectos' }, { status: 401 });
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       await createAuditLog({
         adminUserId: user.id,
-        action: "admin_login",
-        entityType: "AdminUser",
+        action: 'admin_login',
+        entityType: 'AdminUser',
         entityId: user.id,
-        status: "failed",
+        status: 'failed',
         ipHash: hashIdentifier(getClientIp(request)),
       });
-      return NextResponse.json({ message: "Usuario o clave incorrectos" }, { status: 401 });
+      return NextResponse.json({ message: 'Usuario o clave incorrectos' }, { status: 401 });
     }
 
     const token = createAdminSessionToken(user.id, user.username, user.role);
@@ -73,25 +80,25 @@ export async function POST(request: Request) {
       name: SESSION_COOKIE,
       value: token,
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
       maxAge: SESSION_MAX_AGE,
-      priority: "high",
+      priority: 'high',
     });
 
     await createAuditLog({
       adminUserId: user.id,
-      action: "admin_login",
-      entityType: "AdminUser",
+      action: 'admin_login',
+      entityType: 'AdminUser',
       entityId: user.id,
-      status: "ok",
+      status: 'ok',
       ipHash: hashIdentifier(getClientIp(request)),
     });
 
     return response;
   } catch (error) {
-    console.error("Error login admin:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    logger.error({ err: error }, 'Error login admin');
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
   }
 }

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { requireAdminApiUser } from "@/lib/admin-guard";
-import { ensureAdminDefaults } from "@/lib/admin-defaults";
-import { isSameOrigin } from "@/lib/security";
+import logger from '@/lib/logger';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { requireAdminApiUser } from '@/lib/admin-guard';
+import { ensureAdminDefaults } from '@/lib/admin-defaults';
+import { isSameOrigin } from '@/lib/security';
 
 type FlagBody = {
   key?: string;
@@ -11,27 +12,27 @@ type FlagBody = {
 };
 
 export async function GET() {
-  const result = await requireAdminApiUser("ADMIN");
-  if ("error" in result) return result.error;
+  const result = await requireAdminApiUser('ADMIN');
+  if ('error' in result) return result.error;
 
   await ensureAdminDefaults();
 
-  const flags = await db.featureFlag.findMany({ orderBy: { key: "asc" } });
+  const flags = await db.featureFlag.findMany({ orderBy: { key: 'asc' } });
   return NextResponse.json({ flags });
 }
 
 export async function PATCH(request: Request) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+    return NextResponse.json({ message: 'Origen no permitido' }, { status: 403 });
   }
 
-  const result = await requireAdminApiUser("ADMIN");
-  if ("error" in result) return result.error;
+  const result = await requireAdminApiUser('ADMIN');
+  if ('error' in result) return result.error;
 
   try {
     const body = (await request.json()) as FlagBody;
-    if (!body.key || typeof body.enabled !== "boolean") {
-      return NextResponse.json({ message: "Datos invalidos" }, { status: 400 });
+    if (!body.key || typeof body.enabled !== 'boolean') {
+      return NextResponse.json({ message: 'Datos invalidos' }, { status: 400 });
     }
 
     const flag = await db.featureFlag.upsert({
@@ -49,7 +50,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ flag });
   } catch (error) {
-    console.error("Error actualizando flag:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    logger.error({ err: error }, 'Error actualizando flag');
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
   }
 }

@@ -1,33 +1,51 @@
-import { buildPageMetadata } from "@/lib/seo";
+import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata = buildPageMetadata({
-  title: "Política de privacidad | Webtense Energy",
-  description: "Información sobre tratamiento de datos personales y contacto en Webtense Energy.",
-  path: "/privacidad",
-  locale: "root",
+  title: 'Política de privacidad | Webtense Energy',
+  description: 'Información sobre tratamiento de datos personales y contacto en Webtense Energy.',
+  path: '/privacidad',
+  locale: 'root',
 });
 
 export default function PrivacidadPage() {
-  return <LegalShell title="Política de privacidad" intro="Explicamos qué datos recogemos, con qué finalidad y cómo puedes ejercer tus derechos.">
-    <LegalSection title="Responsable del tratamiento">
-      WEBTENSE ENERGY es responsable del tratamiento de los datos enviados a través de formularios, newsletter y canales directos de contacto del sitio.
-    </LegalSection>
-    <LegalSection title="Finalidades">
-      Utilizamos tus datos para responder consultas, elaborar estudios energéticos, gestionar comunicaciones solicitadas y mantener trazabilidad básica de la relación comercial.
-    </LegalSection>
-    <LegalSection title="Base jurídica">
-      La base jurídica es el consentimiento del usuario al enviar formularios o suscribirse, así como el interés legítimo para atender solicitudes relacionadas con nuestros servicios.
-    </LegalSection>
-    <LegalSection title="Conservación">
-      Conservamos los datos durante el tiempo necesario para atender la solicitud, cumplir obligaciones legales y mantener un historial operativo razonable del servicio.
-    </LegalSection>
-    <LegalSection title="Derechos">
-      Puedes solicitar acceso, rectificación, supresión, oposición, limitación o portabilidad escribiendo a `info@webtenseenergy.com`.
-    </LegalSection>
-  </LegalShell>;
+  return (
+    <LegalShell
+      title="Política de privacidad"
+      intro="Explicamos qué datos recogemos, con qué finalidad y cómo puedes ejercer tus derechos."
+    >
+      <LegalSection title="Responsable del tratamiento">
+        WEBTENSE ENERGY es responsable del tratamiento de los datos enviados a través de
+        formularios, newsletter y canales directos de contacto del sitio.
+      </LegalSection>
+      <LegalSection title="Finalidades">
+        Utilizamos tus datos para responder consultas, elaborar estudios energéticos, gestionar
+        comunicaciones solicitadas y mantener trazabilidad básica de la relación comercial.
+      </LegalSection>
+      <LegalSection title="Base jurídica">
+        La base jurídica es el consentimiento del usuario al enviar formularios o suscribirse, así
+        como el interés legítimo para atender solicitudes relacionadas con nuestros servicios.
+      </LegalSection>
+      <LegalSection title="Conservación">
+        Conservamos los datos durante el tiempo necesario para atender la solicitud, cumplir
+        obligaciones legales y mantener un historial operativo razonable del servicio.
+      </LegalSection>
+      <LegalSection title="Derechos">
+        Puedes solicitar acceso, rectificación, supresión, oposición, limitación o portabilidad
+        escribiendo a `info@webtenseenergy.com`.
+      </LegalSection>
+    </LegalShell>
+  );
 }
 
-function LegalShell({ title, intro, children }: { title: string; intro: string; children: React.ReactNode }) {
+function LegalShell({
+  title,
+  intro,
+  children,
+}: {
+  title: string;
+  intro: string;
+  children: React.ReactNode;
+}) {
   return (
     <main className="section-shell pb-24">
       <div className="section-inner max-w-4xl">

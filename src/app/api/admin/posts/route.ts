@@ -1,16 +1,17 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { requireAdminApiUser } from "@/lib/admin-guard";
-import { isSameOrigin } from "@/lib/security";
+import logger from '@/lib/logger';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { requireAdminApiUser } from '@/lib/admin-guard';
+import { isSameOrigin } from '@/lib/security';
 
 type PostPayload = {
   id?: string;
   slug?: string;
-  locale?: "ES" | "CA";
+  locale?: 'ES' | 'CA';
   title?: string;
   excerpt?: string;
   content?: string;
-  status?: "DRAFT" | "REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+  status?: 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
   scheduledFor?: string | null;
   featuredImage?: string | null;
   seoTitle?: string | null;
@@ -22,20 +23,20 @@ function toSlug(value: string) {
   return value
     .toLowerCase()
     .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 function toCategorySlug(value: string) {
-  return toSlug(value) || "general";
+  return toSlug(value) || 'general';
 }
 
 export async function GET() {
   const auth = await requireAdminApiUser();
-  if ("error" in auth) return auth.error;
+  if ('error' in auth) return auth.error;
 
   const posts = await db.post.findMany({
     include: {
@@ -51,7 +52,7 @@ export async function GET() {
         },
       },
     },
-    orderBy: [{ updatedAt: "desc" }],
+    orderBy: [{ updatedAt: 'desc' }],
   });
 
   return NextResponse.json({ posts });
@@ -59,33 +60,36 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+    return NextResponse.json({ message: 'Origen no permitido' }, { status: 403 });
   }
 
   const auth = await requireAdminApiUser();
-  if ("error" in auth) return auth.error;
+  if ('error' in auth) return auth.error;
 
   try {
     const body = (await request.json()) as PostPayload;
-    const locale = body.locale === "CA" ? "CA" : "ES";
-    const title = body.title?.trim() || "";
-    const content = body.content?.trim() || "";
+    const locale = body.locale === 'CA' ? 'CA' : 'ES';
+    const title = body.title?.trim() || '';
+    const content = body.content?.trim() || '';
 
     if (!title || !content) {
-      return NextResponse.json({ message: "Titulo y contenido son obligatorios." }, { status: 400 });
+      return NextResponse.json(
+        { message: 'Titulo y contenido son obligatorios.' },
+        { status: 400 }
+      );
     }
 
     const slug = toSlug(body.slug?.trim() || title);
     if (!slug) {
-      return NextResponse.json({ message: "Slug invalido." }, { status: 400 });
+      return NextResponse.json({ message: 'Slug invalido.' }, { status: 400 });
     }
 
     const existing = await db.post.findUnique({ where: { slug } });
     if (existing) {
-      return NextResponse.json({ message: "El slug ya existe." }, { status: 409 });
+      return NextResponse.json({ message: 'El slug ya existe.' }, { status: 409 });
     }
 
-    const status = body.status || "DRAFT";
+    const status = body.status || 'DRAFT';
     const scheduledFor = body.scheduledFor ? new Date(body.scheduledFor) : null;
     const categoryName = body.category?.trim() || null;
     const category = categoryName
@@ -107,12 +111,12 @@ export async function POST(request: Request) {
       data: {
         slug,
         status,
-        scheduledFor: status === "SCHEDULED" ? scheduledFor : null,
+        scheduledFor: status === 'SCHEDULED' ? scheduledFor : null,
         featuredImage: body.featuredImage || null,
         seoTitle: body.seoTitle || null,
         seoDescription: body.seoDescription || null,
         locale,
-        publishedAt: status === "PUBLISHED" ? new Date() : null,
+        publishedAt: status === 'PUBLISHED' ? new Date() : null,
         authorId: auth.user.id,
         translations: {
           create: {
@@ -144,7 +148,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ post });
   } catch (error) {
-    console.error("Error creando post:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    logger.error({ err: error }, 'Error creando post');
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db } from '@/lib/db';
 
 export async function getAdminSummaryData() {
   const [
@@ -16,14 +16,14 @@ export async function getAdminSummaryData() {
     db.lead.count(),
     db.studyRequest.count(),
     db.subscriber.count({ where: { isActive: true } }),
-    db.telegramDeal.count({ where: { status: { not: "sent" } } }),
-    db.lead.findMany({ orderBy: [{ createdAt: "desc" }], take: 5 }),
-    db.studyRequest.findMany({ orderBy: [{ createdAt: "desc" }], take: 5 }),
-    db.subscriber.findMany({ orderBy: [{ createdAt: "desc" }], take: 5 }),
-    db.campaign.findMany({ orderBy: [{ updatedAt: "desc" }], take: 5 }),
-    db.telegramDeal.findMany({ orderBy: [{ updatedAt: "desc" }], take: 5 }),
+    db.telegramDeal.count({ where: { status: { not: 'sent' } } }),
+    db.lead.findMany({ orderBy: [{ createdAt: 'desc' }], take: 5 }),
+    db.studyRequest.findMany({ orderBy: [{ createdAt: 'desc' }], take: 5 }),
+    db.subscriber.findMany({ orderBy: [{ createdAt: 'desc' }], take: 5 }),
+    db.campaign.findMany({ orderBy: [{ updatedAt: 'desc' }], take: 5 }),
+    db.telegramDeal.findMany({ orderBy: [{ updatedAt: 'desc' }], take: 5 }),
     db.auditLog.findMany({
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 6,
       include: {
         adminUser: {

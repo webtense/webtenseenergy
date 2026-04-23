@@ -1,15 +1,16 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { requireAdminApiUser } from "@/lib/admin-guard";
-import { isSameOrigin } from "@/lib/security";
+import logger from '@/lib/logger';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { requireAdminApiUser } from '@/lib/admin-guard';
+import { isSameOrigin } from '@/lib/security';
 
 type UpdatePayload = {
   slug?: string;
-  locale?: "ES" | "CA";
+  locale?: 'ES' | 'CA';
   title?: string;
   excerpt?: string;
   content?: string;
-  status?: "DRAFT" | "REVIEW" | "SCHEDULED" | "PUBLISHED" | "ARCHIVED";
+  status?: 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
   scheduledFor?: string | null;
   featuredImage?: string | null;
   seoTitle?: string | null;
@@ -21,15 +22,15 @@ function toSlug(value: string) {
   return value
     .toLowerCase()
     .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 function toCategorySlug(value: string) {
-  return toSlug(value) || "general";
+  return toSlug(value) || 'general';
 }
 
 interface Props {
@@ -38,11 +39,11 @@ interface Props {
 
 export async function PUT(request: Request, { params }: Props) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+    return NextResponse.json({ message: 'Origen no permitido' }, { status: 403 });
   }
 
   const auth = await requireAdminApiUser();
-  if ("error" in auth) return auth.error;
+  if ('error' in auth) return auth.error;
 
   const { id } = await params;
 
@@ -56,10 +57,10 @@ export async function PUT(request: Request, { params }: Props) {
       },
     });
     if (!post) {
-      return NextResponse.json({ message: "Post no encontrado" }, { status: 404 });
+      return NextResponse.json({ message: 'Post no encontrado' }, { status: 404 });
     }
 
-    const locale = body.locale === "CA" ? "CA" : "ES";
+    const locale = body.locale === 'CA' ? 'CA' : 'ES';
     const status = body.status || post.status;
     const slug = body.slug ? toSlug(body.slug) : post.slug;
     const categoryName = body.category?.trim();
@@ -80,13 +81,13 @@ export async function PUT(request: Request, { params }: Props) {
       : null;
 
     if (!slug) {
-      return NextResponse.json({ message: "Slug invalido" }, { status: 400 });
+      return NextResponse.json({ message: 'Slug invalido' }, { status: 400 });
     }
 
     if (slug !== post.slug) {
       const duplicated = await db.post.findUnique({ where: { slug } });
       if (duplicated) {
-        return NextResponse.json({ message: "El slug ya existe" }, { status: 409 });
+        return NextResponse.json({ message: 'El slug ya existe' }, { status: 409 });
       }
     }
 
@@ -95,15 +96,16 @@ export async function PUT(request: Request, { params }: Props) {
       data: {
         slug,
         status,
-        scheduledFor: status === "SCHEDULED" && body.scheduledFor ? new Date(body.scheduledFor) : null,
+        scheduledFor:
+          status === 'SCHEDULED' && body.scheduledFor ? new Date(body.scheduledFor) : null,
         featuredImage: body.featuredImage ?? post.featuredImage,
         seoTitle: body.seoTitle ?? post.seoTitle,
         seoDescription: body.seoDescription ?? post.seoDescription,
         locale,
         publishedAt:
-          status === "PUBLISHED"
+          status === 'PUBLISHED'
             ? post.publishedAt || new Date()
-            : status === "ARCHIVED" || status === "DRAFT"
+            : status === 'ARCHIVED' || status === 'DRAFT'
               ? null
               : post.publishedAt,
         ...(category
@@ -119,7 +121,9 @@ export async function PUT(request: Request, { params }: Props) {
       },
     });
 
-    const existingTranslation = post.translations.find((item: { locale: string }) => item.locale === locale);
+    const existingTranslation = post.translations.find(
+      (item: { locale: string }) => item.locale === locale
+    );
     if (existingTranslation) {
       await db.postTranslation.update({
         where: { id: existingTranslation.id },
@@ -155,18 +159,18 @@ export async function PUT(request: Request, { params }: Props) {
 
     return NextResponse.json({ post: updated });
   } catch (error) {
-    console.error("Error actualizando post:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    logger.error({ err: error }, 'Error actualizando post');
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 });
   }
 }
 
 export async function DELETE(_request: Request, { params }: Props) {
   if (!isSameOrigin(_request)) {
-    return NextResponse.json({ message: "Origen no permitido" }, { status: 403 });
+    return NextResponse.json({ message: 'Origen no permitido' }, { status: 403 });
   }
 
   const auth = await requireAdminApiUser();
-  if ("error" in auth) return auth.error;
+  if ('error' in auth) return auth.error;
 
   const { id } = await params;
 
@@ -174,7 +178,7 @@ export async function DELETE(_request: Request, { params }: Props) {
     await db.post.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Error eliminando post:", error);
-    return NextResponse.json({ message: "No se pudo eliminar" }, { status: 500 });
+    logger.error({ err: error }, 'Error eliminando post');
+    return NextResponse.json({ message: 'No se pudo eliminar' }, { status: 500 });
   }
 }

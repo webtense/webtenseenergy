@@ -1,14 +1,14 @@
-import { HomePage } from "@/components/pages/HomePage";
-import { buildPageMetadata } from "@/lib/seo";
+import { HomePage } from '@/components/pages/HomePage';
+import { buildPageMetadata } from '@/lib/seo';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export const metadata = buildPageMetadata({
-  title: "WEBTENSE ENERGY | Eficiencia y Domótica",
+  title: 'WEBTENSE ENERGY | Eficiencia y Domótica',
   description:
-    "Eficiencia energética y domótica práctica para hogares y empresas. Guías, comparativas y soluciones para ahorrar desde hoy.",
-  path: "/",
-  locale: "root",
+    'Eficiencia energética y domótica práctica para hogares y empresas. Guías, comparativas y soluciones para ahorrar desde hoy.',
+  path: '/',
+  locale: 'root',
 });
 
 export default async function Home() {
