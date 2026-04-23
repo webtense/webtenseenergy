@@ -24,6 +24,11 @@
 .DS_Store
 *.pem
 
+# Artifacts de análisis y capturas temporales
+image.png
+Update3.1/
+update3-1.md
+
 # debug
 npm-debug.log*
 yarn-debug.log*

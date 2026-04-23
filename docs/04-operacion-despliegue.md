@@ -61,6 +61,14 @@ El flujo oficial es GitHub como fuente de verdad y EasyPanel como runtime. Queda
 - `NEWSLETTER_REPLY_TO`
 - `CRON_SECRET`
 
+## n8n
+
+- Workflow canonico versionado en `src/n8n/webtense.workflow.json`
+- Credencial requerida en n8n: `httpHeaderAuth` con nombre `webtense-cron-secret`
+- Esa credencial debe enviar `Authorization: Bearer <CRON_SECRET>`
+- Nunca dejar el bearer hardcodeado dentro del nodo `HTTP Request`
+- Guia operativa: `docs/07-n8n-webtense.md`
+
 ## Build y arranque
 
 - Dockerfile compatible con `output: "standalone"`

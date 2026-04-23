@@ -39,7 +39,15 @@
         "ESIOS_TOKEN": "__OPTIONAL__",
         "NEWSLETTER_SENDER_NAME": "Webtense Energy",
         "NEWSLETTER_REPLY_TO": "info@webtenseenergy.com",
-        "CRON_SECRET": "__SET_IN_EASYPANEL__"
+        "CRON_SECRET": "__SET_IN_EASYPANEL__",
+        "AUTOMATION_TIMEZONE": "Europe/Madrid",
+        "AUTOMATION_OFFER_LOOKBACK_HOURS": "24",
+        "AUTOMATION_OFFER_MIN_DISCOUNT_PCT": "15",
+        "AUTOMATION_OFFER_MAX_PER_RUN": "5",
+        "AUTOMATION_NEWSLETTER_WEEKDAY": "1",
+        "AUTOMATION_NEWSLETTER_MAX_POSTS": "3",
+        "AUTOMATION_NEWSLETTER_MAX_OFFERS": "3",
+        "AUTOMATION_LEAD_LOOKBACK_HOURS": "24"
       },
       "ports": [
         {
