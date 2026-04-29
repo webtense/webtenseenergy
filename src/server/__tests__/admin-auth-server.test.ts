@@ -10,7 +10,9 @@ vi.mock('@/lib/admin-auth', () => ({
 
 // Mock next/navigation redirect
 vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => { throw new Error('REDIRECT'); }),
+  redirect: vi.fn(() => {
+    throw new Error('REDIRECT');
+  }),
 }));
 
 import { db } from '@/lib/db';
@@ -51,7 +53,11 @@ describe('requireAdminApiUser', () => {
 
   it('retorna usuario cuando sesión es válida y usuario activo', async () => {
     vi.mocked(getAdminSession).mockResolvedValueOnce({
-      userId: 'user-1', username: 'admin', role: 'ADMIN', isActive: true, exp: 9999999999,
+      userId: 'user-1',
+      username: 'admin',
+      role: 'ADMIN',
+      isActive: true,
+      exp: 9999999999,
     });
     vi.mocked(db.adminUser.findUnique).mockResolvedValueOnce(activeAdmin as never);
 
@@ -75,7 +81,11 @@ describe('requireAdminApiUser', () => {
   it('retorna error 403 si rol insuficiente', async () => {
     const editorUser = { ...activeAdmin, role: 'EDITOR' as const };
     vi.mocked(getAdminSession).mockResolvedValueOnce({
-      userId: 'editor-1', username: 'editor', role: 'EDITOR', isActive: true, exp: 9999999999,
+      userId: 'editor-1',
+      username: 'editor',
+      role: 'EDITOR',
+      isActive: true,
+      exp: 9999999999,
     });
     vi.mocked(db.adminUser.findUnique).mockResolvedValueOnce(editorUser as never);
 
@@ -88,10 +98,15 @@ describe('requireAdminApiUser', () => {
 
   it('retorna error 401 si usuario está inactivo', async () => {
     vi.mocked(getAdminSession).mockResolvedValueOnce({
-      userId: 'user-1', username: 'admin', role: 'ADMIN', isActive: true, exp: 9999999999,
+      userId: 'user-1',
+      username: 'admin',
+      role: 'ADMIN',
+      isActive: true,
+      exp: 9999999999,
     });
     vi.mocked(db.adminUser.findUnique).mockResolvedValueOnce({
-      ...activeAdmin, isActive: false,
+      ...activeAdmin,
+      isActive: false,
     } as never);
 
     const result = await requireAdminApiUser();

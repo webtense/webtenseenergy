@@ -8,7 +8,9 @@ export function ContactoPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorError, setError] = useState('');
   const [loadedAt, setLoadedAt] = useState('');
-  useEffect(() => { setLoadedAt(Date.now().toString()); }, []);
+  useEffect(() => {
+    setLoadedAt(Date.now().toString());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -110,7 +112,14 @@ export function ContactoPage() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                 {/* honeypot — no tocar */}
-                <input name="website" type="text" style={{ position: 'absolute', left: '-9999px' }} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+                <input
+                  name="website"
+                  type="text"
+                  style={{ position: 'absolute', left: '-9999px' }}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
                 <input name="_t" type="hidden" value={loadedAt} readOnly />
                 {errorError ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">

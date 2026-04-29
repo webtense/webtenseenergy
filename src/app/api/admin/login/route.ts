@@ -34,7 +34,12 @@ export async function POST(request: Request) {
     }
 
     const rateKey = hashIdentifier(`${getClientIp(request)}:${identifier}`);
-    const rate = await checkRateLimit({ key: rateKey, endpoint: 'admin-login', limit: 8, windowMs: 10 * 60 * 1000 });
+    const rate = await checkRateLimit({
+      key: rateKey,
+      endpoint: 'admin-login',
+      limit: 8,
+      windowMs: 10 * 60 * 1000,
+    });
     if (!rate.allowed) {
       return NextResponse.json(
         { message: 'Demasiados intentos. Intenta de nuevo mas tarde.' },

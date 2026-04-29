@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  ContactoSchema,
-  EstudioTextSchema,
-  SubscribeSchema,
-} from '../schemas/public';
+import { ContactoSchema, EstudioTextSchema, SubscribeSchema } from '../schemas/public';
 import {
   LeadUpdateSchema,
   StudyUpdateSchema,
@@ -186,7 +182,9 @@ describe('LeadUpdateSchema', () => {
   });
 
   it('acepta estado y nota juntos', () => {
-    expect(LeadUpdateSchema.safeParse({ status: 'CONTACTED', note: 'Llamé hoy' }).success).toBe(true);
+    expect(LeadUpdateSchema.safeParse({ status: 'CONTACTED', note: 'Llamé hoy' }).success).toBe(
+      true
+    );
   });
 
   it('acepta objeto vacío (ningún campo requerido)', () => {
@@ -244,7 +242,9 @@ describe('PostCreateSchema', () => {
   });
 
   it('rechaza status inválido', () => {
-    expect(PostCreateSchema.safeParse({ title: 'T', content: 'C', status: 'BORRADOR' }).success).toBe(false);
+    expect(
+      PostCreateSchema.safeParse({ title: 'T', content: 'C', status: 'BORRADOR' }).success
+    ).toBe(false);
   });
 
   it('acepta seoTitle/seoDescription opcionales', () => {

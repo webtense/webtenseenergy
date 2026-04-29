@@ -46,7 +46,9 @@ describe('verifyAdminSessionToken', () => {
   it('rechaza un token con payload manipulado', () => {
     const token = createAdminSessionToken('user-1', 'admin', 'ADMIN');
     const [, sig] = token.split('.');
-    const evil = Buffer.from(JSON.stringify({ userId: 'hacker', role: 'ADMIN', exp: 9999999999, username: 'hacker' })).toString('base64url');
+    const evil = Buffer.from(
+      JSON.stringify({ userId: 'hacker', role: 'ADMIN', exp: 9999999999, username: 'hacker' })
+    ).toString('base64url');
     expect(verifyAdminSessionToken(`${evil}.${sig}`)).toBeNull();
   });
 

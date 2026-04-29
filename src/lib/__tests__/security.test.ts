@@ -150,7 +150,13 @@ describe('checkRateLimit', () => {
 
   it('permite requests dentro del límite', async () => {
     vi.mocked(db.rateLimit.upsert).mockResolvedValueOnce({
-      id: '1', identifier: 'ip-hash', endpoint: 'test', count: 5, resetAt: futureReset, createdAt: now, updatedAt: now,
+      id: '1',
+      identifier: 'ip-hash',
+      endpoint: 'test',
+      count: 5,
+      resetAt: futureReset,
+      createdAt: now,
+      updatedAt: now,
     });
     const result = await checkRateLimit(params);
     expect(result.allowed).toBe(true);
@@ -158,7 +164,13 @@ describe('checkRateLimit', () => {
 
   it('bloquea cuando el contador supera el límite', async () => {
     vi.mocked(db.rateLimit.upsert).mockResolvedValueOnce({
-      id: '1', identifier: 'ip-hash', endpoint: 'test', count: 11, resetAt: futureReset, createdAt: now, updatedAt: now,
+      id: '1',
+      identifier: 'ip-hash',
+      endpoint: 'test',
+      count: 11,
+      resetAt: futureReset,
+      createdAt: now,
+      updatedAt: now,
     });
     const result = await checkRateLimit(params);
     expect(result.allowed).toBe(false);
@@ -167,7 +179,13 @@ describe('checkRateLimit', () => {
 
   it('reinicia el contador si el registro ya expiró', async () => {
     vi.mocked(db.rateLimit.upsert).mockResolvedValueOnce({
-      id: '1', identifier: 'ip-hash', endpoint: 'test', count: 99, resetAt: pastReset, createdAt: now, updatedAt: now,
+      id: '1',
+      identifier: 'ip-hash',
+      endpoint: 'test',
+      count: 99,
+      resetAt: pastReset,
+      createdAt: now,
+      updatedAt: now,
     });
     vi.mocked(db.rateLimit.update).mockResolvedValueOnce({} as never);
     const result = await checkRateLimit(params);

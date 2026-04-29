@@ -28,7 +28,12 @@ function fallback(topic: string, locale: 'es' | 'ca') {
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   const rateKey = hashIdentifier(`ai:${ip}`);
-  const rate = await checkRateLimit({ key: rateKey, endpoint: 'ai-newsletter-suggest', limit: 20, windowMs: 60_000 });
+  const rate = await checkRateLimit({
+    key: rateKey,
+    endpoint: 'ai-newsletter-suggest',
+    limit: 20,
+    windowMs: 60_000,
+  });
   if (!rate.allowed) {
     return NextResponse.json(
       { message: 'Rate limit excedido' },

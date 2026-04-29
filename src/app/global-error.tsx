@@ -18,7 +18,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         <p className="text-6xl font-bold text-red-500">500</p>
         <h1 className="mt-4 text-2xl font-semibold text-gray-900">Error crítico</h1>
         <p className="mt-2 text-gray-500 max-w-md">
-          La aplicación ha encontrado un error grave. Por favor, recarga la página o vuelve más tarde.
+          La aplicación ha encontrado un error grave. Por favor, recarga la página o vuelve más
+          tarde.
         </p>
         <button
           onClick={reset}

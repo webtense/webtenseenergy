@@ -49,7 +49,9 @@ export default function EnergyAuditWizard() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setLoadedAt(Date.now().toString()); }, []);
+  useEffect(() => {
+    setLoadedAt(Date.now().toString());
+  }, []);
 
   const handleNext = () => setStep((prev) => prev + 1);
   const handleBack = () => setStep((prev) => prev - 1);
@@ -432,7 +434,16 @@ export default function EnergyAuditWizard() {
 
             <form onSubmit={submitForm} className="space-y-4">
               {/* honeypot — no tocar */}
-              <input name="website" type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} style={{ position: 'absolute', left: '-9999px' }} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+              <input
+                name="website"
+                type="text"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ position: 'absolute', left: '-9999px' }}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground/80 dark:text-zinc-300">
                   Nombre Completo *

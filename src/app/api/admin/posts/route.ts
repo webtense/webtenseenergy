@@ -87,7 +87,8 @@ export async function POST(request: Request) {
       data: {
         slug,
         status: data.status,
-        scheduledFor: data.status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
+        scheduledFor:
+          data.status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
         featuredImage: data.featuredImage || null,
         seoTitle: data.seoTitle || null,
         seoDescription: data.seoDescription || null,
@@ -102,9 +103,7 @@ export async function POST(request: Request) {
             content: data.content,
           },
         },
-        ...(category
-          ? { categories: { create: { categoryId: category.id } } }
-          : {}),
+        ...(category ? { categories: { create: { categoryId: category.id } } } : {}),
       },
       include: {
         translations: true,

@@ -847,9 +847,15 @@ async function syncEnergyPrices(now: Date, dryRun: boolean): Promise<EnergyPrice
       indicator?: { values?: Array<{ datetime: string; value: number }> };
     };
     const values = data?.indicator?.values || [];
-    if (!values.length) return { snapshotsCreated: 0, dailySummaryUpdated: false, source: 'esios:empty' };
+    if (!values.length)
+      return { snapshotsCreated: 0, dailySummaryUpdated: false, source: 'esios:empty' };
 
-    if (dryRun) return { snapshotsCreated: values.length, dailySummaryUpdated: true, source: 'esios:dry_run' };
+    if (dryRun)
+      return {
+        snapshotsCreated: values.length,
+        dailySummaryUpdated: true,
+        source: 'esios:dry_run',
+      };
 
     const snapshotDate = new Date(`${dateStr}T00:00:00Z`);
     let created = 0;
@@ -869,10 +875,15 @@ async function syncEnergyPrices(now: Date, dryRun: boolean): Promise<EnergyPrice
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
-    const minHour = new Date(values.find((v) => v.value / 1000 === minPrice)!.datetime).getUTCHours();
-    const maxHour = new Date(values.find((v) => v.value / 1000 === maxPrice)!.datetime).getUTCHours();
+    const minHour = new Date(
+      values.find((v) => v.value / 1000 === minPrice)!.datetime
+    ).getUTCHours();
+    const maxHour = new Date(
+      values.find((v) => v.value / 1000 === maxPrice)!.datetime
+    ).getUTCHours();
     const currentHour = now.getUTCHours();
-    const currentPrice = values.find((v) => new Date(v.datetime).getUTCHours() === currentHour)?.value ?? null;
+    const currentPrice =
+      values.find((v) => new Date(v.datetime).getUTCHours() === currentHour)?.value ?? null;
 
     await db.energyDailySummary.upsert({
       where: { summaryDate: snapshotDate },

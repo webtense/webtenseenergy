@@ -83,7 +83,8 @@ export async function PUT(request: Request, { params }: Props) {
       data: {
         slug,
         status,
-        scheduledFor: status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
+        scheduledFor:
+          status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
         featuredImage: data.featuredImage ?? post.featuredImage,
         seoTitle: data.seoTitle ?? post.seoTitle,
         seoDescription: data.seoDescription ?? post.seoDescription,
@@ -114,7 +115,13 @@ export async function PUT(request: Request, { params }: Props) {
       });
     } else if (data.title && data.content) {
       await db.postTranslation.create({
-        data: { postId: id, locale, title: data.title, excerpt: data.excerpt || null, content: data.content },
+        data: {
+          postId: id,
+          locale,
+          title: data.title,
+          excerpt: data.excerpt || null,
+          content: data.content,
+        },
       });
     }
 
