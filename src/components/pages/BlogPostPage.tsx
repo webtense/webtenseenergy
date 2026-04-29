@@ -5,7 +5,6 @@ import { formatDate } from '@/lib/blog-shared';
 import { getPublishedPostBySlug, type BlogLocale } from '@/lib/content-posts';
 import { withBasePath } from '@/lib/paths';
 import { getSiteUrl, SITE_NAME } from '@/lib/seo';
-import { SectionHero } from '@/components/shared/SectionHero';
 import { ActionBanner } from '@/components/shared/ActionBanner';
 
 type BlogPostPageProps = {
@@ -14,30 +13,43 @@ type BlogPostPageProps = {
   locale: BlogLocale;
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
+const CATEGORY_STYLES: Record<string, string> = {
   Domótica: 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300',
-  'Ahorro Energético':
-    'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300',
+  'Ahorro Energético': 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300',
   'Home Assistant': 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300',
   Ofertas: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
   Reseñas: 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300',
   'Gestión Energética': 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
 };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  Domótica: '🏠',
+  'Ahorro Energético': '⚡',
+  'Home Assistant': '🤖',
+  Ofertas: '🏷️',
+  Reseñas: '⭐',
+  'Gestión Energética': '📊',
+};
+
+const FALLBACK_STYLE = 'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300';
+
 export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps) {
   const post = await getPublishedPostBySlug(slug, locale);
 
   if (!post) notFound();
 
-  const categoryClass =
-    CATEGORY_COLORS[post.category] ??
-    'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300';
+  const categoryStyle = CATEGORY_STYLES[post.category] ?? FALLBACK_STYLE;
+  const icon = CATEGORY_ICONS[post.category] ?? '📄';
+
   const cleanContent = post.content
     .replace(/<!-- wp:[^>]*?-->/g, '')
     .replace(/<!-- \/wp:[^>]*?-->/g, '')
     .trim();
+
   const safeContent = sanitizeHtml(cleanContent, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'h3', 'span']),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      'img', 'h1', 'h2', 'h3', 'h4', 'span', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
+    ]),
     allowedAttributes: {
       a: ['href', 'name', 'target', 'rel'],
       img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
@@ -77,115 +89,124 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Blog',
-        item: new URL(withBasePath(basePath, '/blog'), baseUrl).toString(),
-      },
+      { '@type': 'ListItem', position: 1, name: 'Blog', item: new URL(withBasePath(basePath, '/blog'), baseUrl).toString() },
       { '@type': 'ListItem', position: 2, name: post.title, item: articleUrl },
     ],
   });
+
+  const hasRealImage = post.featuredImage && !post.featuredImage.startsWith('/images/');
 
   return (
     <article className="min-h-screen bg-background pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleSchema }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema }} />
 
-      <SectionHero
-        eyebrow="Artículo"
-        title={post.title}
-        subtitle={
-          post.excerpt ||
-          'Una guía práctica pensada para entender mejor la energía, la domótica y las decisiones que realmente mueven ahorro.'
-        }
-        compact
-        align="center"
-      />
+      {/* Cabecera del artículo */}
+      <header className="border-b border-zinc-100 bg-background dark:border-white/5 pt-10 pb-12">
+        <div className="mx-auto max-w-3xl px-5">
+          {/* Breadcrumb */}
+          <nav className="mb-8 flex items-center gap-2 text-sm text-foreground/45">
+            <Link href={withBasePath(basePath, '/')} className="hover:text-foreground/70 transition">Inicio</Link>
+            <span>/</span>
+            <Link href={withBasePath(basePath, '/blog')} className="hover:text-foreground/70 transition">Blog</Link>
+            <span>/</span>
+            <span className="text-foreground/65 line-clamp-1">{post.title}</span>
+          </nav>
 
-      <section className="section-shell-tight">
-        <div className="section-inner max-w-6xl">
-          <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-sm">
-            <span
-              className={`rounded-full px-3 py-1 font-semibold uppercase tracking-[0.14em] ${categoryClass}`}
-            >
+          {/* Icono + categoría */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-100 text-xl dark:bg-white/5">
+              {icon}
+            </div>
+            <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${categoryStyle}`}>
               {post.category}
             </span>
-            <span className="text-foreground/40">•</span>
-            <span className="text-foreground/55">{formatDate(post.date)}</span>
+            <span className="text-sm text-foreground/40">{formatDate(post.date)}</span>
           </div>
 
-          {post.featuredImage && !post.featuredImage.startsWith('/images/') ? (
-            <div className="surface-panel overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={post.featuredImage}
-                alt={post.title}
-                className="max-h-[560px] w-full object-cover"
-              />
-            </div>
-          ) : null}
+          {/* Título */}
+          <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
+            {post.title}
+          </h1>
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-            <div
-              className="prose prose-zinc dark:prose-invert max-w-none prose-lg prose-p:text-foreground/80 dark:prose-p:text-zinc-300 prose-p:leading-relaxed prose-headings:text-foreground dark:prose-headings:text-white prose-headings:font-heading prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-a:text-primary-600 dark:prose-a:text-primary-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground dark:prose-strong:text-white prose-li:text-foreground/80 dark:prose-li:text-zinc-300 prose-img:rounded-[1.4rem] prose-img:shadow-xl prose-blockquote:border-primary-500 prose-blockquote:bg-zinc-50 dark:prose-blockquote:bg-white/5 prose-blockquote:rounded-r-2xl prose-blockquote:px-6 prose-blockquote:py-4"
-              dangerouslySetInnerHTML={{ __html: safeContent }}
-            />
-
-            <aside className="space-y-4 lg:sticky lg:top-24">
-              <div className="surface-panel-soft p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
-                  En esta guía
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground/70">
-                  Una lectura enfocada a entender mejor el contexto, evaluar opciones y enlazar el
-                  contenido con una siguiente acción práctica.
-                </p>
-              </div>
-              <div className="surface-panel-soft p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
-                  Siguiente paso
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground/70">
-                  Si quieres aterrizar estas ideas sobre tu caso real, la mejor vía sigue siendo
-                  partir de tu factura o tu consumo.
-                </p>
-                <Link href={withBasePath(basePath, '/estudio')} className="cta-primary mt-5 w-full">
-                  Pedir estudio
-                </Link>
-              </div>
-            </aside>
-          </div>
+          {/* Excerpt */}
+          {post.excerpt && (
+            <p className="mt-5 text-lg leading-relaxed text-foreground/60">
+              {post.excerpt}
+            </p>
+          )}
         </div>
-      </section>
+      </header>
 
-      <section className="section-shell-tight pb-12">
-        <div className="section-inner max-w-6xl">
-          <ActionBanner
-            title="Convierte la lectura en una decisión concreta"
-            description="Analizamos tu contrato de luz o tu escenario energético y te devolvemos una recomendación accionable, clara y sin compromiso."
-            action={
-              <Link href={withBasePath(basePath, '/estudio')} className="cta-primary">
-                Solicitar estudio gratuito
-              </Link>
-            }
+      {/* Imagen destacada real (si existe) */}
+      {hasRealImage && (
+        <div className="mx-auto max-w-3xl px-5 mt-8">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.featuredImage!}
+            alt={post.title}
+            className="w-full rounded-3xl object-cover max-h-[420px]"
           />
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 text-sm dark:border-white/10 sm:flex-row">
-            <Link
-              href={withBasePath(basePath, '/blog')}
-              className="font-semibold text-foreground/65 hover:text-primary-600 dark:hover:text-primary-300"
-            >
-              ← Volver al blog
-            </Link>
-            <Link
-              href={withBasePath(basePath, '/contacto')}
-              className="text-foreground/50 hover:text-foreground/75"
-            >
-              ¿Prefieres hablar con el equipo?
-            </Link>
-          </div>
         </div>
-      </section>
+      )}
+
+      {/* Contenido + sidebar */}
+      <div className="mx-auto max-w-3xl px-5 mt-10 lg:max-w-6xl">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-12 lg:items-start">
+
+          {/* Artículo */}
+          <div className="article-body">
+            <div dangerouslySetInnerHTML={{ __html: safeContent }} />
+          </div>
+
+          {/* Sidebar */}
+          <aside className="mt-12 space-y-4 lg:mt-0 lg:sticky lg:top-24">
+            <div className="surface-panel-soft p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45 mb-3">
+                Siguiente paso
+              </p>
+              <p className="text-sm leading-6 text-foreground/65">
+                ¿Quieres aterrizar esto en tu caso? Analizamos tu factura sin compromiso.
+              </p>
+              <Link href={withBasePath(basePath, '/estudio')} className="cta-primary mt-4 w-full block text-center">
+                Estudio gratuito
+              </Link>
+            </div>
+            <div className="surface-panel-soft p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45 mb-3">
+                Contacto directo
+              </p>
+              <p className="text-sm leading-6 text-foreground/65">
+                Si prefieres hablar con el equipo, respondemos en menos de 24h.
+              </p>
+              <Link href={withBasePath(basePath, '/contacto')} className="cta-secondary mt-4 w-full block text-center">
+                Escribir al equipo
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {/* Footer del artículo */}
+      <div className="mx-auto max-w-3xl px-5 mt-16 lg:max-w-6xl">
+        <ActionBanner
+          title="Convierte la lectura en una decisión concreta"
+          description="Analizamos tu contrato de luz y te devolvemos una recomendación accionable, clara y sin compromiso."
+          action={
+            <Link href={withBasePath(basePath, '/estudio')} className="cta-primary">
+              Solicitar estudio gratuito
+            </Link>
+          }
+        />
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 text-sm dark:border-white/10 sm:flex-row">
+          <Link href={withBasePath(basePath, '/blog')} className="font-semibold text-foreground/60 hover:text-primary-600 dark:hover:text-primary-300 transition">
+            ← Volver al blog
+          </Link>
+          <Link href={withBasePath(basePath, '/contacto')} className="text-foreground/45 hover:text-foreground/70 transition">
+            ¿Prefieres hablar con el equipo?
+          </Link>
+        </div>
+      </div>
     </article>
   );
 }

@@ -205,3 +205,121 @@ html {
     padding-bottom: 3.25rem;
   }
 }
+
+/* ── Artículo blog ──────────────────────────────────────────── */
+.article-body {
+  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.article-body h2 {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.article-body h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-body p {
+  margin-bottom: 1.25rem;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.article-body li {
+  margin-bottom: 0.4rem;
+}
+
+.article-body strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.article-body a {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-primary-500) 35%, transparent);
+  text-underline-offset: 3px;
+}
+
+.article-body a:hover {
+  text-decoration-color: var(--color-primary-500);
+}
+
+/* Tablas */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 1.5rem 0 2rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.article-body thead {
+  background: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+}
+
+.article-body th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--foreground);
+  border-bottom: 2px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+  white-space: nowrap;
+}
+
+.article-body td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  vertical-align: top;
+}
+
+.article-body tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Sin barras laterales en blockquotes */
+.article-body blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  border-radius: 0.75rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+
+.article-body img {
+  border-radius: 1rem;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+}
+
+.article-body hr {
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  margin: 2rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .article-body a {
+    color: var(--color-primary-300);
+  }
+}

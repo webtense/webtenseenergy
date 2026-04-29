@@ -11,7 +11,16 @@ const CATEGORY_STYLES: Record<string, string> = {
   'Gestión Energética': 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
 };
 
-const FALLBACK = 'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300';
+const CATEGORY_ICONS: Record<string, string> = {
+  Domótica: '🏠',
+  'Ahorro Energético': '⚡',
+  'Home Assistant': '🤖',
+  Ofertas: '🏷️',
+  Reseñas: '⭐',
+  'Gestión Energética': '📊',
+};
+
+const FALLBACK_STYLE = 'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300';
 
 interface ArticleCardProps {
   title: string;
@@ -32,44 +41,46 @@ export function ArticleCard({
   featuredImage,
   basePath = '',
 }: ArticleCardProps) {
-  const categoryStyle = CATEGORY_STYLES[category] ?? FALLBACK;
+  const categoryStyle = CATEGORY_STYLES[category] ?? FALLBACK_STYLE;
+  const icon = CATEGORY_ICONS[category] ?? '📄';
+  const hasRealImage = featuredImage && !featuredImage.startsWith('/images/blog-placeholder');
 
   return (
     <Link
       href={withBasePath(basePath, `/blog/${slug}`)}
       className="surface-panel-soft group flex h-full flex-col overflow-hidden transition hover:-translate-y-1 hover:border-primary-300 dark:hover:border-primary-500/20"
     >
-      <div className="relative h-56 overflow-hidden bg-zinc-100 dark:bg-[#06111d]">
-        {featuredImage && !featuredImage.startsWith('/images/blog-placeholder') ? (
-          // eslint-disable-next-line @next/next/no-img-element
+      {hasRealImage ? (
+        <div className="relative h-44 overflow-hidden bg-zinc-100 dark:bg-[#06111d]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={featuredImage}
             alt={title}
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
           />
-        ) : (
-          <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(26,183,117,0.14),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(59,118,246,0.16),transparent_34%)] px-8 text-center">
-            <span className="font-heading text-3xl font-bold tracking-tight text-foreground/25">
-              {category}
-            </span>
+        </div>
+      ) : (
+        <div className="px-6 pt-6">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-zinc-100 text-2xl dark:bg-white/5">
+            {icon}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="flex flex-1 flex-col p-6 md:p-7">
+      <div className="flex flex-1 flex-col p-6">
         <div className="flex items-center justify-between gap-3">
           <span
-            className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${categoryStyle}`}
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${categoryStyle}`}
           >
             {category}
           </span>
-          <span className="text-xs font-medium text-foreground/45">{date}</span>
+          <span className="text-xs font-medium text-foreground/40">{date}</span>
         </div>
-        <h3 className="mt-5 font-heading text-2xl font-bold tracking-tight text-foreground transition group-hover:text-primary-600 dark:group-hover:text-primary-300">
+        <h3 className="mt-4 font-heading text-lg font-bold leading-snug tracking-tight text-foreground transition group-hover:text-primary-600 dark:group-hover:text-primary-300">
           {title}
         </h3>
-        <p className="mt-4 text-sm leading-7 text-foreground/70">{excerpt}</p>
-        <div className="mt-6 text-sm font-semibold text-primary-600 dark:text-primary-300">
+        <p className="mt-2.5 line-clamp-2 text-sm leading-6 text-foreground/60">{excerpt}</p>
+        <div className="mt-4 text-xs font-semibold text-primary-600 dark:text-primary-300">
           Leer artículo →
         </div>
       </div>
