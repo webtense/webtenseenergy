@@ -3,28 +3,14 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminApiUser } from '@/lib/admin-guard';
 import { isSameOrigin } from '@/lib/security';
-
-type PostPayload = {
-  id?: string;
-  slug?: string;
-  locale?: 'ES' | 'CA';
-  title?: string;
-  excerpt?: string;
-  content?: string;
-  status?: 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
-  scheduledFor?: string | null;
-  featuredImage?: string | null;
-  seoTitle?: string | null;
-  seoDescription?: string | null;
-  category?: string | null;
-};
+import { PostCreateSchema } from '@/lib/schemas/admin';
 
 function toSlug(value: string) {
   return value
     .toLowerCase()
     .trim()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
@@ -67,19 +53,18 @@ export async function POST(request: Request) {
   if ('error' in auth) return auth.error;
 
   try {
-    const body = (await request.json()) as PostPayload;
-    const locale = body.locale === 'CA' ? 'CA' : 'ES';
-    const title = body.title?.trim() || '';
-    const content = body.content?.trim() || '';
+    const body = await request.json();
+    const result = PostCreateSchema.safeParse(body);
 
-    if (!title || !content) {
+    if (!result.success) {
       return NextResponse.json(
-        { message: 'Titulo y contenido son obligatorios.' },
+        { message: 'Datos inválidos', details: result.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    const slug = toSlug(body.slug?.trim() || title);
+    const data = result.data;
+    const slug = toSlug(data.slug?.trim() || data.title);
     if (!slug) {
       return NextResponse.json({ message: 'Slug invalido.' }, { status: 400 });
     }
@@ -89,60 +74,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'El slug ya existe.' }, { status: 409 });
     }
 
-    const status = body.status || 'DRAFT';
-    const scheduledFor = body.scheduledFor ? new Date(body.scheduledFor) : null;
-    const categoryName = body.category?.trim() || null;
+    const categoryName = data.category?.trim() || null;
     const category = categoryName
       ? await db.category.upsert({
           where: { slug: toCategorySlug(categoryName) },
-          create: {
-            slug: toCategorySlug(categoryName),
-            name: categoryName,
-            locale,
-          },
-          update: {
-            name: categoryName,
-            locale,
-          },
+          create: { slug: toCategorySlug(categoryName), name: categoryName, locale: data.locale },
+          update: { name: categoryName, locale: data.locale },
         })
       : null;
 
     const post = await db.post.create({
       data: {
         slug,
-        status,
-        scheduledFor: status === 'SCHEDULED' ? scheduledFor : null,
-        featuredImage: body.featuredImage || null,
-        seoTitle: body.seoTitle || null,
-        seoDescription: body.seoDescription || null,
-        locale,
-        publishedAt: status === 'PUBLISHED' ? new Date() : null,
+        status: data.status,
+        scheduledFor: data.status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
+        featuredImage: data.featuredImage || null,
+        seoTitle: data.seoTitle || null,
+        seoDescription: data.seoDescription || null,
+        locale: data.locale,
+        publishedAt: data.status === 'PUBLISHED' ? new Date() : null,
         authorId: auth.user.id,
         translations: {
           create: {
-            locale,
-            title,
-            excerpt: body.excerpt || null,
-            content,
+            locale: data.locale,
+            title: data.title,
+            excerpt: data.excerpt || null,
+            content: data.content,
           },
         },
         ...(category
-          ? {
-              categories: {
-                create: {
-                  categoryId: category.id,
-                },
-              },
-            }
+          ? { categories: { create: { categoryId: category.id } } }
           : {}),
       },
       include: {
         translations: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: { include: { category: true } },
       },
     });
 

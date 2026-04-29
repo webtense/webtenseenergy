@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 type MethodType = 'upload' | 'manual' | null;
 
@@ -44,8 +44,12 @@ export default function EnergyAuditWizard() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [loadedAt, setLoadedAt] = useState('');
+  const [honeypot, setHoneypot] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setLoadedAt(Date.now().toString()); }, []);
 
   const handleNext = () => setStep((prev) => prev + 1);
   const handleBack = () => setStep((prev) => prev - 1);
@@ -106,6 +110,8 @@ export default function EnergyAuditWizard() {
       body.set('email', formData.contact.email);
       body.set('phone', formData.contact.phone);
       body.set('company', formData.contact.company);
+      body.set('website', honeypot);
+      body.set('_t', loadedAt);
 
       if (formData.file) {
         body.set('invoice', formData.file, formData.file.name);
@@ -425,6 +431,8 @@ export default function EnergyAuditWizard() {
             </p>
 
             <form onSubmit={submitForm} className="space-y-4">
+              {/* honeypot — no tocar */}
+              <input name="website" type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} style={{ position: 'absolute', left: '-9999px' }} tabIndex={-1} autoComplete="off" aria-hidden="true" />
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground/80 dark:text-zinc-300">
                   Nombre Completo *

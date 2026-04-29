@@ -5,15 +5,13 @@ import {
   escapeHtml,
   getClientIp,
   hashIdentifier,
-  isValidEmail,
   normalizeEmail,
 } from '@/lib/security';
+import { ContactoSchema } from '@/lib/schemas/public';
 import { submitContactRequest } from '@/server/services/contact-service';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, phone, subject, message } = await request.json();
-
     const rate = await checkRateLimit({
       key: hashIdentifier(getClientIp(request)),
       endpoint: 'contacto',
@@ -27,21 +25,45 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
+    const body = await request.json();
+
+    // Honeypot: campo oculto que solo rellenan bots
+    if (body.website) {
+      return NextResponse.json({ success: true, message: 'Email enviado correctamente' });
     }
 
-    const safeEmail = normalizeEmail(email);
-    if (!isValidEmail(safeEmail)) {
-      return NextResponse.json({ error: 'Email no valido' }, { status: 400 });
+    // Timing: menos de 1.2s desde carga de página = bot
+    const elapsed = Date.now() - parseInt(body._t ?? '0', 10);
+    if (!body._t || elapsed < 1200) {
+      return NextResponse.json({ success: true, message: 'Email enviado correctamente' });
     }
+
+    // Nombre aleatorio: >17 chars sin ningún espacio
+    const rawName = typeof body.name === 'string' ? body.name : '';
+    if (rawName.length > 17 && !/\s/.test(rawName)) {
+      return NextResponse.json({ success: true, message: 'Email enviado correctamente' });
+    }
+
+    const result = ContactoSchema.safeParse({
+      ...body,
+      email: typeof body.email === 'string' ? normalizeEmail(body.email) : body.email,
+    });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: result.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { name, email, phone, subject, message } = result.data;
 
     await submitContactRequest(request, {
-      name: escapeHtml(String(name)),
-      email: safeEmail,
-      phone: String(phone || ''),
-      subject: String(subject || ''),
-      message: escapeHtml(String(message)),
+      name: escapeHtml(name),
+      email,
+      phone: escapeHtml(phone),
+      subject: escapeHtml(subject),
+      message: escapeHtml(message),
     });
 
     return NextResponse.json({ success: true, message: 'Email enviado correctamente' });

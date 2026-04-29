@@ -5,10 +5,10 @@ import {
   escapeHtml,
   getClientIp,
   hashIdentifier,
-  isValidEmail,
   normalizeEmail,
 } from '@/lib/security';
 import { scanFile } from '@/lib/antivirus';
+import { EstudioTextSchema } from '@/lib/schemas/public';
 import { submitStudyRequest } from '@/server/services/study-service';
 
 export const runtime = 'nodejs';
@@ -24,7 +24,6 @@ const HABIT_LABELS: Record<string, string> = {
 
 function parseHabits(rawHabits: string | null): string[] {
   if (!rawHabits) return [];
-
   try {
     const parsed = JSON.parse(rawHabits);
     if (Array.isArray(parsed)) {
@@ -33,7 +32,6 @@ function parseHabits(rawHabits: string | null): string[] {
   } catch {
     return [];
   }
-
   return [];
 }
 
@@ -54,39 +52,47 @@ export async function POST(request: Request) {
 
     const form = await request.formData();
 
-    const method = String(form.get('method') || 'manual');
-    const kwConsumed = String(form.get('kwConsumed') || '');
+    // Honeypot: campo oculto que solo rellenan bots
+    if (form.get('website')) {
+      return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
+    }
+
+    // Timing: menos de 1.2s desde carga de página = bot
+    const elapsed = Date.now() - parseInt(String(form.get('_t') ?? '0'), 10);
+    if (!form.get('_t') || elapsed < 1200) {
+      return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
+    }
+
+    // Nombre aleatorio: >17 chars sin ningún espacio
+    const rawName = String(form.get('name') ?? '');
+    if (rawName.length > 17 && !/\s/.test(rawName)) {
+      return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
+    }
+
+    const result = EstudioTextSchema.safeParse({
+      method: form.get('method') ?? undefined,
+      name: form.get('name'),
+      email: normalizeEmail(String(form.get('email') ?? '')),
+      phone: form.get('phone') ?? undefined,
+      company: form.get('company') ?? undefined,
+      kwConsumed: form.get('kwConsumed') ?? undefined,
+    });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: result.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { method, name, email, phone, company, kwConsumed } = result.data;
     const habits = parseHabits(String(form.get('habits') || '[]'));
-    const name = escapeHtml(
-      String(form.get('name') || '')
-        .trim()
-        .slice(0, 120)
-    );
-    const email = normalizeEmail(String(form.get('email') || '').trim());
-    const phone = escapeHtml(
-      String(form.get('phone') || '')
-        .trim()
-        .slice(0, 40)
-    );
-    const company = escapeHtml(
-      String(form.get('company') || '')
-        .trim()
-        .slice(0, 120)
-    );
     const invoiceFile = form.get('invoice');
-
-    if (!name || !email) {
-      return NextResponse.json({ error: 'Faltan datos de contacto obligatorios' }, { status: 400 });
-    }
-
-    if (!isValidEmail(email)) {
-      return NextResponse.json({ error: 'Email no valido' }, { status: 400 });
-    }
 
     const habitsText =
       habits.length > 0 ? habits.map((h) => HABIT_LABELS[h] || h).join(', ') : 'Ninguno';
     const hasInvoice = invoiceFile instanceof File && invoiceFile.size > 0;
-    const safeKwConsumed = escapeHtml(String(kwConsumed || '').slice(0, 20));
+    const safeKwConsumed = escapeHtml(kwConsumed.slice(0, 20));
     const analysisMethod =
       method === 'upload'
         ? `Subida de factura: ${hasInvoice ? escapeHtml(invoiceFile.name) : 'No se adjunto archivo'}`
@@ -133,15 +139,16 @@ export async function POST(request: Request) {
         buffer: fileBuffer,
       };
     }
+
     await submitStudyRequest({
       request,
       method,
       kwConsumed: safeKwConsumed,
       habits,
-      name,
+      name: escapeHtml(name),
       email,
-      phone,
-      company,
+      phone: escapeHtml(phone),
+      company: escapeHtml(company),
       invoiceFile: invoiceData,
       habitsText,
       analysisMethod,

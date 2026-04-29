@@ -9,6 +9,7 @@ export type AdminSessionPayload = {
   role: 'ADMIN' | 'EDITOR';
   username: string;
   exp: number;
+  isActive: boolean;
 };
 
 function getSecret() {
@@ -41,6 +42,7 @@ export function createAdminSessionToken(
     userId,
     role,
     username,
+    isActive: true,
     exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE,
   };
   const encoded = toBase64Url(JSON.stringify(body));

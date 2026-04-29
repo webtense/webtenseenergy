@@ -4,11 +4,17 @@ import { withBasePath } from '@/lib/paths';
 import { SectionHero } from '@/components/shared/SectionHero';
 import { ActionBanner } from '@/components/shared/ActionBanner';
 
-type PrecioLuzHoyPageProps = {
-  basePath: string;
+type FaqItem = {
+  question: string;
+  answer: string;
 };
 
-export function PrecioLuzHoyPage({ basePath }: PrecioLuzHoyPageProps) {
+type PrecioLuzHoyPageProps = {
+  basePath: string;
+  faqItems?: FaqItem[];
+};
+
+export function PrecioLuzHoyPage({ basePath, faqItems }: PrecioLuzHoyPageProps) {
   return (
     <main className="min-h-screen bg-background pb-16">
       <SectionHero
@@ -43,6 +49,24 @@ export function PrecioLuzHoyPage({ basePath }: PrecioLuzHoyPageProps) {
           <ElectricityDashboard />
         </div>
       </section>
+
+      {faqItems && faqItems.length > 0 && (
+        <section className="section-shell-tight">
+          <div className="section-inner">
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground mb-8">
+              Preguntas frecuentes sobre el precio de la luz
+            </h2>
+            <dl className="space-y-6">
+              {faqItems.map((item) => (
+                <div key={item.question} className="surface-panel-soft p-6">
+                  <dt className="font-semibold text-foreground text-lg mb-2">{item.question}</dt>
+                  <dd className="text-foreground/70 leading-7 text-sm">{item.answer}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
 
       <section className="section-shell-tight pb-24">
         <div className="section-inner">

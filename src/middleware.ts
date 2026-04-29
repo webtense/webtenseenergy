@@ -32,7 +32,12 @@ async function verifyToken(token: string): Promise<boolean> {
     if (!valid) return false;
 
     const payload = JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')));
-    return typeof payload.exp === 'number' && payload.exp > Math.floor(Date.now() / 1000);
+    if (typeof payload.exp !== 'number' || payload.exp <= Math.floor(Date.now() / 1000)) {
+      return false;
+    }
+    // isActive=false means the token was explicitly invalidated (e.g. account deactivation at login)
+    if (payload.isActive === false) return false;
+    return true;
   } catch {
     return false;
   }

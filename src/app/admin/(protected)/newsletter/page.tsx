@@ -1,6 +1,10 @@
+import nextDynamic from 'next/dynamic';
 import { db } from '@/lib/db';
-import { AdminNewsletterManager } from '@/components/admin/AdminNewsletterManager';
 import { requireAdminPageUser } from '@/server/auth/admin';
+
+const AdminNewsletterManager = nextDynamic(() =>
+  import('@/components/admin/AdminNewsletterManager').then((m) => m.AdminNewsletterManager)
+);
 
 export const dynamic = 'force-dynamic';
 

@@ -3,27 +3,14 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdminApiUser } from '@/lib/admin-guard';
 import { isSameOrigin } from '@/lib/security';
-
-type UpdatePayload = {
-  slug?: string;
-  locale?: 'ES' | 'CA';
-  title?: string;
-  excerpt?: string;
-  content?: string;
-  status?: 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
-  scheduledFor?: string | null;
-  featuredImage?: string | null;
-  seoTitle?: string | null;
-  seoDescription?: string | null;
-  category?: string | null;
-};
+import { PostUpdateSchema } from '@/lib/schemas/admin';
 
 function toSlug(value: string) {
   return value
     .toLowerCase()
     .trim()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
@@ -48,37 +35,28 @@ export async function PUT(request: Request, { params }: Props) {
   const { id } = await params;
 
   try {
-    const body = (await request.json()) as UpdatePayload;
+    const body = await request.json();
+    const result = PostUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { message: 'Datos inválidos', details: result.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const data = result.data;
     const post = await db.post.findUnique({
       where: { id },
-      include: {
-        translations: true,
-        categories: true,
-      },
+      include: { translations: true, categories: true },
     });
     if (!post) {
       return NextResponse.json({ message: 'Post no encontrado' }, { status: 404 });
     }
 
-    const locale = body.locale === 'CA' ? 'CA' : 'ES';
-    const status = body.status || post.status;
-    const slug = body.slug ? toSlug(body.slug) : post.slug;
-    const categoryName = body.category?.trim();
-
-    const category = categoryName
-      ? await db.category.upsert({
-          where: { slug: toCategorySlug(categoryName) },
-          create: {
-            slug: toCategorySlug(categoryName),
-            name: categoryName,
-            locale,
-          },
-          update: {
-            name: categoryName,
-            locale,
-          },
-        })
-      : null;
+    const locale = data.locale ?? post.locale;
+    const status = data.status ?? post.status;
+    const slug = data.slug ? toSlug(data.slug) : post.slug;
 
     if (!slug) {
       return NextResponse.json({ message: 'Slug invalido' }, { status: 400 });
@@ -91,16 +69,24 @@ export async function PUT(request: Request, { params }: Props) {
       }
     }
 
+    const categoryName = data.category?.trim();
+    const category = categoryName
+      ? await db.category.upsert({
+          where: { slug: toCategorySlug(categoryName) },
+          create: { slug: toCategorySlug(categoryName), name: categoryName, locale },
+          update: { name: categoryName, locale },
+        })
+      : null;
+
     await db.post.update({
       where: { id },
       data: {
         slug,
         status,
-        scheduledFor:
-          status === 'SCHEDULED' && body.scheduledFor ? new Date(body.scheduledFor) : null,
-        featuredImage: body.featuredImage ?? post.featuredImage,
-        seoTitle: body.seoTitle ?? post.seoTitle,
-        seoDescription: body.seoDescription ?? post.seoDescription,
+        scheduledFor: status === 'SCHEDULED' && data.scheduledFor ? new Date(data.scheduledFor) : null,
+        featuredImage: data.featuredImage ?? post.featuredImage,
+        seoTitle: data.seoTitle ?? post.seoTitle,
+        seoDescription: data.seoDescription ?? post.seoDescription,
         locale,
         publishedAt:
           status === 'PUBLISHED'
@@ -109,14 +95,7 @@ export async function PUT(request: Request, { params }: Props) {
               ? null
               : post.publishedAt,
         ...(category
-          ? {
-              categories: {
-                deleteMany: {},
-                create: {
-                  categoryId: category.id,
-                },
-              },
-            }
+          ? { categories: { deleteMany: {}, create: { categoryId: category.id } } }
           : {}),
       },
     });
@@ -128,33 +107,20 @@ export async function PUT(request: Request, { params }: Props) {
       await db.postTranslation.update({
         where: { id: existingTranslation.id },
         data: {
-          title: body.title ?? existingTranslation.title,
-          excerpt: body.excerpt ?? existingTranslation.excerpt,
-          content: body.content ?? existingTranslation.content,
+          title: data.title ?? existingTranslation.title,
+          excerpt: data.excerpt ?? existingTranslation.excerpt,
+          content: data.content ?? existingTranslation.content,
         },
       });
-    } else if (body.title && body.content) {
+    } else if (data.title && data.content) {
       await db.postTranslation.create({
-        data: {
-          postId: id,
-          locale,
-          title: body.title,
-          excerpt: body.excerpt || null,
-          content: body.content,
-        },
+        data: { postId: id, locale, title: data.title, excerpt: data.excerpt || null, content: data.content },
       });
     }
 
     const updated = await db.post.findUnique({
       where: { id },
-      include: {
-        translations: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-      },
+      include: { translations: true, categories: { include: { category: true } } },
     });
 
     return NextResponse.json({ post: updated });

@@ -1,0 +1,42 @@
+# Webtense Energy
+
+> Plataforma española de eficiencia energética y domótica. Ayudamos a hogares y empresas a optimizar su consumo eléctrico, comparar tarifas, dimensionar instalaciones de autoconsumo solar y automatizar el hogar.
+
+Servicio en español y catalán. Área geográfica: España.
+
+## Servicios principales
+
+- **Estudio energético gratuito**: análisis personalizado de tarifa, potencia contratada y hábitos de consumo. El cliente sube su factura o indica su consumo mensual en kWh; el equipo devuelve una recomendación de ahorro.
+- **Precio de la luz en tiempo real**: datos horarios del mercado mayorista PVPC (Red Eléctrica de España / ESIOS). Permite identificar las horas más baratas del día.
+- **Comparativa de tarifas eléctricas**: orientación para elegir la tarifa adecuada según el perfil de consumo (tarifa plana, PVPC, tarifa nocturna).
+- **Consultoría energética para empresas**: auditoría de costes y optimización del contrato eléctrico para pymes y autónomos.
+- **Proyectos de domótica**: automatización del hogar para gestión inteligente de cargas y consumo.
+
+## Público objetivo
+
+- Hogares con factura eléctrica alta o interés en autoconsumo solar
+- Propietarios de vehículo eléctrico, aerotermia o bomba de calor
+- Empresas y pymes que quieran reducir su coste energético
+- Personas comparando comercializadoras eléctricas en España
+
+## Páginas clave
+
+- /luz/precio-hoy — precio del kWh por tramos horarios, en tiempo real
+- /estudio — solicitud de estudio energético personalizado (gratuito)
+- /blog — artículos sobre tarifas, autoconsumo, subvenciones y domótica
+- /ofertas — comparativa de ofertas eléctricas actualizadas
+- /empresas — servicios de consultoría para empresas
+- /particulares — servicios para hogares
+
+## Precios
+
+El estudio energético es gratuito y sin compromiso.
+Las consultas por WhatsApp (+34 691 521 367) son gratuitas.
+Los proyectos de domótica e instalación solar se presupuestan individualmente.
+
+## Contacto
+
+- Web: https://webtenseenergy.com
+- Email: info@webtenseenergy.com
+- WhatsApp: +34 691 521 367
+- Telegram: https://t.me/webtenseenergy

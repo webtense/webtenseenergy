@@ -55,6 +55,12 @@ type LeadStudySummary = {
   notified: boolean;
 };
 
+type EnergyPriceSummary = {
+  snapshotsCreated: number;
+  dailySummaryUpdated: boolean;
+  source: string;
+};
+
 export type DailyAutomationSummary = {
   ok: true;
   dryRun: boolean;
@@ -63,6 +69,7 @@ export type DailyAutomationSummary = {
   blog: BlogTelegramSummary;
   newsletter: NewsletterSummary;
   pipeline: LeadStudySummary;
+  energy: EnergyPriceSummary;
 };
 
 function getNumberEnv(name: string, fallback: number) {
@@ -820,6 +827,88 @@ function formatLeadSummary(leads: Lead[], studies: StudyRequest[]) {
   return lines.join('\n');
 }
 
+async function syncEnergyPrices(now: Date, dryRun: boolean): Promise<EnergyPriceSummary> {
+  const token = process.env.ESIOS_TOKEN;
+  if (!token) {
+    return { snapshotsCreated: 0, dailySummaryUpdated: false, source: 'skipped:no_token' };
+  }
+
+  const dateStr = now.toISOString().slice(0, 10);
+
+  try {
+    const url = `https://api.esios.ree.es/indicators/1001?start_date=${dateStr}T00:00:00&end_date=${dateStr}T23:59:59&time_trunc=hour`;
+    const response = await fetch(url, {
+      headers: { Authorization: `Token token=${token}`, Accept: 'application/json' },
+    });
+
+    if (!response.ok) throw new Error(`ESIOS ${response.status}`);
+
+    const data = (await response.json()) as {
+      indicator?: { values?: Array<{ datetime: string; value: number }> };
+    };
+    const values = data?.indicator?.values || [];
+    if (!values.length) return { snapshotsCreated: 0, dailySummaryUpdated: false, source: 'esios:empty' };
+
+    if (dryRun) return { snapshotsCreated: values.length, dailySummaryUpdated: true, source: 'esios:dry_run' };
+
+    const snapshotDate = new Date(`${dateStr}T00:00:00Z`);
+    let created = 0;
+
+    for (const entry of values) {
+      const hour = new Date(entry.datetime).getUTCHours();
+      const price = entry.value / 1000; // MWh → kWh
+      await db.energyPriceSnapshot.upsert({
+        where: { snapshotDate_hour: { snapshotDate, hour } },
+        create: { snapshotDate, hour, price, source: 'esios' },
+        update: { price, source: 'esios' },
+      });
+      created++;
+    }
+
+    const prices = values.map((v) => v.value / 1000);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const minHour = new Date(values.find((v) => v.value / 1000 === minPrice)!.datetime).getUTCHours();
+    const maxHour = new Date(values.find((v) => v.value / 1000 === maxPrice)!.datetime).getUTCHours();
+    const currentHour = now.getUTCHours();
+    const currentPrice = values.find((v) => new Date(v.datetime).getUTCHours() === currentHour)?.value ?? null;
+
+    await db.energyDailySummary.upsert({
+      where: { summaryDate: snapshotDate },
+      create: {
+        summaryDate: snapshotDate,
+        minPrice,
+        minHour,
+        maxPrice,
+        maxHour,
+        avgPrice,
+        currentPrice: currentPrice !== null ? currentPrice / 1000 : null,
+        entriesCount: values.length,
+        source: 'esios',
+      },
+      update: {
+        minPrice,
+        minHour,
+        maxPrice,
+        maxHour,
+        avgPrice,
+        currentPrice: currentPrice !== null ? currentPrice / 1000 : null,
+        entriesCount: values.length,
+        source: 'esios',
+      },
+    });
+
+    return { snapshotsCreated: created, dailySummaryUpdated: true, source: 'esios' };
+  } catch (error) {
+    return {
+      snapshotsCreated: 0,
+      dailySummaryUpdated: false,
+      source: `error:${error instanceof Error ? error.message : 'unknown'}`,
+    };
+  }
+}
+
 async function processLeadStudySummary(now: Date, dryRun: boolean): Promise<LeadStudySummary> {
   const config = getAutomationConfig();
   const since = new Date(now);
@@ -857,11 +946,12 @@ export async function runDailyAutomation(
   const dryRun = Boolean(options.dryRun);
   const forceNewsletter = Boolean(options.forceNewsletter);
 
-  const [offers, blog, newsletter, pipeline] = await Promise.all([
+  const [offers, blog, newsletter, pipeline, energy] = await Promise.all([
     processOffers(now, dryRun),
     processBlogPosts(now, dryRun),
     processNewsletter(now, dryRun, forceNewsletter),
     processLeadStudySummary(now, dryRun),
+    syncEnergyPrices(now, dryRun),
   ]);
 
   return {
@@ -872,5 +962,6 @@ export async function runDailyAutomation(
     blog,
     newsletter,
     pipeline,
+    energy,
   };
 }

@@ -29,6 +29,9 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
         run: npm run db:generate
 
+      - name: Format check
+        run: npm run format:check
+
       - name: Lint
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
@@ -39,9 +42,15 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
         run: npm run typecheck
 
+      - name: Test with coverage
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET_TEST || 'ci-test-secret-min-32-chars-long' }}
+        run: npm run test:coverage
+
       - name: Build
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/webtenseenergy?schema=public
           NEXT_PUBLIC_SITE_URL: https://webtenseenergy.com
-          ADMIN_SESSION_SECRET: ci-build-secret
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET_TEST || 'ci-build-secret-min-32-chars-long' }}
         run: npm run build

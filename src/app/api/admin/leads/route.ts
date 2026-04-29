@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdminApiUser } from '@/lib/admin-guard';
 
 export async function GET() {
-  const auth = await requireAdminApiUser();
+  const auth = await requireAdminApiUser('ADMIN');
   if ('error' in auth) return auth.error;
 
   const leads = await db.lead.findMany({

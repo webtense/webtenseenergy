@@ -1,5 +1,6 @@
 import logger from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp, hashIdentifier } from '@/lib/security';
 
 const ESIOS_TOKEN = process.env.ESIOS_TOKEN;
 
@@ -93,7 +94,23 @@ function buildFallbackData(now: Date): ElectricityApiResponse {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const rate = await checkRateLimit({
+    key: hashIdentifier(getClientIp(request)),
+    endpoint: 'precios-luz',
+    limit: 60,
+    windowMs: 60 * 1000,
+  });
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rate.retryAfter) },
+      }
+    );
+  }
+
   try {
     const cached = getCachedData();
     if (cached) {

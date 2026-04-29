@@ -3,10 +3,7 @@ import { db } from '@/lib/db';
 import { requireAdminApiUser } from '@/lib/admin-guard';
 import { isSameOrigin } from '@/lib/security';
 import { createAuditLog } from '@/server/services/audit-log';
-
-type UpdateStudyBody = {
-  status?: 'NEW' | 'REVIEWING' | 'QUOTED' | 'WON' | 'LOST';
-};
+import { StudyUpdateSchema } from '@/lib/schemas/admin';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -21,21 +18,31 @@ export async function PATCH(request: Request, { params }: Props) {
   if ('error' in auth) return auth.error;
 
   const { id } = await params;
-  const body = (await request.json()) as UpdateStudyBody;
+  const body = await request.json();
+  const result = StudyUpdateSchema.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json(
+      { message: 'Datos inválidos', details: result.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
 
   const study = await db.studyRequest.findUnique({ where: { id } });
   if (!study) {
     return NextResponse.json({ message: 'Solicitud no encontrada' }, { status: 404 });
   }
 
+  const { status } = result.data;
+
   const updated = await db.studyRequest.update({
     where: { id },
     data: {
-      ...(body.status ? { status: body.status } : {}),
-      ...(body.status === 'REVIEWING' ? { reviewedAt: new Date() } : {}),
-      ...(body.status === 'QUOTED' ? { quotedAt: new Date() } : {}),
-      ...(body.status === 'WON' ? { wonAt: new Date() } : {}),
-      ...(body.status === 'LOST' ? { lostAt: new Date() } : {}),
+      ...(status ? { status } : {}),
+      ...(status === 'REVIEWING' ? { reviewedAt: new Date() } : {}),
+      ...(status === 'QUOTED' ? { quotedAt: new Date() } : {}),
+      ...(status === 'WON' ? { wonAt: new Date() } : {}),
+      ...(status === 'LOST' ? { lostAt: new Date() } : {}),
     },
   });
 
@@ -45,7 +52,7 @@ export async function PATCH(request: Request, { params }: Props) {
     entityType: 'StudyRequest',
     entityId: id,
     status: 'ok',
-    metadata: JSON.stringify({ status: body.status || study.status }),
+    metadata: JSON.stringify({ status: status || study.status }),
   });
 
   return NextResponse.json({ study: updated });

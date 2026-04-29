@@ -56,6 +56,12 @@ enum ScheduleType {
   ONCE
 }
 
+enum SubscriberType {
+  PARTICULAR
+  EMPRESA
+  INSTALADOR
+}
+
 model AdminUser {
   id          String        @id @default(cuid())
   email       String        @unique
@@ -251,16 +257,17 @@ model EmailLog {
 }
 
 model Subscriber {
-  id             String      @id @default(cuid())
-  email          String      @unique
+  id             String          @id @default(cuid())
+  email          String          @unique
   fullName       String?
-  locale         Locale      @default(ES)
-  isActive       Boolean     @default(true)
-  source         String      @default("web")
+  locale         Locale          @default(ES)
+  isActive       Boolean         @default(true)
+  source         String          @default("web")
+  subscriberType SubscriberType?
   consentedAt    DateTime?
   unsubscribedAt DateTime?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   consents       Consent[]
   events         SendEvent[]
 }

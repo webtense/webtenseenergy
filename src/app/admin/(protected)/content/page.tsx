@@ -1,5 +1,9 @@
+import nextDynamic from 'next/dynamic';
 import { db } from '@/lib/db';
-import { AdminBlogManager } from '@/components/admin/AdminBlogManager';
+
+const AdminBlogManager = nextDynamic(() =>
+  import('@/components/admin/AdminBlogManager').then((m) => m.AdminBlogManager)
+);
 
 export const dynamic = 'force-dynamic';
 

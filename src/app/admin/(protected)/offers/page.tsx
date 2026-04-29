@@ -1,5 +1,9 @@
+import nextDynamic from 'next/dynamic';
 import { db } from '@/lib/db';
-import { AdminDealsManager } from '@/components/admin/AdminDealsManager';
+
+const AdminDealsManager = nextDynamic(() =>
+  import('@/components/admin/AdminDealsManager').then((m) => m.AdminDealsManager)
+);
 
 export const dynamic = 'force-dynamic';
 

@@ -1,22 +1,10 @@
 import logger from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import {
-  checkRateLimit,
-  getClientIp,
-  hashIdentifier,
-  isValidEmail,
-  normalizeEmail,
-} from '@/lib/security';
+import { checkRateLimit, getClientIp, hashIdentifier, normalizeEmail } from '@/lib/security';
+import { SubscribeSchema } from '@/lib/schemas/public';
 
 export const runtime = 'nodejs';
-
-interface SubscribePayload {
-  email?: string;
-  consent?: boolean;
-  fullName?: string;
-  locale?: 'ES' | 'CA';
-}
 
 export async function POST(request: Request) {
   try {
@@ -30,23 +18,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Demasiadas solicitudes.' }, { status: 429 });
     }
 
-    const body = (await request.json()) as SubscribePayload;
-    const email = normalizeEmail(body.email || '');
+    const body = await request.json();
+    const result = SubscribeSchema.safeParse({
+      ...body,
+      email: typeof body.email === 'string' ? normalizeEmail(body.email) : body.email,
+    });
 
-    if (!isValidEmail(email)) {
-      return NextResponse.json({ message: 'Email no valido.' }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json(
+        { message: result.error.issues[0]?.message ?? 'Datos inválidos' },
+        { status: 400 }
+      );
     }
 
-    if (!body.consent) {
-      return NextResponse.json({ message: 'Debes aceptar el consentimiento.' }, { status: 400 });
-    }
+    const { email, fullName, locale } = result.data;
 
     const subscriber = await db.subscriber.upsert({
       where: { email },
       create: {
         email,
-        fullName: body.fullName?.trim() || null,
-        locale: body.locale || 'ES',
+        fullName: fullName?.trim() || null,
+        locale,
         source: 'web_footer',
         consentedAt: new Date(),
         isActive: true,
@@ -55,7 +47,7 @@ export async function POST(request: Request) {
         isActive: true,
         unsubscribedAt: null,
         consentedAt: new Date(),
-        locale: body.locale || 'ES',
+        locale,
       },
     });
 
