@@ -390,6 +390,7 @@ export async function sendCampaignTest(params: {
     locale: campaign.locale,
     isActive: true,
     source: 'admin_test',
+    subscriberType: null,
     consentedAt: null,
     unsubscribedAt: null,
     createdAt: new Date(),
