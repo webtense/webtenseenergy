@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createAdminSessionToken, verifyAdminSessionToken } from '../admin-auth';
 
@@ -63,7 +64,6 @@ describe('verifyAdminSessionToken', () => {
     const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
     payload.exp = Math.floor(Date.now() / 1000) - 100;
     const expiredEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
-    const { createHmac } = require('node:crypto');
     const sig = createHmac('sha256', SECRET).update(expiredEncoded).digest('base64url');
     expect(verifyAdminSessionToken(`${expiredEncoded}.${sig}`)).toBeNull();
   });
