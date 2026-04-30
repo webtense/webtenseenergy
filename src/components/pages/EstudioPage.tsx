@@ -46,8 +46,8 @@ export function EstudioPage() {
                 ))}
               </div>
               <p className="mt-5 border-t border-white/10 pt-4 text-xs leading-6 text-white/50 italic">
-                "Lo que más me sorprendió no fue el ahorro. Fue ver por primera vez exactamente
-                dónde se iba el dinero."
+                &ldquo;Lo que más me sorprendió no fue el ahorro. Fue ver por primera vez
+                exactamente dónde se iba el dinero.&rdquo;
               </p>
               <p className="mt-1 text-xs font-semibold text-white/40">
                 Director de operaciones · Hotel 4★
