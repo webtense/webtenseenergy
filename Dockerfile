@@ -9,6 +9,7 @@ ENV DATABASE_URL=${DATABASE_URL}
 RUN npm run build
 
 FROM node:20-alpine
+RUN apk add --no-cache fontconfig ttf-liberation font-noto && fc-cache -f
 WORKDIR /app
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
