@@ -148,9 +148,9 @@ export default function CasoRealPage() {
         <div className="section-inner">
           <blockquote className="surface-panel-soft mx-auto max-w-2xl p-10 text-center">
             <p className="text-xl leading-8 text-foreground/80 italic">
-              "Lo que más me sorprendió no fue el ahorro. Fue ver por primera vez exactamente dónde
-              se iba el dinero. Ahora tenemos control real sobre un coste que antes simplemente
-              pagábamos."
+              &ldquo;Lo que más me sorprendió no fue el ahorro. Fue ver por primera vez exactamente
+              dónde se iba el dinero. Ahora tenemos control real sobre un coste que antes
+              simplemente pagábamos.&rdquo;
             </p>
             <footer className="mt-8">
               <p className="font-semibold text-foreground">Director de operaciones</p>

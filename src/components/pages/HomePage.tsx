@@ -202,7 +202,9 @@ export async function HomePage({ basePath }: HomePageProps) {
               },
             ].map((t) => (
               <blockquote key={t.author} className="surface-panel-soft p-6">
-                <p className="text-sm leading-7 text-foreground/75 italic">"{t.quote}"</p>
+                <p className="text-sm leading-7 text-foreground/75 italic">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
                 <footer className="mt-4">
                   <p className="text-sm font-semibold text-foreground">{t.author}</p>
                   <p className="text-xs text-foreground/50">{t.role}</p>

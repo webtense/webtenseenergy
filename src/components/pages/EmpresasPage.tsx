@@ -206,7 +206,9 @@ export function EmpresasPage({ basePath }: EmpresasPageProps) {
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {testimonials.map((t) => (
               <blockquote key={t.author} className="surface-panel-soft p-7">
-                <p className="text-sm leading-7 text-foreground/75 italic">"{t.quote}"</p>
+                <p className="text-sm leading-7 text-foreground/75 italic">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
                 <footer className="mt-6 border-t border-zinc-200/60 pt-4 dark:border-white/10">
                   <p className="text-sm font-semibold text-foreground">{t.author}</p>
                   <p className="text-xs text-foreground/50">{t.role}</p>

@@ -19,7 +19,6 @@ const IMG_BOTTOM = 740;
 const IMG_H = IMG_BOTTOM - IMG_TOP; // 580
 const AMAZON_BAR_TOP = IMG_BOTTOM; // 740
 const AMAZON_BAR_H = 70;
-const AMAZON_BAR_BOTTOM = AMAZON_BAR_TOP + AMAZON_BAR_H; // 810
 const FOOTER_TOP = H - 80; // 1000
 
 function wrapText(text: string, maxChars: number, maxLines: number): string[] {
