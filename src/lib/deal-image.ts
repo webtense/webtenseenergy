@@ -3,10 +3,24 @@ import type { AmazonProduct } from './amazon-scraper';
 
 const W = 1080;
 const H = 1080;
-const BRAND_DARK = '#0b2d55';
-const BRAND_LIGHT = '#1565c0';
-const ACCENT = '#ff6b00';
+
+// Colores de la web (globals.css)
+const DARK = '#06111d';
+const GREEN = '#1ab775'; // primary-500
+const GREEN_DARK = '#0f935d'; // primary-600
+const GREEN_LIGHT = '#3ed394'; // primary-400
 const WHITE = '#ffffff';
+const ORANGE = '#ff6b00'; // badge descuento (contraste con verde)
+
+// Layout vertical
+const HEADER_H = 160;
+const IMG_TOP = HEADER_H; // 160
+const IMG_BOTTOM = 740;
+const IMG_H = IMG_BOTTOM - IMG_TOP; // 580
+const AMAZON_BAR_TOP = IMG_BOTTOM; // 740
+const AMAZON_BAR_H = 70;
+const AMAZON_BAR_BOTTOM = AMAZON_BAR_TOP + AMAZON_BAR_H; // 810
+const FOOTER_TOP = H - 80; // 1000
 
 function wrapText(text: string, maxChars: number, maxLines: number): string[] {
   const words = text.split(' ');
@@ -35,7 +49,6 @@ function formatPrice(p: number): string {
 }
 
 export async function generateDealImage(product: AmazonProduct): Promise<Buffer> {
-  // Descargar imagen del producto
   let productImgBuffer: Buffer | null = null;
   if (product.image) {
     try {
@@ -46,90 +59,98 @@ export async function generateDealImage(product: AmazonProduct): Promise<Buffer>
     }
   }
 
-  // Redimensionar imagen del producto (cuadrada, fondo blanco)
   let resizedProduct: Buffer | null = null;
   if (productImgBuffer) {
     resizedProduct = await sharp(productImgBuffer)
-      .resize(820, 680, { fit: 'inside', background: WHITE })
+      .resize(860, 520, { fit: 'inside', background: WHITE })
       .flatten({ background: WHITE })
       .png()
       .toBuffer();
   }
 
-  const titleLines = wrapText(esc(product.title), 42, 3);
+  const titleLines = wrapText(esc(product.title), 40, 3);
   const currentPriceStr = product.currentPrice ? formatPrice(product.currentPrice) : '';
   const origPriceStr = product.originalPrice ? formatPrice(product.originalPrice) : '';
   const discountStr = product.discountPercent ? `-${product.discountPercent}%` : '';
 
-  // Líneas del título como elementos SVG
+  // Título: 3 líneas centradas en la zona de texto (y=830 a y=970)
   const titleSvg = titleLines
     .map(
       (l, i) =>
-        `<text x="540" y="${780 + i * 46}" font-family="Liberation Sans,Arial,sans-serif" font-size="32" fill="#222222" text-anchor="middle">${l}</text>`
+        `<text x="540" y="${850 + i * 48}" font-family="Liberation Sans,Arial,sans-serif" font-size="34" fill="#1a1a1a" text-anchor="middle">${l}</text>`
     )
     .join('\n');
 
+  // Precio tachado a la izquierda
   const origPriceSvg = origPriceStr
-    ? `<text x="400" y="960" font-family="Liberation Sans,Arial,sans-serif" font-size="36" fill="#999999" text-decoration="line-through" text-anchor="middle">${esc(origPriceStr)}</text>`
+    ? `<text x="380" y="975" font-family="Liberation Sans,Arial,sans-serif" font-size="36" fill="#999999" text-decoration="line-through" text-anchor="middle">${esc(origPriceStr)}</text>`
     : '';
 
+  // Precio actual en verde
   const currentPriceSvg = currentPriceStr
-    ? `<text x="700" y="965" font-family="Liberation Sans,Arial,sans-serif" font-size="52" font-weight="bold" fill="${ACCENT}" text-anchor="middle">${esc(currentPriceStr)}</text>`
+    ? `<text x="700" y="982" font-family="Liberation Sans,Arial,sans-serif" font-size="54" font-weight="bold" fill="${GREEN}" text-anchor="middle">${esc(currentPriceStr)}</text>`
     : '';
 
+  // Badge descuento (naranja para contraste)
   const discountBadge = discountStr
-    ? `<rect x="20" y="700" width="160" height="72" rx="12" fill="${ACCENT}"/>
-       <text x="100" y="750" font-family="Liberation Sans,Arial,sans-serif" font-size="42" font-weight="bold" fill="${WHITE}" text-anchor="middle">${discountStr}</text>`
+    ? `<rect x="24" y="${IMG_BOTTOM - 82}" width="150" height="70" rx="14" fill="${ORANGE}"/>
+       <text x="99" y="${IMG_BOTTOM - 32}" font-family="Liberation Sans,Arial,sans-serif" font-size="40" font-weight="bold" fill="${WHITE}" text-anchor="middle">${discountStr}</text>`
     : '';
 
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <!-- Fondo blanco -->
   <rect width="${W}" height="${H}" fill="${WHITE}"/>
 
-  <!-- Zona imagen: fondo gris claro -->
-  <rect x="0" y="0" width="${W}" height="740" fill="#f5f7fa"/>
+  <!-- ===== HEADER (160px) ===== -->
+  <rect x="0" y="0" width="${W}" height="${HEADER_H}" fill="${DARK}"/>
+  <!-- Franja verde izquierda -->
+  <rect x="0" y="0" width="12" height="${HEADER_H}" fill="${GREEN}"/>
 
-  <!-- Header azul con logo texto -->
-  <rect x="0" y="0" width="${W}" height="80" fill="${BRAND_DARK}"/>
-  <rect x="0" y="0" width="8" height="80" fill="${ACCENT}"/>
-  <text x="32" y="30" font-family="Liberation Sans,Arial,sans-serif" font-size="14" fill="#90caf9">ENERGIA SOLAR &amp; DOMOTICA</text>
-  <text x="32" y="60" font-family="Liberation Sans,Arial,sans-serif" font-size="28" font-weight="bold" fill="${WHITE}">Webtense Energy</text>
-  <text x="${W - 24}" y="50" font-family="Liberation Sans,Arial,sans-serif" font-size="18" fill="#90caf9" text-anchor="end">webtenseenergy.com</text>
+  <!-- Eyebrow verde -->
+  <text x="36" y="50" font-family="Liberation Sans,Arial,sans-serif" font-size="16" fill="${GREEN}" letter-spacing="3">ENERGIA SOLAR &amp; DOMOTICA</text>
 
-  <!-- Badge disponible en Amazon -->
-  <rect x="${W - 220}" y="94" width="200" height="38" rx="8" fill="#ff9900"/>
-  <text x="${W - 120}" y="120" font-family="Liberation Sans,Arial,sans-serif" font-size="18" font-weight="bold" fill="${WHITE}" text-anchor="middle">disponible en amazon</text>
+  <!-- Logo: WEBTENSE (blanco) + ENERGY (verde) -->
+  <text x="36" y="124" font-family="Liberation Sans,Arial,sans-serif" font-size="62" font-weight="bold">
+    <tspan fill="${WHITE}">WEBTENSE</tspan><tspan fill="${GREEN}">ENERGY</tspan>
+  </text>
 
-  <!-- Badge descuento -->
+  <!-- URL web derecha -->
+  <text x="${W - 28}" y="100" font-family="Liberation Sans,Arial,sans-serif" font-size="20" fill="${GREEN_LIGHT}" text-anchor="end">webtenseenergy.com</text>
+
+  <!-- ===== ZONA IMAGEN (y=160 a y=740) ===== -->
+  <rect x="0" y="${IMG_TOP}" width="${W}" height="${IMG_H}" fill="#f2f9f5"/>
+
+  <!-- Badge descuento sobre imagen -->
   ${discountBadge}
 
-  <!-- Separador -->
-  <line x1="40" y1="756" x2="${W - 40}" y2="756" stroke="#e0e0e0" stroke-width="1.5"/>
+  <!-- ===== BARRA AMAZON (y=740 a y=810, 70px) ===== -->
+  <rect x="0" y="${AMAZON_BAR_TOP}" width="${W}" height="${AMAZON_BAR_H}" fill="${GREEN_DARK}"/>
+  <text x="${W / 2}" y="${AMAZON_BAR_TOP + 46}" font-family="Liberation Sans,Arial,sans-serif" font-size="30" font-weight="bold" fill="${WHITE}" text-anchor="middle">Disponible en Amazon</text>
 
-  <!-- Titulo producto -->
+  <!-- ===== ZONA TÍTULO (y=810 a y=990) ===== -->
   ${titleSvg}
 
-  <!-- Precios -->
+  <!-- ===== PRECIOS ===== -->
   ${origPriceSvg}
   ${currentPriceSvg}
 
-  <!-- Footer -->
-  <rect x="0" y="${H - 58}" width="${W}" height="58" fill="${BRAND_DARK}"/>
-  <rect x="0" y="${H - 58}" width="${W}" height="4" fill="${BRAND_LIGHT}"/>
-  <text x="24" y="${H - 22}" font-family="Liberation Sans,Arial,sans-serif" font-size="18" fill="#90caf9">Oferta detectada automaticamente</text>
-  <text x="${W - 24}" y="${H - 22}" font-family="Liberation Sans,Arial,sans-serif" font-size="18" fill="#90caf9" text-anchor="end">#domotica  #ahorro  #solar</text>
+  <!-- ===== FOOTER (y=1000 a y=1080) ===== -->
+  <rect x="0" y="${FOOTER_TOP}" width="${W}" height="${H - FOOTER_TOP}" fill="${DARK}"/>
+  <rect x="0" y="${FOOTER_TOP}" width="${W}" height="5" fill="${GREEN}"/>
+  <text x="28" y="${FOOTER_TOP + 50}" font-family="Liberation Sans,Arial,sans-serif" font-size="20" fill="${GREEN_LIGHT}">Oferta detectada automaticamente</text>
+  <text x="${W - 28}" y="${FOOTER_TOP + 50}" font-family="Liberation Sans,Arial,sans-serif" font-size="20" fill="${GREEN_LIGHT}" text-anchor="end">#domotica  #ahorro  #solar</text>
 </svg>`;
 
   const layers: sharp.OverlayOptions[] = [{ input: Buffer.from(svg), top: 0, left: 0 }];
 
   if (resizedProduct) {
     const meta = await sharp(resizedProduct).metadata();
-    const pw = meta.width ?? 820;
-    const ph = meta.height ?? 680;
+    const pw = meta.width ?? 860;
+    const ph = meta.height ?? 520;
     const left = Math.round((W - pw) / 2);
-    // Centrar verticalmente en zona imagen (80 header → 740 separator)
-    const top = Math.round(80 + (660 - ph) / 2);
-    layers.push({ input: resizedProduct, top: Math.max(84, top), left });
+    // Centrar verticalmente en zona imagen (y=160 a y=740 = 580px)
+    const top = Math.round(IMG_TOP + (IMG_H - ph) / 2);
+    layers.push({ input: resizedProduct, top: Math.max(IMG_TOP + 10, top), left });
   }
 
   return sharp({
