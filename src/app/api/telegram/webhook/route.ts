@@ -11,6 +11,23 @@ const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID ?? '';
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET ?? '';
 // ID de Telegram del usuario administrador (quién puede enviar URLs al bot)
 const ADMIN_TELEGRAM_ID = process.env.TELEGRAM_ADMIN_USER_ID ?? '';
+const AFFILIATE_TAG = process.env.AMAZON_AFFILIATE_TAG ?? '';
+
+function addAffiliateTag(url: string): string {
+  if (!AFFILIATE_TAG) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set('tag', AFFILIATE_TAG);
+    // Limpiar parámetros de tracking innecesarios, dejar solo lo esencial
+    const keep = ['tag', 'th', 'psc'];
+    for (const key of [...u.searchParams.keys()]) {
+      if (!keep.includes(key)) u.searchParams.delete(key);
+    }
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
 
 async function reply(chatId: number, text: string) {
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -67,7 +84,9 @@ async function processAmazonUrl(url: string, chatId: number) {
   try {
     await reply(chatId, '⏳ Scrapeando Amazon...');
 
-    const product = await scrapeAmazon(url);
+    const affiliateUrl = addAffiliateTag(url);
+    const product = await scrapeAmazon(affiliateUrl);
+    if (product) product.url = affiliateUrl;
     if (!product) {
       await reply(chatId, '❌ No pude extraer el producto. ¿Es una URL válida de Amazon?');
       return;
