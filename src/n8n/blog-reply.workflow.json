@@ -1,0 +1,202 @@
+{
+  "name": "webtense-blog-reply",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "meta": {
+    "description": "Recibe la respuesta del usuario por WhatsApp (1-5), genera el post con Gemini y envía confirmación. Configurar en Evolution API: webhook URL = https://n8n.webtenseenergy.com/webhook/blog-reply, evento = MESSAGES_UPSERT."
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog-reply",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-blog-reply",
+      "name": "Webhook Evolution API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "blog-reply"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "ok",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Responder 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [480, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\nconst event = body?.event;\nconst data = body?.data;\n\n// Solo procesar mensajes entrantes nuevos\nif (event !== 'messages.upsert') return [];\n\nconst msg = data?.message;\nconst key = data?.key;\n\n// Ignorar mensajes propios\nif (key?.fromMe) return [];\n\n// Solo desde el número del admin\nconst sender = key?.remoteJid || '';\nconst adminNumber = '34691521367@s.whatsapp.net';\nif (!sender.startsWith('34691521367')) return [];\n\n// Obtener texto del mensaje\nconst text = (\n  msg?.conversation ||\n  msg?.extendedTextMessage?.text ||\n  ''\n).trim();\n\n// Solo números del 1 al 5\nconst choice = parseInt(text, 10);\nif (isNaN(choice) || choice < 1 || choice > 5) return [];\n\nreturn [{ json: { choice, sender, text } }];"
+      },
+      "id": "parse-reply",
+      "name": "Parsear respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webtenseenergy.com/api/automation/blog/create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "choice",
+              "value": "={{ $json.choice }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "http-create-post",
+      "name": "Crear post en webtenseenergy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "webtense-cron-secret",
+          "name": "webtense-cron-secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-ok",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-success",
+      "name": "¿Post creado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolution.webtenseenergy.com/message/sendText/test",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "34691521367@s.whatsapp.net"
+            },
+            {
+              "name": "text",
+              "value": "=✅ *Post creado en revisión:*\\n\\n📝 {{ $json.post.title }}\\n\\nRevísalo y publícalo en:\\nhttps://webtenseenergy.com/admin/posts"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-wa-success",
+      "name": "WhatsApp: confirmación",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 220],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "evolution-api-key",
+          "name": "evolution-api-key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolution.webtenseenergy.com/message/sendText/test",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "34691521367@s.whatsapp.net"
+            },
+            {
+              "name": "text",
+              "value": "=❌ Error al crear el post. Detalle: {{ $json.error || 'error desconocido' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-wa-error",
+      "name": "WhatsApp: error",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "evolution-api-key",
+          "name": "evolution-api-key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Evolution API": {
+      "main": [
+        [
+          { "node": "Responder 200 OK", "type": "main", "index": 0 },
+          { "node": "Parsear respuesta", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parsear respuesta": {
+      "main": [
+        [{ "node": "Crear post en webtenseenergy", "type": "main", "index": 0 }]
+      ]
+    },
+    "Crear post en webtenseenergy": {
+      "main": [
+        [{ "node": "¿Post creado?", "type": "main", "index": 0 }]
+      ]
+    },
+    "¿Post creado?": {
+      "main": [
+        [{ "node": "WhatsApp: confirmación", "type": "main", "index": 0 }],
+        [{ "node": "WhatsApp: error", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

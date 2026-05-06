@@ -1,0 +1,112 @@
+{
+  "name": "webtense-blog-propose",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "meta": {
+    "description": "Genera 5 propuestas de post diarias con Gemini y las envía por WhatsApp. Requiere credencial 'webtense-cron-secret' (httpHeaderAuth) y credencial 'evolution-api-key' (httpHeaderAuth)."
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "schedule-blog-propose",
+      "name": "Todos los días a las 9:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webtenseenergy.com/api/automation/blog/propose",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "http-propose",
+      "name": "Obtener propuestas (Gemini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "webtense-cron-secret",
+          "name": "webtense-cron-secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const proposals = $input.first().json.proposals;\nif (!proposals || proposals.length === 0) {\n  throw new Error('No se recibieron propuestas');\n}\n\nconst lines = proposals.map(p => `${p.id}. *${p.title}*\\n   _${p.brief}_`).join('\\n\\n');\n\nconst message = `🟢 *Webtense Energy — Propuestas de hoy*\\n\\n${lines}\\n\\nResponde con el número (1-5) para generar el post.`;\n\nreturn [{ json: { message, proposals } }];"
+      },
+      "id": "format-wa-message",
+      "name": "Formatear mensaje WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolution.webtenseenergy.com/message/sendText/test",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "34691521367@s.whatsapp.net"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-wa-proposals",
+      "name": "Enviar propuestas por WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "evolution-api-key",
+          "name": "evolution-api-key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Todos los días a las 9:00": {
+      "main": [
+        [{ "node": "Obtener propuestas (Gemini)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Obtener propuestas (Gemini)": {
+      "main": [
+        [{ "node": "Formatear mensaje WhatsApp", "type": "main", "index": 0 }]
+      ]
+    },
+    "Formatear mensaje WhatsApp": {
+      "main": [
+        [{ "node": "Enviar propuestas por WhatsApp", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
