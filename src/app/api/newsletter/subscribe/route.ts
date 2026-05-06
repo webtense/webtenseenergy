@@ -1,7 +1,14 @@
 import logger from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { checkRateLimit, getClientIp, hashIdentifier, normalizeEmail } from '@/lib/security';
+import {
+  checkRateLimit,
+  getClientIp,
+  hashIdentifier,
+  isBotEmail,
+  isBotName,
+  normalizeEmail,
+} from '@/lib/security';
 import { SubscribeSchema } from '@/lib/schemas/public';
 
 export const runtime = 'nodejs';
@@ -19,9 +26,33 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+
+    // Honeypot: campo oculto que solo rellenan bots
+    if (body.website) {
+      return NextResponse.json({ ok: true, message: 'Registrado correctamente.' });
+    }
+
+    // Timing: menos de 1.5s desde carga = bot
+    const elapsed = Date.now() - parseInt(String(body._t ?? '0'), 10);
+    if (!body._t || elapsed < 1500) {
+      return NextResponse.json({ ok: true, message: 'Registrado correctamente.' });
+    }
+
+    const email = typeof body.email === 'string' ? normalizeEmail(body.email) : '';
+
+    // Email con patrón de bot (puntos excesivos)
+    if (isBotEmail(email)) {
+      return NextResponse.json({ ok: true, message: 'Registrado correctamente.' });
+    }
+
+    // Nombre con patrón de bot
+    if (body.fullName && isBotName(String(body.fullName))) {
+      return NextResponse.json({ ok: true, message: 'Registrado correctamente.' });
+    }
+
     const result = SubscribeSchema.safeParse({
       ...body,
-      email: typeof body.email === 'string' ? normalizeEmail(body.email) : body.email,
+      email,
     });
 
     if (!result.success) {
@@ -31,7 +62,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, fullName, locale } = result.data;
+    const { fullName, locale } = result.data;
 
     const subscriber = await db.subscriber.upsert({
       where: { email },

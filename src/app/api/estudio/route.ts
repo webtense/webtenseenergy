@@ -5,6 +5,7 @@ import {
   escapeHtml,
   getClientIp,
   hashIdentifier,
+  isBotEmail,
   normalizeEmail,
 } from '@/lib/security';
 import { scanFile } from '@/lib/antivirus';
@@ -63,16 +64,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
     }
 
-    // Nombre aleatorio: >17 chars sin ningún espacio
+    // Nombre aleatorio: >14 chars sin ningún espacio
     const rawName = String(form.get('name') ?? '');
-    if (rawName.length > 17 && !/\s/.test(rawName)) {
+    if (rawName.length > 14 && !/\s/.test(rawName)) {
+      return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
+    }
+
+    const rawEmail = normalizeEmail(String(form.get('email') ?? ''));
+    // Email con patrón de bot (puntos excesivos)
+    if (isBotEmail(rawEmail)) {
       return NextResponse.json({ success: true, message: 'Solicitud enviada correctamente' });
     }
 
     const result = EstudioTextSchema.safeParse({
       method: form.get('method') ?? undefined,
       name: form.get('name'),
-      email: normalizeEmail(String(form.get('email') ?? '')),
+      email: rawEmail,
       phone: form.get('phone') ?? undefined,
       company: form.get('company') ?? undefined,
       kwConsumed: form.get('kwConsumed') ?? undefined,

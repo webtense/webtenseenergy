@@ -71,6 +71,26 @@ export function hashIdentifier(value: string): string {
   return createHash('sha256').update(value).digest('hex');
 }
 
+// Detecta emails de bots con patrón de puntos: x.x.x.0.5@gmail.com
+export function isBotEmail(email: string): boolean {
+  const local = (email.split('@')[0] ?? '').toLowerCase();
+  const segments = local.split('.');
+  if (segments.length < 4) return false;
+  const shortSegments = segments.filter((s) => s.length <= 3);
+  return shortSegments.length >= Math.ceil(segments.length * 0.7);
+}
+
+// Detecta nombres aleatorios sin espacios: "ElrduWaobYFNaaAU" etc.
+export function isBotName(name: string): boolean {
+  if (!name) return false;
+  // Sin espacio y más de 14 chars = muy probable bot
+  if (name.length > 14 && !/\s/.test(name)) return true;
+  // Solo letras sin vocales mayoritarias (patrón aleatorio)
+  const vowels = (name.match(/[aeiouáéíóúàèìòù]/gi) || []).length;
+  if (name.length > 8 && vowels / name.length < 0.15) return true;
+  return false;
+}
+
 export function isSameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   const host = request.headers.get('host');

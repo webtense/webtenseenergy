@@ -8,6 +8,7 @@ export function NewsletterForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [newsletterEnabled, setNewsletterEnabled] = useState<boolean | null>(null);
+  const [loadedAt] = useState(() => Date.now());
   const [copy, setCopy] = useState({
     title: 'Boletin Webtense',
     subtitle:
@@ -65,7 +66,7 @@ export function NewsletterForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, consent }),
+        body: JSON.stringify({ email, consent, _t: loadedAt, website: '' }),
       });
 
       const payload = (await response.json()) as { message?: string };
@@ -91,6 +92,15 @@ export function NewsletterForm() {
       </p>
       <p className="mt-2 text-sm text-zinc-300">{copy.subtitle}</p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+        {/* honeypot: invisible para humanos, los bots lo rellenan */}
+        <input
+          type="text"
+          name="website"
+          style={{ display: 'none' }}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
         <input
           type="email"
           required
