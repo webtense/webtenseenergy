@@ -10,10 +10,13 @@ import { withBasePath } from '@/lib/paths';
 const footerLinks = {
   es: {
     explorar: [
-      { name: 'Blog de Eficiencia', href: '/blog' },
       { name: 'Consultoría Empresas', href: '/empresas' },
-      { name: 'Ahorro Particulares', href: '/particulares' },
+      { name: 'Caso Real', href: '/caso-real' },
       { name: 'Estudio Gratuito', href: '/estudio' },
+      { name: 'Ahorro Particulares', href: '/particulares' },
+      { name: 'Blog de Eficiencia', href: '/blog' },
+      { name: 'Sobre nosotros', href: '/sobre-nosotros' },
+      { name: 'Checklist energético', href: '/recursos/checklist-energia' },
     ],
     comunidad: [
       { name: 'Canal Telegram', href: 'https://t.me/webtenseenergy', external: true },
@@ -36,10 +39,12 @@ const footerLinks = {
   },
   ca: {
     explorar: [
-      { name: "Blog d'Eficiència", href: '/blog' },
       { name: 'Consultoria Empreses', href: '/empresas' },
-      { name: 'Estalvi Particulars', href: '/particulares' },
+      { name: 'Cas real', href: '/ca/cas-real' },
       { name: 'Estudi Gratuit', href: '/estudio' },
+      { name: 'Estalvi Particulars', href: '/particulares' },
+      { name: "Blog d'Eficiència", href: '/blog' },
+      { name: 'Qui som', href: '/sobre-nosotros' },
     ],
     comunidad: [
       { name: 'Canal Telegram', href: 'https://t.me/webtenseenergy', external: true },

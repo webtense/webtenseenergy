@@ -11,6 +11,9 @@ interface LeadData {
   company: string;
   email: string;
   phone: string;
+  businessType: string;
+  city: string;
+  preferredTime: string;
 }
 
 const BILL_OPTIONS = [
@@ -20,6 +23,17 @@ const BILL_OPTIONS = [
   { value: '<3000', label: 'Menos de 3.000 €/mes' },
 ];
 
+const BUSINESS_TYPES = [
+  'Hotel / Alojamiento',
+  'Restauración',
+  'Industria',
+  'Retail / Comercio',
+  'Logística',
+  'Otro',
+];
+
+const PREFERRED_TIMES = ['Mañana (9–13 h)', 'Tarde (13–18 h)', 'Indiferente'];
+
 const INITIAL: LeadData = {
   file: null,
   monthlyBill: '',
@@ -27,6 +41,9 @@ const INITIAL: LeadData = {
   company: '',
   email: '',
   phone: '',
+  businessType: '',
+  city: '',
+  preferredTime: '',
 };
 
 export default function B2BLeadForm() {
@@ -81,6 +98,9 @@ export default function B2BLeadForm() {
       body.set('phone', data.phone);
       body.set('company', data.company);
       body.set('kwConsumed', data.monthlyBill);
+      body.set('businessType', data.businessType);
+      body.set('city', data.city);
+      body.set('preferredTime', data.preferredTime);
       body.set('habits', '[]');
       body.set('website', honeypot);
       body.set('_t', loadedAt);
@@ -317,6 +337,59 @@ export default function B2BLeadForm() {
                   placeholder="600 000 000"
                   className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-5 mt-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
+                  Tipo de negocio
+                </label>
+                <select
+                  value={data.businessType}
+                  onChange={(e) => setData((prev) => ({ ...prev, businessType: e.target.value }))}
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <option value="">Selecciona...</option>
+                  {BUSINESS_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
+                  Ciudad
+                </label>
+                <input
+                  type="text"
+                  value={data.city}
+                  onChange={(e) => setData((prev) => ({ ...prev, city: e.target.value }))}
+                  placeholder="Ej. Barcelona"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
+                Horario preferido de contacto
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {PREFERRED_TIMES.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setData((prev) => ({ ...prev, preferredTime: t }))}
+                    className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                      data.preferredTime === t
+                        ? 'border-primary-500 bg-primary-50 text-primary-700 ring-1 ring-primary-500 dark:bg-primary-500/10 dark:text-primary-300'
+                        : 'border-zinc-200 text-foreground/70 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

@@ -92,6 +92,9 @@ export default function CasoRealPage() {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-xs text-foreground/35 leading-5 max-w-2xl">
+            El ahorro se calcula comparando facturación normalizada antes y después de las medidas, ajustada por ocupación y temporada. Los resultados dependen del estado inicial de la instalación, contrato, hábitos de consumo y capacidad de automatización.
+          </p>
         </div>
       </section>
 
@@ -139,6 +142,43 @@ export default function CasoRealPage() {
                 <p className="mt-3 text-sm leading-7 text-foreground/75">{t.action}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TABLA RESUMEN DE MEDIDAS */}
+      <section className="section-shell">
+        <div className="section-inner">
+          <div className="mb-8">
+            <p className="eyebrow">Resumen de medidas</p>
+            <h2 className="section-title mt-3 text-foreground">Qué se hizo y cuánto aportó</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-200 dark:border-white/10">
+                  <th className="pb-4 text-left font-semibold text-foreground/60">Medida</th>
+                  <th className="pb-4 text-left font-semibold text-foreground/60">Plazo</th>
+                  <th className="pb-4 text-left font-semibold text-foreground/60">Inversión</th>
+                  <th className="pb-4 text-left font-semibold text-foreground/60">Ahorro mensual</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-white/5">
+                {[
+                  { medida: 'Ajuste potencias contratadas', plazo: 'Semana 1–2', inversion: '0 €', ahorro: '680 €/mes' },
+                  { medida: 'Monitorización por zonas', plazo: 'Semana 3–4', inversion: '4.200 €', ahorro: 'Control activado' },
+                  { medida: 'Automatización climatización (HVAC)', plazo: 'Mes 2', inversion: '18.500 €', ahorro: '~34% consumo HVAC' },
+                  { medida: 'Ajuste fino + alertas automáticas', plazo: 'Mes 3', inversion: '5.800 €', ahorro: 'Optimización continua' },
+                ].map((row) => (
+                  <tr key={row.medida}>
+                    <td className="py-4 pr-6 font-medium text-foreground">{row.medida}</td>
+                    <td className="py-4 pr-6 text-foreground/60">{row.plazo}</td>
+                    <td className="py-4 pr-6 text-foreground/60">{row.inversion}</td>
+                    <td className="py-4 text-primary-600 font-semibold dark:text-primary-400">{row.ahorro}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

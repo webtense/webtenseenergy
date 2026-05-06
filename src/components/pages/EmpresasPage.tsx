@@ -115,6 +115,9 @@ export function EmpresasPage({ basePath }: EmpresasPageProps) {
             <MetricPill label="Ahorro medio certificado" value="22–38%" />
             <MetricPill label="Retorno de inversión" value="4–7 meses" />
             <MetricPill label="Análisis previo" value="48h / gratis" />
+            <p className="text-xs text-foreground/40 leading-5 lg:col-span-1 sm:col-span-3 mt-1">
+              Los resultados dependen del estado inicial de la instalación, contrato, hábitos de consumo y capacidad de automatización.
+            </p>
           </div>
         }
       />

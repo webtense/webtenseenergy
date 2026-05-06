@@ -7,30 +7,29 @@ import { withBasePath } from '@/lib/paths';
 
 const navigation = [
   { key: 'empresas', href: '/empresas' },
-  { key: 'particulares', href: '/particulares' },
-  { key: 'precio', href: '/luz/precio-hoy' },
+  { key: 'casoReal', href: '/caso-real' },
   { key: 'blog', href: '/blog' },
-  { key: 'ofertas', href: '/ofertas' },
+  { key: 'particulares', href: '/particulares' },
   { key: 'contacto', href: '/contacto' },
 ];
 
 const labels = {
   es: {
     empresas: 'Empresas',
+    casoReal: 'Caso real',
     particulares: 'Particulares',
     precio: 'Precio luz',
     blog: 'Blog',
-    ofertas: 'Ofertas',
     contacto: 'Contacto',
     estudio: 'Estudio gratuito',
     telegram: 'Canal Telegram',
   },
   ca: {
     empresas: 'Empreses',
+    casoReal: 'Cas real',
     particulares: 'Particulars',
     precio: 'Preu llum',
     blog: 'Blog',
-    ofertas: 'Ofertes',
     contacto: 'Contacte',
     estudio: 'Estudi gratuit',
     telegram: 'Canal Telegram',

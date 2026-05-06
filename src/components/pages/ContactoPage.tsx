@@ -50,10 +50,50 @@ export function ContactoPage() {
             <span className="text-primary-600 dark:text-primary-300">sin rodeos</span>
           </>
         }
-        subtitle="Si buscas consultoría, ahorro para hogar, domótica o simplemente entender mejor tu situación energética, este es el mejor punto de entrada."
+        subtitle="Selecciona la opción que mejor describe tu situación para que podamos orientarte mejor."
         align="center"
         compact
       />
+
+      <section className="section-shell-tight pt-0 pb-0">
+        <div className="section-inner">
+          <div className="grid gap-4 sm:grid-cols-2 max-w-2xl mx-auto">
+            <a
+              href="/estudio"
+              className="group surface-panel-soft p-7 flex flex-col gap-3 transition hover:-translate-y-1 hover:border-primary-300 dark:hover:border-primary-500/20"
+            >
+              <span className="text-2xl">▣</span>
+              <p className="font-heading text-lg font-bold tracking-tight text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-300 transition-colors">
+                Soy empresa y pago más de 3.000 €/mes
+              </p>
+              <p className="text-sm text-foreground/60 leading-6">
+                Solicita el análisis energético gratuito. Te respondemos en 48 horas con cifras reales.
+              </p>
+              <span className="mt-auto text-sm font-semibold text-primary-600 dark:text-primary-400">
+                Solicitar estudio →
+              </span>
+            </a>
+            <a
+              href="/particulares"
+              className="group surface-panel-soft p-7 flex flex-col gap-3 transition hover:-translate-y-1 hover:border-zinc-300 dark:hover:border-white/20"
+            >
+              <span className="text-2xl">◫</span>
+              <p className="font-heading text-lg font-bold tracking-tight text-foreground group-hover:text-foreground/80 transition-colors">
+                Soy particular
+              </p>
+              <p className="text-sm text-foreground/60 leading-6">
+                Guías, comparativas de tarifas, domótica y recursos para ahorrar en tu hogar.
+              </p>
+              <span className="mt-auto text-sm font-semibold text-foreground/50">
+                Ver recursos →
+              </span>
+            </a>
+          </div>
+          <p className="text-center text-xs text-foreground/35 mt-6">
+            O rellena el formulario de abajo si tienes una consulta específica.
+          </p>
+        </div>
+      </section>
 
       <section className="section-shell-tight pb-24">
         <div className="section-inner grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
