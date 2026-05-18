@@ -357,16 +357,13 @@ export default function EnergyAuditWizard() {
             )}
 
             <div className="mt-8 flex gap-4">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 text-foreground/80 dark:text-zinc-300 font-bold hover:bg-zinc-100 dark:bg-zinc-800 transition-colors"
-              >
+              <button onClick={handleBack} className="cta-secondary">
                 Volver
               </button>
               <button
                 onClick={handleNext}
                 disabled={formData.method === 'upload' ? !formData.file : !formData.kwConsumed}
-                className="flex-1 bg-primary-600 text-foreground font-bold rounded-xl py-3 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="cta-primary flex-1"
               >
                 Siguiente Paso
               </button>
@@ -407,16 +404,10 @@ export default function EnergyAuditWizard() {
             </div>
 
             <div className="mt-8 flex gap-4">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 text-foreground/80 dark:text-zinc-300 font-bold hover:bg-zinc-100 dark:bg-zinc-800 transition-colors"
-              >
+              <button onClick={handleBack} className="cta-secondary">
                 Volver
               </button>
-              <button
-                onClick={handleNext}
-                className="flex-1 bg-primary-600 text-foreground font-bold rounded-xl py-3 hover:bg-primary-500 transition-all"
-              >
+              <button onClick={handleNext} className="cta-primary flex-1">
                 Siguiente Paso
               </button>
             </div>
@@ -458,7 +449,7 @@ export default function EnergyAuditWizard() {
                       contact: { ...formData.contact, name: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                  className="input"
                   placeholder="Ej. María García"
                 />
               </div>
@@ -478,7 +469,7 @@ export default function EnergyAuditWizard() {
                         contact: { ...formData.contact, email: e.target.value },
                       })
                     }
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                    className="input"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -496,7 +487,7 @@ export default function EnergyAuditWizard() {
                         contact: { ...formData.contact, phone: e.target.value },
                       })
                     }
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                    className="input"
                     placeholder="600 000 000"
                   />
                 </div>
@@ -516,7 +507,7 @@ export default function EnergyAuditWizard() {
                       contact: { ...formData.contact, company: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                  className="input"
                   placeholder="Ej. Iberdrola, Endesa, Repsol..."
                 />
               </div>
@@ -526,14 +517,14 @@ export default function EnergyAuditWizard() {
                   type="button"
                   onClick={handleBack}
                   disabled={isSubmitting}
-                  className="px-6 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 text-foreground/80 dark:text-zinc-300 font-bold hover:bg-zinc-100 dark:bg-zinc-800 transition-colors disabled:opacity-50"
+                  className="cta-secondary disabled:opacity-50"
                 >
                   Volver
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 text-foreground font-bold rounded-xl py-3 hover:bg-primary-500 transition-all shadow-lg shadow-primary-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="cta-primary flex-1 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

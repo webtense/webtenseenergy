@@ -248,7 +248,7 @@ export default function B2BLeadForm() {
             type="button"
             disabled={!data.monthlyBill}
             onClick={handleStep1Next}
-            className="mt-8 w-full rounded-xl bg-primary-600 py-4 text-sm font-bold text-white transition-all hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="cta-primary mt-8 w-full"
           >
             Continuar →
           </button>
@@ -284,58 +284,50 @@ export default function B2BLeadForm() {
 
           <div className="space-y-5">
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                Nombre completo *
-              </label>
+              <label className="form-label mb-1.5">Nombre completo *</label>
               <input
                 type="text"
                 required
                 value={data.name}
                 onChange={(e) => setData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Ej. Carlos López"
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                className="input"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                Empresa *
-              </label>
+              <label className="form-label mb-1.5">Empresa *</label>
               <input
                 type="text"
                 required
                 value={data.company}
                 onChange={(e) => setData((prev) => ({ ...prev, company: e.target.value }))}
                 placeholder="Hotel, cadena de restauración, industria..."
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                className="input"
               />
             </div>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                  Email *
-                </label>
+                <label className="form-label mb-1.5">Email *</label>
                 <input
                   type="email"
                   required
                   value={data.email}
                   onChange={(e) => setData((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="tu@empresa.com"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="input"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                  Teléfono *
-                </label>
+                <label className="form-label mb-1.5">Teléfono *</label>
                 <input
                   type="tel"
                   required
                   value={data.phone}
                   onChange={(e) => setData((prev) => ({ ...prev, phone: e.target.value }))}
                   placeholder="600 000 000"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="input"
                 />
               </div>
             </div>
@@ -344,37 +336,33 @@ export default function B2BLeadForm() {
           <div className="space-y-5 mt-5">
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                  Tipo de negocio
-                </label>
+                <label className="form-label mb-1.5">Tipo de negocio</label>
                 <select
                   value={data.businessType}
                   onChange={(e) => setData((prev) => ({ ...prev, businessType: e.target.value }))}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="input"
                 >
                   <option value="">Selecciona...</option>
                   {BUSINESS_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                  Ciudad
-                </label>
+                <label className="form-label mb-1.5">Ciudad</label>
                 <input
                   type="text"
                   value={data.city}
                   onChange={(e) => setData((prev) => ({ ...prev, city: e.target.value }))}
                   placeholder="Ej. Barcelona"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-foreground transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="input"
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-foreground/80">
-                Horario preferido de contacto
-              </label>
+              <label className="form-label mb-1.5">Horario preferido de contacto</label>
               <div className="flex flex-wrap gap-3">
                 {PREFERRED_TIMES.map((t) => (
                   <button
@@ -399,15 +387,11 @@ export default function B2BLeadForm() {
               type="button"
               onClick={() => setStep(1)}
               disabled={isSubmitting}
-              className="rounded-xl border border-zinc-200 px-5 py-4 text-sm font-bold text-foreground/70 transition-all hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-800 dark:hover:bg-zinc-900"
+              className="cta-secondary"
             >
               ← Volver
             </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600 py-4 text-sm font-bold text-white transition-all hover:bg-primary-500 disabled:opacity-50"
-            >
+            <button type="submit" disabled={isSubmitting} className="cta-primary flex-1">
               {isSubmitting ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

@@ -67,7 +67,8 @@ export function ContactoPage() {
                 Soy empresa y pago más de 3.000 €/mes
               </p>
               <p className="text-sm text-foreground/60 leading-6">
-                Solicita el análisis energético gratuito. Te respondemos en 48 horas con cifras reales.
+                Solicita el análisis energético gratuito. Te respondemos en 48 horas con cifras
+                reales.
               </p>
               <span className="mt-auto text-sm font-semibold text-primary-600 dark:text-primary-400">
                 Solicitar estudio →
@@ -99,7 +100,7 @@ export function ContactoPage() {
         <div className="section-inner grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="space-y-5">
             <div className="surface-panel-soft p-7">
-              <p className="eyebrow">Canales</p>
+              <p className="eyebrow">Contacto directo</p>
               <div className="mt-5 space-y-5 text-sm">
                 <div>
                   <p className="font-semibold text-foreground">WhatsApp / Teléfono</p>
@@ -107,16 +108,17 @@ export function ContactoPage() {
                     href="https://wa.me/34691521367"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 block text-foreground/70 hover:text-primary-600 dark:hover:text-primary-300"
+                    className="mt-1.5 block text-xl font-bold text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors"
                   >
                     +34 691 521 367
                   </a>
+                  <p className="mt-1 text-foreground/50">Lunes a viernes · 9:00 – 18:00</p>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Email</p>
                   <a
                     href="mailto:info@webtenseenergy.com"
-                    className="mt-2 block text-foreground/70 hover:text-primary-600 dark:hover:text-primary-300"
+                    className="mt-1.5 block text-foreground/70 hover:text-primary-600 dark:hover:text-primary-300 transition-colors"
                   >
                     info@webtenseenergy.com
                   </a>
@@ -129,6 +131,22 @@ export function ContactoPage() {
                 Respondemos en un plazo máximo de 24 horas laborables y, si tu caso encaja mejor con
                 un estudio, te indicaremos el camino más rápido.
               </p>
+            </div>
+            <div className="surface-panel-soft p-7">
+              <p className="eyebrow mb-4">Zona de servicio</p>
+              <div className="space-y-2 text-sm text-foreground/70">
+                <p className="flex items-center gap-2">
+                  <span className="text-primary-500">✓</span> España peninsular e islas
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-primary-500">✓</span> Consultoría online para cualquier
+                  ubicación
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-primary-500">✓</span> No somos distribuidores — criterio
+                  independiente
+                </p>
+              </div>
             </div>
           </div>
 
@@ -161,11 +179,7 @@ export function ContactoPage() {
                   aria-hidden="true"
                 />
                 <input name="_t" type="hidden" value={loadedAt} readOnly />
-                {errorError ? (
-                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                    {errorError}
-                  </div>
-                ) : null}
+                {errorError ? <div className="alert alert-error">{errorError}</div> : null}
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field
                     label="Nombre completo"
@@ -182,18 +196,11 @@ export function ContactoPage() {
                   required
                   type="email"
                 />
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="mb-2 block text-sm font-medium text-foreground/75"
-                  >
+                <div className="form-group">
+                  <label htmlFor="subject" className="form-label">
                     Asunto
                   </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-foreground dark:border-white/10 dark:bg-white/5"
-                  >
+                  <select id="subject" name="subject" className="input">
                     <option value="Información general">Información general</option>
                     <option value="Consultoría B2B">Consultoría B2B</option>
                     <option value="Ahorro Particulares">Ahorro Particulares / Solar</option>
@@ -201,11 +208,8 @@ export function ContactoPage() {
                     <option value="Otros">Otros</option>
                   </select>
                 </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="mb-2 block text-sm font-medium text-foreground/75"
-                  >
+                <div className="form-group">
+                  <label htmlFor="message" className="form-label">
                     Mensaje
                   </label>
                   <textarea
@@ -213,7 +217,7 @@ export function ContactoPage() {
                     name="message"
                     required
                     rows={5}
-                    className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-foreground dark:border-white/10 dark:bg-white/5"
+                    className="textarea"
                     placeholder="¿En qué podemos ayudarte?"
                   ></textarea>
                 </div>
@@ -247,8 +251,8 @@ function Field({
   type?: string;
 }) {
   return (
-    <div>
-      <label htmlFor={name} className="mb-2 block text-sm font-medium text-foreground/75">
+    <div className="form-group">
+      <label htmlFor={name} className="form-label">
         {label}
       </label>
       <input
@@ -257,7 +261,7 @@ function Field({
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-foreground dark:border-white/10 dark:bg-white/5"
+        className="input"
       />
     </div>
   );

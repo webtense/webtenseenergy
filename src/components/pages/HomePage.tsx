@@ -221,7 +221,7 @@ export async function HomePage({ basePath }: HomePageProps) {
           <SectionIntro
             eyebrow="Sectores"
             title="Para negocios con consumo energético real"
-            description="No trabajamos con particulares ni con consumos residenciales. Nuestro foco son instalaciones donde el ahorro tiene impacto directo en el margen operativo."
+            description="Instalaciones donde el ahorro tiene impacto directo en el margen operativo. Factura mínima 3.000 €/mes: hoteles, restauración organizada, industria ligera y retail."
             align="center"
           />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

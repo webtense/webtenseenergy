@@ -49,11 +49,11 @@ export function ParticularesPage({ basePath }: ParticularesPageProps) {
         subtitle="Tarifa, hábitos, solar y domótica deben trabajar juntos. La idea no es añadir gadgets porque sí, sino reducir coste y ganar confort con criterio."
         actions={
           <>
-            <Link href={withBasePath(basePath, '/estudio')} className="cta-primary">
-              Analizar mi factura
+            <Link href={withBasePath(basePath, '/contacto')} className="cta-primary">
+              Consulta gratuita
             </Link>
             <Link href={withBasePath(basePath, '/luz/precio-hoy')} className="cta-secondary">
-              Ver precio de hoy
+              Precio de la luz hoy
             </Link>
           </>
         }
@@ -120,10 +120,10 @@ export function ParticularesPage({ basePath }: ParticularesPageProps) {
         <div className="section-inner">
           <ActionBanner
             title="Si ya pagas la luz cada mes, ya tienes una oportunidad de mejora"
-            description="Sube tu factura o cuéntanos tu caso. Revisamos consumo, potencia y margen de ahorro con una propuesta clara y sin compromiso."
+            description="Cuéntanos tu caso. Revisamos consumo, tarifa y margen de ahorro con orientación clara y sin compromiso. Solo hace falta un mensaje."
             action={
-              <Link href={withBasePath(basePath, '/estudio')} className="cta-primary">
-                Solicitar estudio
+              <Link href={withBasePath(basePath, '/contacto')} className="cta-primary">
+                Escribirnos gratis
               </Link>
             }
           />

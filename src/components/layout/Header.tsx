@@ -9,7 +9,6 @@ const navigation = [
   { key: 'empresas', href: '/empresas' },
   { key: 'casoReal', href: '/caso-real' },
   { key: 'blog', href: '/blog' },
-  { key: 'particulares', href: '/particulares' },
   { key: 'contacto', href: '/contacto' },
 ];
 
@@ -77,14 +76,27 @@ export function Header() {
         </div>
 
         <div className="hidden sm:flex items-center gap-3">
-          <Link
-            href="https://t.me/webtenseenergy"
+          <a
+            href="https://wa.me/34691521367"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden xl:inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:border-brand-400/30 dark:hover:text-brand-300"
+            className="hidden xl:inline-flex items-center gap-1.5 text-sm font-semibold text-foreground/55 transition hover:text-primary-600 dark:hover:text-primary-400"
           >
-            {localeLabels.telegram}
-          </Link>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.02 1.18 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"></path>
+            </svg>
+            +34 691 521 367
+          </a>
           <Link
             href={withBasePath(basePath, '/estudio')}
             className="cta-primary text-sm px-5 py-2.5"
