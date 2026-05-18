@@ -59,6 +59,11 @@ const nextConfig: NextConfig = {
         destination: "/blog",
         permanent: true,
       },
+      {
+        source: "/blog/como-reducir-factura-luz-2025-energia-solar",
+        destination: "/blog/como-reducir-factura-luz-2026-energia-solar",
+        permanent: true,
+      },
     ];
   },
   images: {
