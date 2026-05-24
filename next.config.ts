@@ -66,6 +66,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      { source: "/ueb", destination: "/ueb/index.html" },
+      { source: "/ueb/", destination: "/ueb/index.html" },
+    ];
+  },
   images: {
     remotePatterns: imageHosts.map((hostname) => ({
       protocol: "https",
