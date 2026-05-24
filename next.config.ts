@@ -70,6 +70,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/ueb", destination: "/ueb/index.html" },
       { source: "/ueb/", destination: "/ueb/index.html" },
+      { source: "/ueb/admin", destination: "/ueb/admin/index.html" },
+      { source: "/ueb/admin/", destination: "/ueb/admin/index.html" },
     ];
   },
   images: {
