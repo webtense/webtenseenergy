@@ -363,6 +363,16 @@
   }
 
   render();
+
+  // ─── ANALYTICS (counterapi.dev, 1 visita única por sesión) ──────────────
+  (function track() {
+    if (sessionStorage.getItem('uebVisitCounted')) return;
+    sessionStorage.setItem('uebVisitCounted', '1');
+    const WS = 'wts-ueb-2025-priv-x7k9q';
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    fetch(`https://api.counterapi.dev/v1/${WS}/total/up`).catch(() => {});
+    fetch(`https://api.counterapi.dev/v1/${WS}/day_${today}/up`).catch(() => {});
+  })();
 })();
 </script>
 </body>
