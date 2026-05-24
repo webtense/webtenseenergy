@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>UE Barberà · Horaris Posttemporada 25-26</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; background: linear-gradient(160deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; color: #e2e8f0; }
+  #app { max-width: 100%; }
+  .header { background: linear-gradient(90deg, #1d4ed8, #0ea5e9); padding: 16px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 24px rgba(14,165,233,.35); flex-wrap: wrap; row-gap: 8px; }
+  .header-icon { font-size: 28px; }
+  .header-title { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: .03em; }
+  .header-sub { font-size: 11px; color: #bae6fd; letter-spacing: .1em; text-transform: uppercase; }
+  .header-warn { background: rgba(255,255,255,.15); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: #fef9c3; font-weight: 700; }
+  .container { padding: 16px; max-width: 680px; margin: 0 auto; }
+  .search-input { width: 100%; padding: 11px 14px; border-radius: 12px; border: 1.5px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 14px; margin-bottom: 14px; outline: none; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab-btn { flex: 1; padding: 10px 0; border-radius: 10px; border: none; background: #1e293b; color: #94a3b8; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .tab-btn.active.masc { background: #1d4ed8; color: #fff; }
+  .tab-btn.active.fem { background: #db2777; color: #fff; }
+  .tab-btn.active.info { background: #047857; color: #fff; }
+  .equips-list { display: flex; flex-direction: column; gap: 8px; }
+  .equip-card { background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 13px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; text-align: left; color: #e2e8f0; transition: border-color .15s; width: 100%; font-family: inherit; }
+  .equip-card:hover { border-color: var(--accent, #1d4ed8); }
+  .equip-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--accent, #1d4ed8); }
+  .equip-info { flex: 1; }
+  .equip-name { font-weight: 700; font-size: 14px; }
+  .equip-meta { font-size: 11px; color: #64748b; margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .equip-meta .session { color: #475569; }
+  .equip-chev { color: #475569; font-size: 16px; }
+  .empty { color: #64748b; text-align: center; padding: 32px; }
+  .back-btn { background: transparent; border: none; color: #0ea5e9; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; font-weight: 700; font-family: inherit; }
+  .detall-card { background: #1e293b; border-radius: 16px; overflow: hidden; border: 1.5px solid #334155; }
+  .detall-header { padding: 16px 20px; background: linear-gradient(90deg, var(--accent, #1d4ed8), color-mix(in srgb, var(--accent, #1d4ed8) 80%, transparent)); }
+  .detall-name { font-size: 20px; font-weight: 900; }
+  .detall-entr { font-size: 12px; opacity: .85; margin-top: 3px; }
+  .detall-body { padding: 16px 20px; }
+  .nota { background: #422006; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fde68a; margin-bottom: 14px; }
+  .section-label { font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .sessions-wrap { display: flex; flex-wrap: wrap; margin-bottom: 16px; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; color: #fff; border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 700; margin-right: 6px; margin-bottom: 6px; }
+  .badge.Dilluns { background: #1d4ed8; }
+  .badge.Dimarts { background: #0369a1; }
+  .badge.Dimecres { background: #0f766e; }
+  .badge.Dijous { background: #7c3aed; }
+  .badge.Divendres { background: #b45309; }
+  .download-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; background: var(--accent, #1d4ed8); color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 16px; transition: background .3s; font-family: inherit; }
+  .download-btn.done { background: #047857; }
+  .download-hint { font-size: 11px; color: #475569; text-align: center; margin-bottom: 16px; line-height: 1.4; }
+  .jugadors { columns: 2; column-gap: 10px; }
+  .jugador { font-size: 12px; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #0f172a; break-inside: avoid; }
+  .jugador-num { color: #475569; margin-right: 5px; font-size: 10px; }
+  .contactes { display: flex; flex-direction: column; gap: 8px; }
+  .contacte { background: #1e293b; border-radius: 12px; border: 1px solid #334155; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .contacte-nom { font-weight: 700; font-size: 14px; }
+  .contacte-rol { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .contacte-tel { color: #0ea5e9; font-weight: 800; font-size: 14px; text-decoration: none; }
+  .contacte-tel-empty { color: #475569; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+  // ─── DADES ────────────────────────────────────────────────────────────────
+  const DIA_NUM = { Dilluns: 1, Dimarts: 2, Dimecres: 3, Dijous: 4, Divendres: 5 };
+  const DIES_SHORT = { Dilluns: 'Dl', Dimarts: 'Dm', Dimecres: 'Dc', Dijous: 'Dj', Divendres: 'Dv' };
+
+  const EQUIPS_MASC = [
+    { nom: 'Premini 1r Any A', entrenadors: 'David Nuñez / Aleix', sessions: [{ dia: 'Dimarts', ini: '17:30', fi: '18:30' }, { dia: 'Dijous', ini: '17:30', fi: '18:30' }], jugadors: ['Oscar Sanz Sogel (2018)','Lucas Garcia Moreno (2018)','Alberto Campano Escobar (2018)','Jan Reyes Porro (2018)','Maria Prieto Pascual (2018)','Erik Perez Asensio (2018)','Eric Garrido Abreu (2018)','Xiaoxu Jiang Jiang (2018)','Irai Flores Caballero (2018)','Pol Bayo (2018)','Oriol Martinez Torrico (2018)'] },
+    { nom: 'Premini 1r Any B', entrenadors: 'David Nuñez / Aleix', sessions: [{ dia: 'Dimarts', ini: '17:30', fi: '18:30' }, { dia: 'Dijous', ini: '17:30', fi: '18:30' }], jugadors: ['Pol Martinez Oliva (2018)','Alex Navalón Crux (2019)','Yi Chen (2018)','Santiago Fernandez Perez (2018)','Jan Alvarez Saldaña (2018)','Eric Guillem Molina (2018)','David Franco Lumbreras (2018)','Luca Alarcón Busquets (2018)'] },
+    { nom: 'Premini 2n Any', entrenadors: 'Izan Castro', sessions: [{ dia: 'Dimarts', ini: '17:00', fi: '18:00' }, { dia: 'Dimarts', ini: '18:00', fi: '19:00' }, { dia: 'Dijous', ini: '17:00', fi: '18:00' }], jugadors: ['Marc Andrei Petre (2017)','Lucca Pardo (2017)','Mario Rodriguez (2017)','Joan Cabeza (2017)','Abraham Casabona (2017)','Joaquin Ullari (2017)','Paul Cobo Over (2017)','Martin Mellado Osuna (2017)','Martí Nolla Muñoz (2018)','Mateo Padilla López (2017)','Daniel Gallardo (2016)','Aritz Cruz (2015)','Leo Zhou (2015)','Gael Guzman (2016)','Marc Antequera (2015)','Teo Nicolas (2015)','Jael Perez Vico (2015)','Daniel Guerrero (2016)','Bruno Salazar (2016)','Miquel Martinez (2016)'] },
+    { nom: 'Mini 2n Any A', entrenadors: 'David Nuñez', sessions: [{ dia: 'Dimarts', ini: '18:30', fi: '19:30' }, { dia: 'Divendres', ini: '18:30', fi: '19:30' }], jugadors: ['Mario Muñoz (2015)','Teo Ternero (2015)','Gerard Lamana (2015)','Dario Gallego (2015)','Adrià Fernandez (2015)','Yifan Wang (2015)','Ethan Ortega (2015)','Aleix Garrido (2015)','Biel Motos (2015)','Oriol Mateu (2015)','Marc Abella (2015)'] },
+    { nom: 'Mini 2n Any B', entrenadors: 'David Vinardell', sessions: [{ dia: 'Dilluns', ini: '17:00', fi: '18:30' }, { dia: 'Dimecres', ini: '17:00', fi: '18:30' }], jugadors: ['Emma Egea (2012)','Julia Teresa Jimenez (2012)','Valentina Granados (2012)','Noa Alba Alonso (2012)','Carla Martin Crespo (2012)','Noa Muñoz Benito (2012)','Sky Kirana Van Tuil (2012)','Teresa Lobo (2013)','Bianca Dimitru (2012)'] },
+    { nom: 'Mini 2n Any C', entrenadors: 'Josué Garcia', sessions: [{ dia: 'Dilluns', ini: '18:00', fi: '19:00' }, { dia: 'Dimecres', ini: '18:00', fi: '19:00' }], jugadors: ['Aina Giralt (2013)','Mia Esteo Juan (2014)','Paula Romano (2013)','Paula Bornay (2013)','Naiara Robles (2013)','Vera Garcia (2013)','Maria Gutierrez (2013)','Mireia Gonzalez (2015)'] },
+    { nom: 'Preinfantil A', entrenadors: 'Mario / Maria', sessions: [{ dia: 'Dilluns', ini: '18:00', fi: '19:00' }, { dia: 'Dijous', ini: '18:30', fi: '20:00' }], jugadors: ['Noa Salinas (2011)','Emma Cano (2011)','Eva Gonzalez (2011)','Ana Lucia (2011)','Noa Cano (2011)','Carla Rodriguez (2011)','Nora Camacho (2011)','Laia Ramon (2012)','Marina Romero (2011)'] },
+    { nom: 'Preinfantil B', entrenadors: 'David Otero', sessions: [{ dia: 'Dimarts', ini: '18:30', fi: '19:30' }, { dia: 'Dijous', ini: '18:30', fi: '20:00' }], jugadors: ['Joana Fernandez (2010)','Sarah Osazee (2010)','Alexandra Parra (2010)','Anouk Del Campo (2010)','Nuria Rodrigo (2010)','Leyre Aguiar (2010)','Carla Fernandez (2010)','Leire Villafaina Arco (2010)','Alejandra Alcaraz (2010)'] },
+    { nom: 'Preinfantil C', entrenadors: 'Jordi Garrido', sessions: [{ dia: 'Dimecres', ini: '18:00', fi: '19:00' }, { dia: 'Divendres', ini: '18:00', fi: '19:00' }], jugadors: ['Martina Hortal (2009)','Ainhoa Lopez (2009)','Anna Gonzalez (2009)','Ariadna Planas (2009)'] },
+    { nom: 'Infantil A', entrenadors: 'Mario Delgado', sessions: [{ dia: 'Dimarts', ini: '18:30', fi: '19:30' }, { dia: 'Dijous', ini: '17:30', fi: '18:30' }, { dia: 'Divendres', ini: '18:00', fi: '19:00' }], jugadors: ['David Salvador (2015)','Ruben Franco (2015)','Yassin Aourram (2015)','Lucas Ripoll Santos (2015)','Bruno Mesas (2015)','Pau Basalobre (2015)','Aritz Alvarez (2015)','Ian El Bochi (2015)'] },
+    { nom: 'Infantil B', entrenadors: 'Hugo / Maria', sessions: [{ dia: 'Dilluns', ini: '18:00', fi: '19:00' }, { dia: 'Dimecres', ini: '18:00', fi: '19:00' }], jugadors: ['Jordi Pancorbo (2014)','Alex Pancorbo (2014)','Pol Cespedosa (2014)','Andres Romero (2014)','Lucas Prieto (2014)','Martí Fernandez (2014)','Lennart Winer (2014)','Tom Nusas (2014)','Daniel Garcia Perez (2014)'] },
+    { nom: 'Cadete A', entrenadors: 'Jordi Altimira', sessions: [{ dia: 'Dilluns', ini: '19:00', fi: '20:00' }, { dia: 'Dimecres', ini: '18:30', fi: '20:00' }, { dia: 'Divendres', ini: '19:00', fi: '20:00' }], nota: 'Els divendres de juny NO hi ha entrenament', jugadors: ['Yago Lopez (2011)','Alex Narvaez (2011)','Raul Navarro (2011)','Daniel Marquez (2011)','Aray Soria (2011)','Pau Burguillos (2011)','Gerard Bernabé (2011)','Omar Nausirat (2011)','Gerard Rodriguez (2011)','Hugo Aladro (2012)','Pau Canet (2011)','Thomas Jarauta (2011)','Bruno Gómez (2011)','Alex Picallo (2011)','Isaac Ibern (2011)','Dario Vazquez (2011)','Hugo Martinez (2012)','Izan Salmeron (2012)','Roc Mestres (2011)','Alvaro Menbrilla (2011)','Eric Marin (2011)'] },
+    { nom: 'Cadete B', entrenadors: 'Arnau Parreño / Iker Cayuela', sessions: [{ dia: 'Dilluns', ini: '19:00', fi: '20:00' }, { dia: 'Dijous', ini: '18:30', fi: '19:30' }], jugadors: ['Arnau Faci (2012)','Edu Fuentes (2012)','Eric Garcia (2012)','Marc Lazaro (2012)','Aaron Casabona (2012)','Daniel Ohts (2012)','Pablo Gonzalez (2012)','Neizan Ferrandiz (2012)','Argau Martinez (2012)','Oliver Przybyla (2012)','Arnau Garcia (2011)','Eric Soria (2012)','Oriol Ramirez (2012)','Hugo Martinez (2012)','Izan Salmeron (2012)','Roc Mestres (2011)','Alvaro Menbrilla (2011)','Eric Marin (2011)'] },
+    { nom: 'Junior A', entrenadors: 'Mario Delgado', sessions: [{ dia: 'Dimarts', ini: '19:30', fi: '20:30' }, { dia: 'Dijous', ini: '19:30', fi: '20:30' }], jugadors: ['Hugo Porta (2010)','Cristian Lopez (2010)','Adria Marco (2010)','Alex Anciones (2010)','Didac Abion (2010)','Marc Mostazo (2010)','Mario Sanchez (2010)','Javi Chenzhou (2010)','Gerard Oliva (2010)','Oriol Giralt (2010)','Carlos Perez (2010)','Pau Jimenez (2010)','David Hernandez (2009)','Gonzalo Schiavo (2009)','Eloi Romero (2009)','Marc Rubio (2009)','Victor Fernandez (2009)','Oscar Martin (2009)','Quim Ruiz (2009)','Abel Morueta (2009)','Joan Gago Gonzalez (2009)','Diego Meroño (2009)'] },
+    { nom: 'Junior B', entrenadors: 'Carlos Meroño', sessions: [{ dia: 'Dilluns', ini: '19:00', fi: '20:00' }, { dia: 'Dimecres', ini: '19:00', fi: '20:00' }], jugadors: ['Bruno Hernandez (2014)','Marti Movilla (2014)','Nil Romero (2014)','Marc Arenas (2014)','Marc Duran (2014)','Cel Del Campo (2014)','Marc Capilla (2014)','Takashi Berlanga (2014)','Jordi Zamora (2014)','Guillem Barrachina (2014)','Daniel Mellado (2013)','Nil Gallardo (2013)','Eric Moral (2014)','Eric Martinez (2014)','Joan Sanchez (2014)','Jan Rivera (2014)','Liam Domingue (2014)','Iker Asensio (2014)'] },
+    { nom: 'Junior C', entrenadors: 'Hugo Cortés', sessions: [{ dia: 'Dimarts', ini: '19:30', fi: '20:30' }, { dia: 'Dijous', ini: '20:00', fi: '21:00' }], jugadors: ['Daniel Zumaquero (2013)','Eric Fernandez (2013)','Roman Rodriguez (2013)','Eneko Barreña (2013)','Hugo Sanchez (2013)','Pablo Sanchez (2013)','Tendo Rosendo (2013)','Marc Delgado (2013)','Abel Jabbi Mañas (2013)','Arnau Chica (2013)','Iago Figueroa (2013)','Daniel Gonzalez (2013)','Jose Cañero (2013)','Alex Valero (2013)','Yago Valero (2013)','Guillem Guerrero (2013)','Oliver Perez Benitez (2013)','Eloi Palacios (2013)'] },
+    { nom: 'Sèniors / Sub20 / Veterans', entrenadors: 'Pepe Nuñez (consultar disponibilitat)', nota: 'Consultar disponibilitat amb Pepe Nuñez', sessions: [{ dia: 'Dilluns', ini: '20:00', fi: '23:30' }, { dia: 'Dimarts', ini: '21:00', fi: '23:00' }, { dia: 'Dimecres', ini: '20:30', fi: '23:30' }, { dia: 'Dijous', ini: '20:30', fi: '23:30' }], jugadors: [] }
+  ];
+
+  const EQUIPS_FEM = [
+    { nom: 'Premini Fem', entrenadors: 'Arnau / Oscar', sessions: [{ dia: 'Dimarts', ini: '17:00', fi: '18:00' }, { dia: 'Dijous', ini: '17:00', fi: '18:00' }], jugadors: ['Abril Escartin Bitrian (2018)','Maria Prieto Pascual (2018)','Nerea Estebean Seone (2018)'] },
+    { nom: 'Mini Fem', entrenadors: 'Mar Garcia / Emma Ysas', sessions: [{ dia: 'Dimarts', ini: '17:00', fi: '18:00' }, { dia: 'Dijous', ini: '17:00', fi: '18:00' }], jugadors: ['Laia Barrachina (2014)','Laia Simon Alonso (2018)','Chloe Llivinia Berniel (2018)','Noa Fernandez Santiago (2017)','Aishasillah Cham Sanchez (2017)','Emma Martín Crespo (2017)','Mina Brcan (2015)','Siena Martinez Callejo (2017)','Martina Vila (2015)','Aina Narvaez (2015)','Silvia Rodriguez (2013)','Noa Gabriela (2013)','Mina Brcan (2015)'] },
+    { nom: 'Preinfantil Fem', entrenadors: 'Silvia / Anna Ysas', sessions: [{ dia: 'Dimarts', ini: '18:00', fi: '19:15' }, { dia: 'Dijous', ini: '18:00', fi: '19:30' }], jugadors: [] },
+    { nom: 'Infantil Fem', entrenadors: 'Benja Calleja / Mar Garcia', sessions: [{ dia: 'Dimarts', ini: '18:30', fi: '19:30' }, { dia: 'Dijous', ini: '19:15', fi: '20:30' }], jugadors: ['Valeria Tapia (2011)'] },
+    { nom: 'Cadet Fem 1r Any', entrenadors: 'Emma Ysas', sessions: [{ dia: 'Dimarts', ini: '19:30', fi: '20:30' }, { dia: 'Dijous', ini: '19:30', fi: '20:30' }], jugadors: ['Fatima El Khayat Issaoui (2015)','Noa Rodriguez Garcia (2015)','Ainara Solano Bustamante (2015)','Sana Maha (2014)','Fatoumata Traore (2014)','Lisbet Gyamfi (2014)','Claudia Garcia (2015)','Eileen Ibarra (2015)'] },
+    { nom: 'Cadet Fem 2n Any A', entrenadors: 'Miguel Molina / Paula Portaña', sessions: [{ dia: 'Dimarts', ini: '18:30', fi: '19:30' }, { dia: 'Dimarts', ini: '19:30', fi: '20:30' }, { dia: 'Dijous', ini: '18:30', fi: '19:30' }], jugadors: ['Martina Cosano Ramos (2015)','Elena Oya (2016)','Lisbet Gyamfi (2014)','Celia Mañosa (2016)','Aina Herrera (2016)','Eileen Ibarra (2015)'] },
+    { nom: 'Junior Fem', entrenadors: '—', sessions: [{ dia: 'Dimecres', ini: '18:00', fi: '19:00' }, { dia: 'Divendres', ini: '19:00', fi: '20:00' }], jugadors: ['Marc Herrero (2011)','Ibai Hernandez (2010)','Mikhael Pedraza (2010)','Nil Perez (2010)','Biel Perez (2010)','Guillermo Granados (2010)','Ismael Benatia (2010)','Mario Aviles (2011)','Unai Mendoza (2010)','Didac Llorens (2011)','Joel Cortés (2011)','Acraf Ben Salah (2011)','Elsa Sevillano (2010)','Erik Herrera (2009)','Eric Prete (2009)','Juanjo Molina (2009)'] },
+    { nom: 'Veteranes UE Barberà', entrenadors: '—', sessions: [{ dia: 'Dijous', ini: '21:30', fi: '23:30' }], jugadors: [] }
+  ];
+
+  const CONTACTES = [
+    { nom: 'Luis Soumah', rol: 'Director Tècnic Club', tel: '677679715' },
+    { nom: 'Izan Castro', rol: 'Adj. Coordinació Cistella Petita Masc', tel: '666135393' },
+    { nom: 'Miguel Molina', rol: 'Adj. Coordinació Secció Femenina Base', tel: '633058678' },
+    { nom: 'Mario Delgado', rol: 'Adj. Coordinació Cistella Gran Masc (Preinfantil → Junior)', tel: '674045645' },
+    { nom: 'Jordi Altimira', rol: 'Cadete A', tel: '606715304' },
+    { nom: 'Arnau Parreño', rol: 'Cadete B', tel: '680709247' },
+    { nom: 'Iker Cayuela', rol: 'Cadete B', tel: '698626011' },
+    { nom: 'David Nuñez', rol: 'Premini A/B · Mini 2n Any A', tel: '682835562' },
+    { nom: 'David Vinardell', rol: 'Mini 2n Any B', tel: '667643028' },
+    { nom: 'Josué Garcia', rol: 'Mini 2n Any C', tel: '639068469' },
+    { nom: 'David Otero', rol: 'Preinfantil B', tel: '609851977' },
+    { nom: 'Jordi Garrido', rol: 'Preinfantil C', tel: '610294060' },
+    { nom: 'Hugo Cortés', rol: 'Junior C', tel: '692665171' },
+    { nom: 'Carlos Meroño', rol: 'Junior B', tel: '644301333' },
+    { nom: 'Mar Garcia', rol: 'Infantil Fem · Mini Fem', tel: '623106746' },
+    { nom: 'Emma Ysas', rol: 'Cadet Fem 1r Any · Mini Fem', tel: '686554575' },
+    { nom: 'Benja Calleja', rol: 'Infantil Fem', tel: '609804795' },
+    { nom: 'Paula Portaña', rol: 'Cadet Fem 2n Any', tel: '' },
+    { nom: 'Paula Garrido', rol: 'Escola Bàsquet', tel: '634483038' }
+  ];
+
+  // ─── ICS GENERATION ───────────────────────────────────────────────────────
+  function datesBetween(dowISO) {
+    const dates = [];
+    const start = new Date('2025-05-26');
+    const end = new Date('2025-06-19');
+    const d = new Date(start);
+    const jsDow = dowISO === 7 ? 0 : dowISO;
+    while (d.getDay() !== (jsDow % 7 === 0 ? 0 : jsDow)) d.setDate(d.getDate() + 1);
+    while (d <= end) {
+      dates.push(new Date(d));
+      d.setDate(d.getDate() + 7);
+    }
+    return dates;
+  }
+
+  function fmtDT(date, hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const dt = new Date(date);
+    dt.setHours(h, m, 0);
+    const pad = n => String(n).padStart(2, '0');
+    return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(h)}${pad(m)}00`;
+  }
+
+  function generarICS(equip) {
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//UE Barberà//Horaris//CA', 'CALSCALE:GREGORIAN'];
+    equip.sessions.forEach(ses => {
+      const dowISO = DIA_NUM[ses.dia];
+      const dates = datesBetween(dowISO);
+      dates.forEach(date => {
+        const iso = date.toISOString().slice(0, 10);
+        if (iso === '2025-06-06') return;
+        if (equip.nom === 'Cadete A' && date.getDay() === 5 && date >= new Date('2025-06-01')) return;
+        const uid = `${equip.nom.replace(/\s/g,'')}${iso}${ses.ini.replace(':','')}-${Math.random().toString(36).slice(2,8)}@uebarb`;
+        lines.push('BEGIN:VEVENT');
+        lines.push(`DTSTART:${fmtDT(date, ses.ini)}`);
+        lines.push(`DTEND:${fmtDT(date, ses.fi)}`);
+        lines.push(`SUMMARY:🏀 ${equip.nom}`);
+        lines.push(`DESCRIPTION:Entrenament ${equip.nom}\\nEntrenador/a: ${equip.entrenadors || '—'}`);
+        lines.push('LOCATION:UE Barberà');
+        lines.push(`UID:${uid}`);
+        lines.push('END:VEVENT');
+      });
+    });
+    lines.push('END:VCALENDAR');
+    return lines.join('\r\n');
+  }
+
+  function downloadICS(equip) {
+    const ics = generarICS(equip);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${equip.nom.replace(/\s+/g,'_')}_UE_Barbera.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ─── ESTAT ────────────────────────────────────────────────────────────────
+  const state = {
+    tab: 'masc',
+    seleccionat: null,
+    busqueda: '',
+    downloaded: false
+  };
+
+  const allEquips = [...EQUIPS_MASC, ...EQUIPS_FEM];
+  const isFem = e => EQUIPS_FEM.some(f => f.nom === e.nom);
+
+  function accentColor(e) {
+    if (!e) return '#1d4ed8';
+    if (isFem(e)) return '#db2777';
+    if (e.nom.includes('Sènior') || e.nom.includes('Veteran')) return '#64748b';
+    return '#1d4ed8';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function formatTel(tel) {
+    return tel.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+  }
+
+  // ─── RENDER ───────────────────────────────────────────────────────────────
+  function render() {
+    const equips = state.tab === 'masc' ? EQUIPS_MASC : state.tab === 'fem' ? EQUIPS_FEM : [];
+    const filtered = state.busqueda.trim()
+      ? allEquips.filter(e =>
+          e.nom.toLowerCase().includes(state.busqueda.toLowerCase()) ||
+          (e.entrenadors || '').toLowerCase().includes(state.busqueda.toLowerCase()) ||
+          (e.jugadors || []).some(j => j.toLowerCase().includes(state.busqueda.toLowerCase()))
+        )
+      : equips;
+    const detall = state.seleccionat && allEquips.find(e => e.nom === state.seleccionat);
+
+    const headerHTML = `
+      <div class="header">
+        <span class="header-icon">🏀</span>
+        <div style="flex:1">
+          <div class="header-title">UE BARBERÀ</div>
+          <div class="header-sub">Posttemporada 25-26 · 26 Maig → 19 Juny</div>
+        </div>
+        <div class="header-warn">⚠️ Dv 5 Juny = FESTIU</div>
+      </div>`;
+
+    let bodyHTML = '';
+
+    if (detall) {
+      const accent = accentColor(detall);
+      bodyHTML = `
+        <button class="back-btn" data-back="1">← Tornar</button>
+        <div class="detall-card" style="--accent:${accent}">
+          <div class="detall-header">
+            <div class="detall-name">${escapeHtml(detall.nom)}</div>
+            ${detall.entrenadors && detall.entrenadors !== '—' ? `<div class="detall-entr">🧑‍🏫 ${escapeHtml(detall.entrenadors)}</div>` : ''}
+          </div>
+          <div class="detall-body">
+            ${detall.nota ? `<div class="nota">⚠️ ${escapeHtml(detall.nota)}</div>` : ''}
+            <div class="section-label">📅 Entrenaments</div>
+            <div class="sessions-wrap">
+              ${detall.sessions.map(s => `<span class="badge ${s.dia}">${DIES_SHORT[s.dia]} ${s.ini}–${s.fi}</span>`).join('')}
+            </div>
+            <button class="download-btn ${state.downloaded ? 'done' : ''}" data-download="${escapeHtml(detall.nom)}">
+              ${state.downloaded ? '✅ Descarregat! Obre-ho amb Google Calendar / Apple Calendar' : '📅 Afegir al calendari (.ics)'}
+            </button>
+            <div class="download-hint">
+              Compatible amb Google Calendar, Apple Calendar i Outlook.<br>
+              Genera tots els entrenaments del 26 Maig al 19 Juny.
+            </div>
+            ${detall.jugadors && detall.jugadors.length > 0 ? `
+              <div class="section-label">👥 Jugadors/es (${detall.jugadors.length})</div>
+              <div class="jugadors">
+                ${detall.jugadors.map((j, i) => `<div class="jugador"><span class="jugador-num">${i+1}.</span>${escapeHtml(j)}</div>`).join('')}
+              </div>
+            ` : `<div style="font-size:12px;color:#475569;text-align:center;padding:8px">Llista de jugadors/es pendent</div>`}
+          </div>
+        </div>`;
+    } else {
+      const tabsHTML = !state.busqueda.trim() ? `
+        <div class="tabs">
+          <button class="tab-btn masc ${state.tab==='masc' ? 'active' : ''}" data-tab="masc">👦 Masculí</button>
+          <button class="tab-btn fem ${state.tab==='fem' ? 'active' : ''}" data-tab="fem">👧 Femení</button>
+          <button class="tab-btn info ${state.tab==='info' ? 'active' : ''}" data-tab="info">📞 Contactes</button>
+        </div>
+      ` : '';
+
+      let listHTML = '';
+      if (state.tab === 'info' && !state.busqueda.trim()) {
+        listHTML = `<div class="contactes">
+          ${CONTACTES.map(c => `
+            <div class="contacte">
+              <div>
+                <div class="contacte-nom">${escapeHtml(c.nom)}</div>
+                <div class="contacte-rol">${escapeHtml(c.rol)}</div>
+              </div>
+              ${c.tel ? `<a class="contacte-tel" href="tel:${c.tel}">📱 ${formatTel(c.tel)}</a>` : '<span class="contacte-tel-empty">—</span>'}
+            </div>
+          `).join('')}
+        </div>`;
+      } else {
+        if (filtered.length === 0) {
+          listHTML = '<div class="empty">Cap resultat</div>';
+        } else {
+          listHTML = `<div class="equips-list">
+            ${filtered.map(e => `
+              <button class="equip-card" data-equip="${escapeHtml(e.nom)}" style="--accent:${accentColor(e)}">
+                <div class="equip-dot"></div>
+                <div class="equip-info">
+                  <div class="equip-name">${escapeHtml(e.nom)}</div>
+                  <div class="equip-meta">
+                    ${e.entrenadors && e.entrenadors !== '—' ? `<span>🧑‍🏫 ${escapeHtml(e.entrenadors)} ·</span>` : ''}
+                    ${e.sessions.map(s => `<span class="session">${DIES_SHORT[s.dia]} ${s.ini}</span>`).join('')}
+                    ${e.jugadors && e.jugadors.length > 0 ? `<span>· ${e.jugadors.length} jugadors</span>` : ''}
+                  </div>
+                </div>
+                <span class="equip-chev">›</span>
+              </button>
+            `).join('')}
+          </div>`;
+        }
+      }
+
+      bodyHTML = `
+        <input class="search-input" id="search" placeholder="🔍 Busca equip, entrenador/a o jugador/a..." value="${escapeHtml(state.busqueda)}">
+        ${tabsHTML}
+        ${listHTML}`;
+    }
+
+    document.getElementById('app').innerHTML = `${headerHTML}<div class="container">${bodyHTML}</div>`;
+
+    // Eventos
+    const search = document.getElementById('search');
+    if (search) {
+      search.addEventListener('input', ev => {
+        state.busqueda = ev.target.value;
+        state.seleccionat = null;
+        render();
+        const s2 = document.getElementById('search');
+        if (s2) { s2.focus(); s2.setSelectionRange(s2.value.length, s2.value.length); }
+      });
+    }
+
+    document.querySelectorAll('[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.tab = btn.dataset.tab;
+        state.seleccionat = null;
+        render();
+      });
+    });
+
+    document.querySelectorAll('[data-equip]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.seleccionat = btn.dataset.equip;
+        state.downloaded = false;
+        render();
+      });
+    });
+
+    const back = document.querySelector('[data-back]');
+    if (back) {
+      back.addEventListener('click', () => {
+        state.seleccionat = null;
+        render();
+      });
+    }
+
+    const dl = document.querySelector('[data-download]');
+    if (dl) {
+      dl.addEventListener('click', () => {
+        const equip = allEquips.find(e => e.nom === dl.dataset.download);
+        if (equip) {
+          downloadICS(equip);
+          state.downloaded = true;
+          render();
+          setTimeout(() => { state.downloaded = false; render(); }, 2500);
+        }
+      });
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
