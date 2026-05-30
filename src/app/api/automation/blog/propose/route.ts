@@ -6,93 +6,118 @@ import { generateWithOpenRouter } from '@/lib/ai/openrouter';
 
 export const runtime = 'nodejs';
 
-export const PROPOSALS_KEY = '_blog_proposals_pending';
-const PROPOSALS_TTL_MS = 23 * 60 * 60 * 1000;
-
-type Proposal = { id: number; title: string; brief: string };
-
-const FALLBACK: Proposal[] = [
-  {
-    id: 1,
-    title: 'Cómo reducir la factura eléctrica de tu hotel en 90 días',
-    brief: 'Caso práctico con acciones concretas y ROI documentado.',
-  },
-  {
-    id: 2,
-    title: 'Penalizaciones por exceso de potencia: cómo detectarlas y eliminarlas',
-    brief: 'Guía técnica para revisar el contrato eléctrico B2B.',
-  },
-  {
-    id: 3,
-    title: 'Automatización HVAC: climatización inteligente según ocupación',
-    brief: 'Cómo vincular la climatización al PMS para ahorrar hasta un 34%.',
-  },
-  {
-    id: 4,
-    title: 'Monitorización energética por zonas: qué medir y cómo actuar',
-    brief: 'Qué instalar, qué datos analizar y cómo priorizar las intervenciones.',
-  },
-  {
-    id: 5,
-    title: 'Discriminación horaria en tarifas B2B: ahorra sin invertir',
-    brief: 'Cómo optimizar el contrato eléctrico sin obras ni cambio de suministrador.',
-  },
+const TOPIC_POOL: string[] = [
+  'Cómo reducir la factura eléctrica de tu hotel en 90 días',
+  'Penalizaciones por exceso de potencia contratada: cómo detectarlas y eliminarlas',
+  'Automatización HVAC: climatización inteligente según ocupación en hoteles y restaurantes',
+  'Monitorización energética por zonas: qué medir y cómo priorizar las intervenciones',
+  'Discriminación horaria en tarifas B2B: ahorra sin invertir ni cambiar de suministrador',
+  'Auditoría energética en PYMES: qué incluye, cuánto cuesta y qué ROI esperar',
+  'Instalación de placas solares en empresas: guía práctica para directores financieros',
+  'Tarifa indexada vs tarifa fija: cuál conviene en 2025 según tu perfil de consumo',
+  'Compensación de reactiva: qué es, por qué penaliza y cómo corregirla',
+  'Gestión de demanda eléctrica: cómo evitar picos que disparan tu factura',
+  'Certificado energético para empresas: obligaciones, plazos y ayudas disponibles',
+  'Comunidades energéticas para empresas: cómo unirte y cuánto puedes ahorrar',
+  'Autoconsumo colectivo en polígonos industriales: modelo y beneficios reales',
+  'Baterías de almacenamiento para empresas: cuándo rentabilizan la inversión',
+  'Eficiencia energética en el sector hostelero: los 5 focos de gasto oculto',
+  'Contrato de suministro eléctrico B2B: cláusulas que debes revisar antes de firmar',
+  'Subvenciones y deducciones fiscales para eficiencia energética en empresas (2025)',
+  'Iluminación LED industrial: cálculo de ahorro y periodo de retorno',
+  'Sistemas de gestión energética ISO 50001: guía de implantación para empresas medianas',
+  'Caldera de biomasa vs bomba de calor: análisis de costes para instalaciones hosteleras',
 ];
 
-export async function POST(request: Request) {
+/**
+ * GET /api/automation/blog/propose
+ * Devuelve un único tema B2B no publicado recientemente para generar un artículo.
+ */
+export async function GET(request: Request) {
   if (!hasValidCronBearer(request)) {
     return unauthorizedMachineResponse();
   }
 
-  const raw = await generateWithOpenRouter([
-    {
-      role: 'system',
-      content:
-        'Eres editor senior de Webtense Energy. Respondes solo con JSON válido, sin markdown ni texto adicional.',
-    },
-    {
-      role: 'user',
-      content: `Genera 5 propuestas de artículo para el blog de Webtense Energy (consultoría energética B2B: hoteles, restaurantes, empresas con factura >3.000€/mes).
+  try {
+    // Obtener títulos de los últimos 30 posts para evitar duplicados
+    const recentPosts = await db.post.findMany({
+      take: 30,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        translations: {
+          where: { locale: 'ES' },
+          select: { title: true },
+        },
+      },
+    });
+
+    const recentTitles = recentPosts
+      .flatMap((p) => p.translations.map((t) => t.title.toLowerCase()))
+      .filter(Boolean);
+
+    // Filtrar temas del pool que no aparezcan en posts recientes
+    const available = TOPIC_POOL.filter((topic) => {
+      const topicLower = topic.toLowerCase();
+      return !recentTitles.some(
+        (title) =>
+          title.includes(topicLower.slice(0, 30)) ||
+          topicLower.includes(title.slice(0, 30))
+      );
+    });
+
+    const candidatePool = available.length > 0 ? available : TOPIC_POOL;
+
+    // Intentar que la IA elija o adapte el mejor tema del día
+    const poolStr = candidatePool.map((t, i) => `${i + 1}. ${t}`).join('\n');
+
+    const raw = await generateWithOpenRouter([
+      {
+        role: 'system',
+        content:
+          'Eres editor senior de Webtense Energy. Respondes solo con JSON válido, sin markdown ni texto adicional.',
+      },
+      {
+        role: 'user',
+        content: `Elige el tema más relevante y oportuno para el blog B2B de Webtense Energy hoy.
+Públcio objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento con facturas eléctricas >3.000€/mes.
+
+Temas disponibles:
+${poolStr}
+
+Puedes adaptar ligeramente el enunciado para hacerlo más concreto o actual, pero mantén el enfoque B2B energético.
 
 Devuelve exactamente este JSON:
-{"proposals":[{"id":1,"title":"...","brief":"..."},{"id":2,"title":"...","brief":"..."},{"id":3,"title":"...","brief":"..."},{"id":4,"title":"...","brief":"..."},{"id":5,"title":"...","brief":"..."}]}
+{"topic": "..."}
 
 Reglas:
-- Títulos concretos, SEO-friendly, orientados a ahorro energético B2B.
-- Brief de 1 frase (enfoque o ángulo del artículo).
-- Varía entre: casos prácticos, guías técnicas, análisis de costes, automatización, regulación.`,
-    },
-  ]);
+- El topic debe ser un título de artículo concreto, SEO-friendly y orientado a ahorro o eficiencia energética B2B.
+- Máximo 100 caracteres.
+- Sin signos de interrogación en el título.`,
+      },
+    ]);
 
-  let proposals: Proposal[] = FALLBACK;
+    let topic: string = candidatePool[Math.floor(Math.random() * candidatePool.length)];
 
-  if (raw) {
-    try {
-      const cleaned = raw
-        .replace(/^```json\s*/i, '')
-        .replace(/^```\s*/i, '')
-        .replace(/```$/i, '')
-        .trim();
-      const parsed = JSON.parse(cleaned) as { proposals?: Proposal[] };
-      if (Array.isArray(parsed.proposals) && parsed.proposals.length >= 5) {
-        proposals = parsed.proposals.slice(0, 5).map((p, i) => ({ ...p, id: i + 1 }));
+    if (raw) {
+      try {
+        const cleaned = raw
+          .replace(/^```json\s*/i, '')
+          .replace(/^```\s*/i, '')
+          .replace(/```$/i, '')
+          .trim();
+        const parsed = JSON.parse(cleaned) as { topic?: string };
+        if (parsed.topic && parsed.topic.length > 10) {
+          topic = parsed.topic.trim();
+        }
+      } catch {
+        logger.warn('IA devolvió JSON inválido en blog/propose, usando fallback aleatorio');
       }
-    } catch {
-      logger.warn('Gemini devolvió JSON inválido en blog/propose, usando fallback');
     }
+
+    logger.info({ topic }, 'Tema del día seleccionado para blog automation');
+    return NextResponse.json({ ok: true, topic });
+  } catch (error) {
+    logger.error({ err: error }, 'Error en blog/propose');
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
-
-  await db.siteSetting.upsert({
-    where: { key: PROPOSALS_KEY },
-    create: {
-      key: PROPOSALS_KEY,
-      value: JSON.stringify({ proposals, createdAt: new Date().toISOString() }),
-    },
-    update: {
-      value: JSON.stringify({ proposals, createdAt: new Date().toISOString() }),
-    },
-  });
-
-  logger.info({ count: proposals.length }, 'Propuestas de blog generadas y guardadas');
-  return NextResponse.json({ ok: true, proposals, ttlMs: PROPOSALS_TTL_MS });
 }

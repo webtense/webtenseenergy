@@ -6,11 +6,6 @@ import { generateWithOpenRouter } from '@/lib/ai/openrouter';
 
 export const runtime = 'nodejs';
 
-const PROPOSALS_KEY = '_blog_proposals_pending';
-const PROPOSALS_TTL_MS = 23 * 60 * 60 * 1000;
-
-type Proposal = { id: number; title: string; brief: string };
-
 type GeneratedDraft = {
   title: string;
   excerpt: string;
@@ -46,31 +41,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { choice?: number };
-    const choice = Number(body.choice);
+    const body = (await request.json()) as { topic?: string; locale?: string };
+    const topic = body.topic?.trim();
+    const locale = (body.locale?.toUpperCase() ?? 'ES') as 'ES';
 
-    if (!choice || choice < 1 || choice > 5) {
-      return NextResponse.json({ error: 'choice debe ser un número del 1 al 5' }, { status: 400 });
-    }
-
-    const setting = await db.siteSetting.findUnique({ where: { key: PROPOSALS_KEY } });
-    if (!setting) {
-      return NextResponse.json({ error: 'No hay propuestas pendientes' }, { status: 404 });
-    }
-
-    const { proposals, createdAt } = JSON.parse(setting.value) as {
-      proposals: Proposal[];
-      createdAt: string;
-    };
-
-    if (Date.now() - new Date(createdAt).getTime() > PROPOSALS_TTL_MS) {
-      await db.siteSetting.delete({ where: { key: PROPOSALS_KEY } });
-      return NextResponse.json({ error: 'Las propuestas han caducado (>23h)' }, { status: 410 });
-    }
-
-    const chosen = proposals.find((p) => p.id === choice);
-    if (!chosen) {
-      return NextResponse.json({ error: 'Propuesta no encontrada' }, { status: 404 });
+    if (!topic) {
+      return NextResponse.json(
+        { error: 'El campo "topic" es obligatorio' },
+        { status: 400 }
+      );
     }
 
     const raw = await generateWithOpenRouter([
@@ -83,10 +62,9 @@ export async function POST(request: Request) {
         role: 'user',
         content: `Genera un artículo completo para el blog de Webtense Energy en español.
 
-Título base: ${chosen.title}
-Enfoque: ${chosen.brief}
-Público objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento con facturas eléctricas >3.000€/mes.
-CTA final: Invitar a solicitar análisis energético gratuito en /estudio.
+Tema: ${topic}
+Público objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento de empresas con facturas eléctricas superiores a 3.000 €/mes.
+CTA final: Invitar a solicitar un análisis energético gratuito en /estudio.
 
 Devuelve exactamente este JSON (sin texto fuera del JSON):
 {
@@ -102,15 +80,24 @@ Devuelve exactamente este JSON (sin texto fuera del JSON):
 Reglas para content:
 - HTML limpio con <p>, <h2>, <h3>, <ul>, <li>, <strong>.
 - Sin markdown ni code blocks.
-- 600-900 palabras.
-- Estructura: intro → problema → solución → caso/ejemplo → conclusión + CTA.
-- Tono: claro, técnico, orientado a decisión empresarial.`,
+- 800-1200 palabras.
+- Estructura: introducción → problema → solución detallada → caso práctico o datos → conclusión + CTA.
+- Tono: técnico, claro, orientado a la toma de decisiones empresariales.
+- Enfocado en energía B2B: auditorías, ahorro, solar, tarifas, HVAC para empresas.
+
+Reglas para los demás campos:
+- title: concreto, SEO-friendly, orientado a ahorro o eficiencia B2B.
+- excerpt: 1-2 frases que resuman el valor del artículo (máx. 180 caracteres).
+- seoTitle: hasta 60 caracteres.
+- seoDescription: entre 120 y 155 caracteres.
+- slug: URL amigable en español, sin tildes, con guiones.
+- category: una de estas categorías: Ahorro Energético | Energía Solar | Tarifas Eléctricas | Eficiencia HVAC | Auditoría Energética | Regulación y Normativa.`,
       },
     ]);
 
     if (!raw) {
       return NextResponse.json(
-        { error: 'No se pudo generar el artículo con Gemini' },
+        { error: 'No se pudo generar el artículo con IA' },
         { status: 500 }
       );
     }
@@ -130,12 +117,12 @@ Reglas para content:
         };
       }
     } catch {
-      logger.error('Gemini devolvió JSON inválido en blog/create');
+      logger.error('IA devolvió JSON inválido en blog/create');
     }
 
     if (!draft) {
       return NextResponse.json(
-        { error: 'La respuesta de Gemini no pudo parsearse' },
+        { error: 'La respuesta de la IA no pudo parsearse' },
         { status: 500 }
       );
     }
@@ -148,7 +135,7 @@ Reglas para content:
     const catSlug = toSlug(catName);
     const category = await db.category.upsert({
       where: { slug: catSlug },
-      create: { slug: catSlug, name: catName, locale: 'ES' },
+      create: { slug: catSlug, name: catName, locale },
       update: { name: catName },
     });
 
@@ -157,14 +144,14 @@ Reglas para content:
     const post = await db.post.create({
       data: {
         slug: finalSlug,
-        status: 'REVIEW',
-        locale: 'ES',
+        status: 'DRAFT',
+        locale,
         seoTitle: draft.seoTitle.slice(0, 70) || null,
         seoDescription: draft.seoDescription.slice(0, 160) || null,
         authorId: author?.id ?? null,
         translations: {
           create: {
-            locale: 'ES',
+            locale,
             title: draft.title,
             excerpt: draft.excerpt,
             content: draft.content,
@@ -174,11 +161,9 @@ Reglas para content:
       },
     });
 
-    await db.siteSetting.delete({ where: { key: PROPOSALS_KEY } });
-
     logger.info(
-      { postId: post.id, slug: finalSlug, chosenTitle: chosen.title },
-      'Post creado via blog automation'
+      { postId: post.id, slug: finalSlug, topic },
+      'Post DRAFT creado via blog automation'
     );
 
     return NextResponse.json({
@@ -187,7 +172,7 @@ Reglas para content:
         id: post.id,
         title: draft.title,
         slug: finalSlug,
-        status: 'REVIEW',
+        status: 'DRAFT',
         adminUrl: 'https://webtenseenergy.com/admin/posts',
       },
     });

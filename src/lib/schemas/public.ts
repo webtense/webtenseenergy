@@ -15,6 +15,9 @@ export const EstudioTextSchema = z.object({
   phone: z.string().max(40).optional().default(''),
   company: z.string().max(120).optional().default(''),
   kwConsumed: z.string().max(20).optional().default(''),
+  businessType: z.string().max(80).optional().default(''),
+  city: z.string().max(120).optional().default(''),
+  preferredTime: z.enum(['morning', 'afternoon', 'anytime']).optional().default('anytime'),
 });
 
 export const SubscribeSchema = z.object({

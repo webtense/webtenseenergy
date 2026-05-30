@@ -27,6 +27,9 @@ type SubmitStudyInput = {
   email: string;
   phone: string;
   company: string;
+  businessType?: string;
+  city?: string;
+  preferredTime?: string;
   invoiceFile?: {
     name: string;
     type: string;
@@ -47,6 +50,14 @@ export async function submitStudyRequest(input: SubmitStudyInput) {
   const safePhone = escapeHtml(input.phone.trim().slice(0, 40));
   const safeCompany = escapeHtml(input.company.trim().slice(0, 120));
   const safeKwConsumed = escapeHtml(input.kwConsumed.slice(0, 20));
+  const safeBusinessType = escapeHtml((input.businessType ?? '').slice(0, 80));
+  const safeCity = escapeHtml((input.city ?? '').slice(0, 120));
+  const preferredTimeLabels: Record<string, string> = {
+    morning: 'Mañana 9-13h',
+    afternoon: 'Tarde 15-19h',
+    anytime: 'Cualquier hora',
+  };
+  const preferredTimeLabel = preferredTimeLabels[input.preferredTime ?? 'anytime'] ?? 'Cualquier hora';
 
   const study = await db.studyRequest.create({
     data: {
@@ -98,6 +109,9 @@ export async function submitStudyRequest(input: SubmitStudyInput) {
           <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${normalizedEmail}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Telefono:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${safePhone || 'No indicado'}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Compania actual:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${safeCompany || 'No indicada'}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Tipo de negocio:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${safeBusinessType || 'No indicado'}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Ciudad / Provincia:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${safeCity || 'No indicada'}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Horario preferido:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${preferredTimeLabel}</td></tr>
         </table>
 
         <h3 style="margin-top: 20px; color: #0f935d;">Analisis solicitado</h3>

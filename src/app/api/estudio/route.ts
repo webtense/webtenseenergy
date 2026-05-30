@@ -83,6 +83,9 @@ export async function POST(request: Request) {
       phone: form.get('phone') ?? undefined,
       company: form.get('company') ?? undefined,
       kwConsumed: form.get('kwConsumed') ?? undefined,
+      businessType: form.get('businessType') ?? undefined,
+      city: form.get('city') ?? undefined,
+      preferredTime: form.get('preferredTime') ?? undefined,
     });
 
     if (!result.success) {
@@ -92,7 +95,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { method, name, email, phone, company, kwConsumed } = result.data;
+    const { method, name, email, phone, company, kwConsumed, businessType, city, preferredTime } = result.data;
     const habits = parseHabits(String(form.get('habits') || '[]'));
     const invoiceFile = form.get('invoice');
 
@@ -156,6 +159,9 @@ export async function POST(request: Request) {
       email,
       phone: escapeHtml(phone),
       company: escapeHtml(company),
+      businessType: escapeHtml(businessType ?? ''),
+      city: escapeHtml(city ?? ''),
+      preferredTime: preferredTime ?? 'anytime',
       invoiceFile: invoiceData,
       habitsText,
       analysisMethod,

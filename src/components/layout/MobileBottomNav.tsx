@@ -7,25 +7,25 @@ import { withBasePath } from '@/lib/paths';
 const labels = {
   es: {
     home: 'Inicio',
+    empresas: 'Empresas',
+    precio: 'Precio luz',
     blog: 'Blog',
-    ofertas: 'Ofertas',
-    estudio: 'Estudio',
     contacto: 'Contacto',
   },
   ca: {
     home: 'Inici',
+    empresas: 'Empreses',
+    precio: 'Preu llum',
     blog: 'Blog',
-    ofertas: 'Ofertes',
-    estudio: 'Estudi',
     contacto: 'Contacte',
   },
 };
 
 const items = [
   { key: 'home', href: '/', icon: '⌂' },
+  { key: 'empresas', href: '/empresas', icon: '🏢' },
+  { key: 'precio', href: '/luz/precio-hoy', icon: '⚡' },
   { key: 'blog', href: '/blog', icon: '◫' },
-  { key: 'ofertas', href: '/ofertas', icon: '⚡' },
-  { key: 'estudio', href: '/estudio', icon: '▣' },
   { key: 'contacto', href: '/contacto', icon: '✆' },
 ];
 

@@ -7,7 +7,8 @@ import { withBasePath } from '@/lib/paths';
 
 const navigation = [
   { key: 'empresas', href: '/empresas' },
-  { key: 'casoReal', href: '/caso-real' },
+  { key: 'particulares', href: '/particulares' },
+  { key: 'precio', href: '/luz/precio-hoy' },
   { key: 'blog', href: '/blog' },
   { key: 'contacto', href: '/contacto' },
 ];
