@@ -145,10 +145,10 @@ const CA: Content = {
   eyebrowHero: 'Sobre Webtense Energy',
   titleHero: 'Consultoria energètica independent',
   subtitleHero:
-    "No venem energia ni representem cap comercialitzadora. La nostra única feina és reduir el que pagues per ella, amb dades i sense lletra petita.",
+    'No venem energia ni representem cap comercialitzadora. La nostra única feina és reduir el que pagues per ella, amb dades i sense lletra petita.',
 
   eyebrowWhy: 'Per què existim',
-  titleWhy: "Les empreses paguen energia de més. I ho saben.",
+  titleWhy: 'Les empreses paguen energia de més. I ho saben.',
   descWhy:
     "El problema no és la tarifa. És que ningú analitza la factura seriosament. S'aprova, es paga i el cicle es repeteix. Mentrestant, els excessos de potència, la discriminació horària mal configurada i els equips sense gestió acumulen sobrecostos que ningú ha quantificat.",
 
@@ -188,14 +188,13 @@ const CA: Content = {
     {
       icon: '◫',
       title: 'Especialització sectorial',
-      desc: "Hostaleria, restauració, indústria lleugera i retail. Cada sector té patrons de consum diferents i solucions diferents. No apliquem la mateixa recepta a tothom.",
+      desc: 'Hostaleria, restauració, indústria lleugera i retail. Cada sector té patrons de consum diferents i solucions diferents. No apliquem la mateixa recepta a tothom.',
     },
   ],
 
   eyebrowHow: 'Com treballem',
   titleHow: 'Quatre passos. Sense risc previ.',
-  descHow:
-    "El procés complet no requereix cap compromís fins que tens els números sobre la taula.",
+  descHow: 'El procés complet no requereix cap compromís fins que tens els números sobre la taula.',
 
   steps: [
     {
@@ -229,7 +228,7 @@ const CA: Content = {
     {
       icon: '◧',
       title: 'Independència',
-      desc: "No som intermediaris de cap comercialitzadora. No rebem comissions de proveïdors. Si no hi ha estalvi real, no hi ha projecte.",
+      desc: 'No som intermediaris de cap comercialitzadora. No rebem comissions de proveïdors. Si no hi ha estalvi real, no hi ha projecte.',
     },
     {
       icon: '▣',
@@ -246,7 +245,7 @@ const CA: Content = {
   ctaTitle: 'La teva empresa paga més de 3.000 €/mes en electricitat?',
   ctaDesc:
     "Aquest és el llindar a partir del qual l'estalvi potencial justifica una anàlisi seriosa. Envia'ns les teves tres últimes factures. En 48 hores et diem si hi ha marge i quant pots recuperar.",
-  ctaButton: "Sol·licita el teu estudi gratuït",
+  ctaButton: 'Sol·licita el teu estudi gratuït',
 };
 
 export function SobreNosotrosPage({ basePath, lang = 'es' }: SobreNosotrosPageProps) {
@@ -255,21 +254,12 @@ export function SobreNosotrosPage({ basePath, lang = 'es' }: SobreNosotrosPagePr
   return (
     <div className="flex flex-col bg-background">
       {/* HERO */}
-      <SectionHero
-        eyebrow={c.eyebrowHero}
-        title={c.titleHero}
-        subtitle={c.subtitleHero}
-        compact
-      />
+      <SectionHero eyebrow={c.eyebrowHero} title={c.titleHero} subtitle={c.subtitleHero} compact />
 
       {/* POR QUÉ EXISTIMOS */}
       <section className="section-shell">
         <div className="section-inner grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
-          <SectionIntro
-            eyebrow={c.eyebrowWhy}
-            title={c.titleWhy}
-            description={c.descWhy}
-          />
+          <SectionIntro eyebrow={c.eyebrowWhy} title={c.titleWhy} description={c.descWhy} />
           <div className="grid gap-4">
             {c.whyPoints.map((p) => (
               <div key={p.title} className="surface-panel-soft p-6">
@@ -284,10 +274,7 @@ export function SobreNosotrosPage({ basePath, lang = 'es' }: SobreNosotrosPagePr
       {/* QUIÉNES SOMOS */}
       <section className="section-shell-muted">
         <div className="section-inner">
-          <SectionIntro
-            eyebrow={c.eyebrowWho}
-            title={c.titleWho}
-          />
+          <SectionIntro eyebrow={c.eyebrowWho} title={c.titleWho} />
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
             {c.whoBlocks.map((b) => (
               <div key={b.title} className="surface-panel-soft p-6 flex gap-5">
@@ -340,7 +327,10 @@ export function SobreNosotrosPage({ basePath, lang = 'es' }: SobreNosotrosPagePr
           />
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {c.diffPoints.map((d) => (
-              <div key={d.title} className="surface-panel-soft p-8 text-center flex flex-col items-center">
+              <div
+                key={d.title}
+                className="surface-panel-soft p-8 text-center flex flex-col items-center"
+              >
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-2xl text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
                   {d.icon}
                 </div>

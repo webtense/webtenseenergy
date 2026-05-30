@@ -57,7 +57,8 @@ export async function submitStudyRequest(input: SubmitStudyInput) {
     afternoon: 'Tarde 15-19h',
     anytime: 'Cualquier hora',
   };
-  const preferredTimeLabel = preferredTimeLabels[input.preferredTime ?? 'anytime'] ?? 'Cualquier hora';
+  const preferredTimeLabel =
+    preferredTimeLabels[input.preferredTime ?? 'anytime'] ?? 'Cualquier hora';
 
   const study = await db.studyRequest.create({
     data: {

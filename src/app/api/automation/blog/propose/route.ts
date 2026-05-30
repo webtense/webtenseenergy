@@ -60,8 +60,7 @@ export async function GET(request: Request) {
       const topicLower = topic.toLowerCase();
       return !recentTitles.some(
         (title) =>
-          title.includes(topicLower.slice(0, 30)) ||
-          topicLower.includes(title.slice(0, 30))
+          title.includes(topicLower.slice(0, 30)) || topicLower.includes(title.slice(0, 30))
       );
     });
 

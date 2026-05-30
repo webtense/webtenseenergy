@@ -46,10 +46,7 @@ export async function POST(request: Request) {
     const locale = (body.locale?.toUpperCase() ?? 'ES') as 'ES';
 
     if (!topic) {
-      return NextResponse.json(
-        { error: 'El campo "topic" es obligatorio' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'El campo "topic" es obligatorio' }, { status: 400 });
     }
 
     const raw = await generateWithOpenRouter([
@@ -96,10 +93,7 @@ Reglas para los demás campos:
     ]);
 
     if (!raw) {
-      return NextResponse.json(
-        { error: 'No se pudo generar el artículo con IA' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'No se pudo generar el artículo con IA' }, { status: 500 });
     }
 
     let draft: GeneratedDraft | null = null;

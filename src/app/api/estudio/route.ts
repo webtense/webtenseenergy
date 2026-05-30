@@ -95,7 +95,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { method, name, email, phone, company, kwConsumed, businessType, city, preferredTime } = result.data;
+    const { method, name, email, phone, company, kwConsumed, businessType, city, preferredTime } =
+      result.data;
     const habits = parseHabits(String(form.get('habits') || '[]'));
     const invoiceFile = form.get('invoice');
 

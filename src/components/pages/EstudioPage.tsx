@@ -127,7 +127,8 @@ export function EstudioPage() {
           <div className="max-w-lg">
             <B2BLeadForm />
             <p className="mt-5 text-xs text-foreground/40 leading-5">
-              Si tu factura es inferior a 3.000 €/mes, te redirigiremos a recursos para particulares.
+              Si tu factura es inferior a 3.000 €/mes, te redirigiremos a recursos para
+              particulares.
             </p>
           </div>
 

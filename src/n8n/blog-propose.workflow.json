@@ -155,19 +155,13 @@
   ],
   "connections": {
     "Todos los días a las 9:00": {
-      "main": [
-        [{ "node": "Obtener tema del día", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Obtener tema del día", "type": "main", "index": 0 }]]
     },
     "Obtener tema del día": {
-      "main": [
-        [{ "node": "Generar artículo con IA", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Generar artículo con IA", "type": "main", "index": 0 }]]
     },
     "Generar artículo con IA": {
-      "main": [
-        [{ "node": "¿Éxito?", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "¿Éxito?", "type": "main", "index": 0 }]]
     },
     "¿Éxito?": {
       "main": [

@@ -183,14 +183,10 @@
       ]
     },
     "Parsear respuesta": {
-      "main": [
-        [{ "node": "Crear post en webtenseenergy", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Crear post en webtenseenergy", "type": "main", "index": 0 }]]
     },
     "Crear post en webtenseenergy": {
-      "main": [
-        [{ "node": "¿Post creado?", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "¿Post creado?", "type": "main", "index": 0 }]]
     },
     "¿Post creado?": {
       "main": [

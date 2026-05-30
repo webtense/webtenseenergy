@@ -134,8 +134,7 @@ function TablaComparativa() {
                   i % 2 === 0
                     ? 'color-mix(in srgb, var(--background) 100%, transparent)'
                     : 'color-mix(in srgb, var(--background) 96%, var(--color-neutral-100) 4%)',
-                borderTop:
-                  '1px solid color-mix(in srgb, var(--foreground) 5%, transparent)',
+                borderTop: '1px solid color-mix(in srgb, var(--foreground) 5%, transparent)',
               }}
             >
               <td className="px-5 py-4 font-medium text-foreground">{row.concepto}</td>
@@ -145,8 +144,7 @@ function TablaComparativa() {
                 <span
                   className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold"
                   style={{
-                    background:
-                      'color-mix(in srgb, var(--color-primary-500) 12%, transparent)',
+                    background: 'color-mix(in srgb, var(--color-primary-500) 12%, transparent)',
                     color: 'var(--color-primary-700)',
                   }}
                 >
@@ -188,8 +186,7 @@ function BarrasAhorro() {
             className="h-full rounded-xl flex items-center justify-end pr-4"
             style={{
               width: `${anchoAntes}%`,
-              background:
-                'linear-gradient(90deg, #dc2626 0%, #ef4444 60%, #f87171 100%)',
+              background: 'linear-gradient(90deg, #dc2626 0%, #ef4444 60%, #f87171 100%)',
             }}
           >
             <span className="text-white text-xs font-bold tracking-wide">Referencia 100%</span>
@@ -213,8 +210,7 @@ function BarrasAhorro() {
             className="h-full rounded-xl flex items-center"
             style={{
               width: `${anchoDespues}%`,
-              background:
-                'linear-gradient(90deg, #0e754d 0%, #0f935d 50%, #1ab775 100%)',
+              background: 'linear-gradient(90deg, #0e754d 0%, #0f935d 50%, #1ab775 100%)',
             }}
           >
             <span className="ml-4 text-white text-xs font-bold tracking-wide hidden sm:block">
@@ -315,7 +311,8 @@ function LineaTiempoVisual() {
               style={{
                 background:
                   'linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%)',
-                boxShadow: '0 0 0 4px color-mix(in srgb, var(--color-primary-500) 20%, transparent)',
+                boxShadow:
+                  '0 0 0 4px color-mix(in srgb, var(--color-primary-500) 20%, transparent)',
               }}
             >
               {paso.num}
@@ -414,12 +411,10 @@ export default function CasoRealPage() {
         <div className="section-inner">
           <div className="mb-10">
             <p className="eyebrow">Impacto económico</p>
-            <h2 className="section-title mt-3 text-foreground">
-              De 18.400 € a 11.200 € al mes
-            </h2>
+            <h2 className="section-title mt-3 text-foreground">De 18.400 € a 11.200 € al mes</h2>
             <p className="section-copy mt-4 max-w-2xl text-foreground/65">
-              La reducción del 39% en la factura mensual supone 7.200 € menos cada mes.
-              Con una inversión total de 28.500 €, el retorno se alcanzó en 4,2 meses.
+              La reducción del 39% en la factura mensual supone 7.200 € menos cada mes. Con una
+              inversión total de 28.500 €, el retorno se alcanzó en 4,2 meses.
             </p>
           </div>
           <BarrasAhorro />
