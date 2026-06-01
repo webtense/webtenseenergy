@@ -31,6 +31,7 @@ async function callGemini(messages: OpenRouterMessage[]): Promise<string | null>
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }],
     })),
+    generationConfig: { responseMimeType: 'application/json' },
   };
 
   if (systemMsg) {
