@@ -85,20 +85,20 @@ ${poolStr}
 
 Puedes adaptar ligeramente los enunciados para hacerlos más concretos o actuales, pero mantén el enfoque B2B energético.
 
-Devuelve exactamente este JSON con 3 opciones distintas:
-{"topics": ["...", "...", "..."]}
+Devuelve exactamente este JSON con 5 opciones distintas:
+{"topics": ["...", "...", "...", "...", "..."]}
 
 Reglas:
 - Cada topic debe ser un título de artículo concreto, SEO-friendly y orientado a ahorro o eficiencia energética B2B.
 - Máximo 100 caracteres por título.
 - Sin signos de interrogación.
-- Los 3 temas deben ser variados (no todos del mismo subtema).`,
+- Los 5 temas deben ser variados (distintos subtemas: tarifas, solar, HVAC, auditoría, regulación, etc.).`,
       },
     ]);
 
     // Fallback: 3 temas aleatorios del pool
     const shuffle = [...candidatePool].sort(() => Math.random() - 0.5);
-    const fallbackTopics = shuffle.slice(0, 3);
+    const fallbackTopics = shuffle.slice(0, 5);
     let topics: string[] = fallbackTopics;
 
     if (raw) {
@@ -111,7 +111,7 @@ Reglas:
         const parsed = JSON.parse(cleaned) as { topics?: string[]; topic?: string };
         if (Array.isArray(parsed.topics) && parsed.topics.length >= 2) {
           topics = parsed.topics
-            .slice(0, 3)
+            .slice(0, 5)
             .map((t: string) => t.trim())
             .filter((t) => t.length > 10);
         } else if (parsed.topic && parsed.topic.length > 10) {
