@@ -77,25 +77,29 @@ export async function GET(request: Request) {
       },
       {
         role: 'user',
-        content: `Elige el tema más relevante y oportuno para el blog B2B de Webtense Energy hoy.
-Públcio objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento con facturas eléctricas >3.000€/mes.
+        content: `Elige los 3 temas más relevantes y oportunos para el blog B2B de Webtense Energy hoy.
+Público objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento con facturas eléctricas >3.000€/mes.
 
 Temas disponibles:
 ${poolStr}
 
-Puedes adaptar ligeramente el enunciado para hacerlo más concreto o actual, pero mantén el enfoque B2B energético.
+Puedes adaptar ligeramente los enunciados para hacerlos más concretos o actuales, pero mantén el enfoque B2B energético.
 
-Devuelve exactamente este JSON:
-{"topic": "..."}
+Devuelve exactamente este JSON con 3 opciones distintas:
+{"topics": ["...", "...", "..."]}
 
 Reglas:
-- El topic debe ser un título de artículo concreto, SEO-friendly y orientado a ahorro o eficiencia energética B2B.
-- Máximo 100 caracteres.
-- Sin signos de interrogación en el título.`,
+- Cada topic debe ser un título de artículo concreto, SEO-friendly y orientado a ahorro o eficiencia energética B2B.
+- Máximo 100 caracteres por título.
+- Sin signos de interrogación.
+- Los 3 temas deben ser variados (no todos del mismo subtema).`,
       },
     ]);
 
-    let topic: string = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+    // Fallback: 3 temas aleatorios del pool
+    const shuffle = [...candidatePool].sort(() => Math.random() - 0.5);
+    const fallbackTopics = shuffle.slice(0, 3);
+    let topics: string[] = fallbackTopics;
 
     if (raw) {
       try {
@@ -104,17 +108,22 @@ Reglas:
           .replace(/^```\s*/i, '')
           .replace(/```$/i, '')
           .trim();
-        const parsed = JSON.parse(cleaned) as { topic?: string };
-        if (parsed.topic && parsed.topic.length > 10) {
-          topic = parsed.topic.trim();
+        const parsed = JSON.parse(cleaned) as { topics?: string[]; topic?: string };
+        if (Array.isArray(parsed.topics) && parsed.topics.length >= 2) {
+          topics = parsed.topics
+            .slice(0, 3)
+            .map((t: string) => t.trim())
+            .filter((t) => t.length > 10);
+        } else if (parsed.topic && parsed.topic.length > 10) {
+          topics = [parsed.topic.trim(), ...fallbackTopics.slice(1)];
         }
       } catch {
         logger.warn('IA devolvió JSON inválido en blog/propose, usando fallback aleatorio');
       }
     }
 
-    logger.info({ topic }, 'Tema del día seleccionado para blog automation');
-    return NextResponse.json({ ok: true, topic });
+    logger.info({ topics }, 'Temas del día seleccionados para blog automation');
+    return NextResponse.json({ ok: true, topics, topic: topics[0] });
   } catch (error) {
     logger.error({ err: error }, 'Error en blog/propose');
     return NextResponse.json({ error: 'Error interno' }, { status: 500 });
