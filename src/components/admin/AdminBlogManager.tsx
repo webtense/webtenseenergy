@@ -181,7 +181,7 @@ export function AdminBlogManager({ initialPosts }: Props) {
     try {
       const payload = newStatus ? { ...modalForm, status: newStatus } : modalForm;
       const res = await fetch(`/api/admin/posts/${modalForm.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
