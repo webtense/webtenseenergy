@@ -14,19 +14,22 @@ const TOPIC_POOL: string[] = [
   'Discriminación horaria en tarifas B2B: ahorra sin invertir ni cambiar de suministrador',
   'Auditoría energética en PYMES: qué incluye, cuánto cuesta y qué ROI esperar',
   'Instalación de placas solares en empresas: guía práctica para directores financieros',
-  'Tarifa indexada vs tarifa fija: cuál conviene en 2025 según tu perfil de consumo',
+  'Tarifa indexada vs tarifa fija: cuál conviene en 2026 según tu perfil de consumo',
   'Compensación de reactiva: qué es, por qué penaliza y cómo corregirla',
   'Gestión de demanda eléctrica: cómo evitar picos que disparan tu factura',
-  'Certificado energético para empresas: obligaciones, plazos y ayudas disponibles',
-  'Comunidades energéticas para empresas: cómo unirte y cuánto puedes ahorrar',
+  'Certificado energético para empresas: obligaciones, plazos y ayudas disponibles en 2026',
+  'Comunidades energéticas para empresas: cómo unirte y cuánto puedes ahorrar en 2026',
   'Autoconsumo colectivo en polígonos industriales: modelo y beneficios reales',
-  'Baterías de almacenamiento para empresas: cuándo rentabilizan la inversión',
+  'Baterías de almacenamiento para empresas: cuándo rentabilizan la inversión en 2026',
   'Eficiencia energética en el sector hostelero: los 5 focos de gasto oculto',
   'Contrato de suministro eléctrico B2B: cláusulas que debes revisar antes de firmar',
-  'Subvenciones y deducciones fiscales para eficiencia energética en empresas (2025)',
+  'Subvenciones y deducciones fiscales para eficiencia energética en empresas (2026)',
   'Iluminación LED industrial: cálculo de ahorro y periodo de retorno',
   'Sistemas de gestión energética ISO 50001: guía de implantación para empresas medianas',
   'Caldera de biomasa vs bomba de calor: análisis de costes para instalaciones hosteleras',
+  'Precio de la luz en 2026: cómo proteger tu empresa de la volatilidad del mercado eléctrico',
+  'Nuevas ayudas europeas Next Generation EU para eficiencia energética empresarial en 2026',
+  'Vehículo eléctrico de empresa: cómo gestionar la carga y el coste energético en 2026',
 ];
 
 /**
@@ -90,6 +93,7 @@ Devuelve exactamente este JSON con 5 opciones distintas:
 
 Reglas:
 - Cada topic debe ser un título de artículo concreto, SEO-friendly y orientado a ahorro o eficiencia energética B2B.
+- Año actual: 2026. Si el tema incluye un año, SIEMPRE usa 2026, nunca 2025.
 - Máximo 100 caracteres por título.
 - Sin signos de interrogación.
 - Los 5 temas deben ser variados (distintos subtemas: tarifas, solar, HVAC, auditoría, regulación, etc.).`,

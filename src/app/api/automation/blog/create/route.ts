@@ -60,6 +60,7 @@ export async function POST(request: Request) {
         content: `Genera un artículo completo para el blog de Webtense Energy en español.
 
 Tema: ${topic}
+Año actual: 2026. Toda la información, cifras, normativas y referencias deben ser de 2026. NUNCA menciones 2025 como año actual o vigente.
 Público objetivo: Directores de operaciones, gerentes financieros y responsables de mantenimiento de empresas con facturas eléctricas superiores a 3.000 €/mes.
 CTA final: Invitar a solicitar un análisis energético gratuito en /estudio.
 
