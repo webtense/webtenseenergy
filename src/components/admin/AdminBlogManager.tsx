@@ -579,7 +579,10 @@ export function AdminBlogManager({ initialPosts }: Props) {
       {/* ── MODAL PANTALLA COMPLETA ── */}
       {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
       {modalPost && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950">
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-zinc-950"
+          style={{ ['--foreground' as string]: '#f8fafc', ['--background' as string]: '#020617' }}
+        >
           {/* Barra superior */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-zinc-900 px-4 py-3">
             <button

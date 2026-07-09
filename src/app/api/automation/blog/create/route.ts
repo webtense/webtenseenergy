@@ -41,9 +41,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { topic?: string; locale?: string };
+    const body = (await request.json()) as { topic?: string; locale?: string; publish?: boolean };
     const topic = body.topic?.trim();
     const locale = (body.locale?.toUpperCase() ?? 'ES') as 'ES';
+    const publish = body.publish === true;
 
     if (!topic) {
       return NextResponse.json({ error: 'El campo "topic" es obligatorio' }, { status: 400 });
@@ -139,7 +140,8 @@ Reglas para los demás campos:
     const post = await db.post.create({
       data: {
         slug: finalSlug,
-        status: 'DRAFT',
+        status: publish ? 'PUBLISHED' : 'DRAFT',
+        publishedAt: publish ? new Date() : null,
         locale,
         seoTitle: draft.seoTitle.slice(0, 70) || null,
         seoDescription: draft.seoDescription.slice(0, 160) || null,
@@ -157,8 +159,8 @@ Reglas para los demás campos:
     });
 
     logger.info(
-      { postId: post.id, slug: finalSlug, topic },
-      'Post DRAFT creado via blog automation'
+      { postId: post.id, slug: finalSlug, topic, status: post.status },
+      `Post ${post.status} creado via blog automation`
     );
 
     return NextResponse.json({
@@ -167,7 +169,8 @@ Reglas para los demás campos:
         id: post.id,
         title: draft.title,
         slug: finalSlug,
-        status: 'DRAFT',
+        status: post.status,
+        url: publish ? `https://webtenseenergy.com/blog/${finalSlug}` : undefined,
         adminUrl: 'https://webtenseenergy.com/admin/posts',
       },
     });
