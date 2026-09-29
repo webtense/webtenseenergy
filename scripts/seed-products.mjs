@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const db = new PrismaClient();
 
 const AFFILIATE_TAG = "semillasdet02-21"; // Tu Amazon affiliate tag
 
@@ -147,7 +147,7 @@ async function main() {
 
   for (const product of products) {
     try {
-      const existing = await prisma.productReview.findUnique({
+      const existing = await db.productReview.findUnique({
         where: { asin: product.asin },
       });
 
@@ -157,7 +157,7 @@ async function main() {
         continue;
       }
 
-      await prisma.productReview.create({
+      await db.productReview.create({
         data: product,
       });
 
@@ -179,5 +179,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   });

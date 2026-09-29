@@ -112,11 +112,17 @@ export function ProductCard({
               rel="noopener noreferrer"
               onClick={() => {
                 // Tracking opcional (GA)
-                if (typeof window !== "undefined" && window.gtag) {
-                  window.gtag("event", "affiliate_click", {
-                    asin: title,
-                    source: "product_card",
-                  });
+                const gac = (globalThis as unknown as Record<string, unknown>)
+                  .gtag;
+                if (typeof gac === "function") {
+                  try {
+                    gac("event", "affiliate_click", {
+                      asin: title,
+                      source: "product_card",
+                    });
+                  } catch {
+                    // GA no disponible, ignorar silenciosamente
+                  }
                 }
               }}
               className="cta-primary cta-sm ml-auto"

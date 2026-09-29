@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { ProductReview } from "@prisma/client";
-import Link from "next/link";
 
 interface FormState {
   title: string;

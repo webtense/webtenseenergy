@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/server/db";
-import { getAdminSession } from "@/server/auth/session";
+import { db } from "@/lib/db";
+import { getAdminSession } from "@/lib/admin-auth";
 import { z } from "zod";
 
 const addProductSchema = z.object({
@@ -10,11 +10,12 @@ const addProductSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const post = await prisma.post.findUnique({
-      where: { slug: params.slug },
+    const { slug } = await params;
+    const post = await db.post.findUnique({
+      where: { slug },
       include: {
         productReviews: {
           include: { productReview: true },
@@ -43,7 +44,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getAdminSession();
@@ -51,12 +52,13 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { slug } = await params;
     const body = await req.json();
     const validatedData = addProductSchema.parse(body);
 
     // Buscar post
-    const post = await prisma.post.findUnique({
-      where: { slug: params.slug },
+    const post = await db.post.findUnique({
+      where: { slug },
     });
 
     if (!post) {
@@ -64,7 +66,7 @@ export async function POST(
     }
 
     // Verificar que el producto existe
-    const product = await prisma.productReview.findUnique({
+    const product = await db.productReview.findUnique({
       where: { id: validatedData.productReviewId },
     });
 
@@ -76,7 +78,7 @@ export async function POST(
     }
 
     // Crear asociación
-    const association = await prisma.postProductReview.create({
+    const association = await db.postProductReview.create({
       data: {
         postId: post.id,
         productReviewId: validatedData.productReviewId,
@@ -89,7 +91,7 @@ export async function POST(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validación fallida", details: error.errors },
+        { error: "Validación fallida", details: error.issues },
         { status: 400 }
       );
     }
@@ -104,7 +106,7 @@ export async function POST(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getAdminSession();
@@ -112,6 +114,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const productReviewId = searchParams.get("productReviewId");
 
@@ -122,8 +125,8 @@ export async function DELETE(
       );
     }
 
-    const post = await prisma.post.findUnique({
-      where: { slug: params.slug },
+    const post = await db.post.findUnique({
+      where: { slug },
     });
 
     if (!post) {
@@ -131,7 +134,7 @@ export async function DELETE(
     }
 
     // Eliminar asociación
-    await prisma.postProductReview.delete({
+    await db.postProductReview.delete({
       where: {
         postId_productReviewId: {
           postId: post.id,

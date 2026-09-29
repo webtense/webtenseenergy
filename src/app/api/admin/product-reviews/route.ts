@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/server/db";
-import { getAdminSession } from "@/server/auth/session";
+import { db } from "@/lib/db";
+import { getAdminSession } from "@/lib/admin-auth";
 import { z } from "zod";
 
 const createProductSchema = z.object({
@@ -31,13 +31,13 @@ export async function GET(req: NextRequest) {
     const where = categoryId ? { categoryId } : undefined;
 
     const [products, total] = await Promise.all([
-      prisma.productReview.findMany({
+      db.productReview.findMany({
         where,
         orderBy: { createdAt: "desc" },
         take: limit,
         skip,
       }),
-      prisma.productReview.count({ where }),
+      db.productReview.count({ where }),
     ]);
 
     return NextResponse.json({
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const validatedData = createProductSchema.parse(body);
 
     // Comprobar ASIN único
-    const existing = await prisma.productReview.findUnique({
+    const existing = await db.productReview.findUnique({
       where: { asin: validatedData.asin },
     });
 
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Crear producto
-    const product = await prisma.productReview.create({
+    const product = await db.productReview.create({
       data: validatedData,
     });
 
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validación fallida", details: error.errors },
+        { error: "Validación fallida", details: error.issues },
         { status: 400 }
       );
     }
