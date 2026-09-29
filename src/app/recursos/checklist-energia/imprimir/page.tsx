@@ -81,18 +81,24 @@ export default function ChecklistImprimirPage() {
       <body>
         <div className="header">
           <div>
-            <div className="logo">WEBTENSE<span>ENERGY</span></div>
-            <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>Consultoría energética para empresas</div>
+            <div className="logo">
+              WEBTENSE<span>ENERGY</span>
+            </div>
+            <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>
+              Consultoría energética para empresas
+            </div>
           </div>
           <div className="header-sub">
-            webtenseenergy.com<br />
+            webtenseenergy.com
+            <br />
             Análisis gratuito · 48h · Sin compromiso
           </div>
         </div>
 
         <h1>Checklist: ¿Tu empresa está pagando energía de más?</h1>
         <p className="subtitle">
-          Marca cada punto que aplique a tu situación actual. Si marcas <strong>5 o más</strong>, hay margen de ahorro relevante sin necesidad de grandes inversiones.
+          Marca cada punto que aplique a tu situación actual. Si marcas <strong>5 o más</strong>,
+          hay margen de ahorro relevante sin necesidad de grandes inversiones.
         </p>
 
         {checks.map((section) => (
@@ -118,10 +124,13 @@ export default function ChecklistImprimirPage() {
 
         <div className="footer">
           <div className="footer-note">
-            Los resultados dependen del estado inicial de la instalación, contrato, hábitos de consumo y capacidad de automatización. Este checklist es orientativo y no sustituye a un análisis técnico profesional.
+            Los resultados dependen del estado inicial de la instalación, contrato, hábitos de
+            consumo y capacidad de automatización. Este checklist es orientativo y no sustituye a un
+            análisis técnico profesional.
           </div>
           <div className="footer-cta">
-            webtenseenergy.com/estudio<br />
+            webtenseenergy.com/estudio
+            <br />
             <span style={{ fontWeight: 400, color: '#888' }}>info@webtenseenergy.com</span>
           </div>
         </div>

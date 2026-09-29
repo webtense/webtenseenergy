@@ -76,7 +76,10 @@ export default function ChecklistEnergiaPage() {
             >
               Imprimir / Guardar como PDF
             </a>
-            <Link href="/estudio" className="cta-secondary border-white/20 text-white/80 hover:text-white">
+            <Link
+              href="/estudio"
+              className="cta-secondary border-white/20 text-white/80 hover:text-white"
+            >
               Solicitar análisis gratuito
             </Link>
           </div>
@@ -87,7 +90,8 @@ export default function ChecklistEnergiaPage() {
       <section className="section-shell">
         <div className="section-inner max-w-3xl">
           <p className="text-sm text-foreground/50 mb-8">
-            Marca cada punto que aplique a tu situación actual. Cuantos más marques, mayor es el potencial de ahorro sin inversión técnica.
+            Marca cada punto que aplique a tu situación actual. Cuantos más marques, mayor es el
+            potencial de ahorro sin inversión técnica.
           </p>
           <div className="space-y-10">
             {checks.map((section) => (
@@ -99,10 +103,7 @@ export default function ChecklistEnergiaPage() {
                 </h2>
                 <ul className="space-y-3">
                   {section.items.map((item) => (
-                    <li
-                      key={item}
-                      className="surface-panel-soft flex items-start gap-4 p-5"
-                    >
+                    <li key={item} className="surface-panel-soft flex items-start gap-4 p-5">
                       <span className="mt-0.5 flex-shrink-0 h-5 w-5 rounded border-2 border-zinc-300 dark:border-zinc-600" />
                       <span className="text-sm leading-6 text-foreground/75">{item}</span>
                     </li>

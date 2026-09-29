@@ -118,22 +118,23 @@ model Tag {
 }
 
 model Post {
-  id             String            @id @default(cuid())
-  slug           String            @unique
-  status         PostStatus        @default(DRAFT)
-  publishedAt    DateTime?
-  scheduledFor   DateTime?
-  featuredImage  String?
-  seoTitle       String?
-  seoDescription String?
-  locale         Locale            @default(ES)
-  authorId       String?
-  author         AdminUser?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  translations   PostTranslation[]
-  categories     PostCategory[]
-  tags           PostTag[]
+  id               String                @id @default(cuid())
+  slug             String                @unique
+  status           PostStatus            @default(DRAFT)
+  publishedAt      DateTime?
+  scheduledFor     DateTime?
+  featuredImage    String?
+  seoTitle         String?
+  seoDescription   String?
+  locale           Locale                @default(ES)
+  authorId         String?
+  author           AdminUser?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  translations     PostTranslation[]
+  categories       PostCategory[]
+  tags             PostTag[]
+  productReviews   PostProductReview[]
 
   @@index([status, publishedAt])
   @@index([locale])
@@ -336,6 +337,41 @@ model SendEvent {
   subscriber   Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
 
   @@index([eventType, createdAt])
+}
+
+model ProductReview {
+  id            String   @id @default(cuid())
+  title         String   @db.VarChar(255)
+  description   String?  @db.Text
+  asin          String   @unique @db.VarChar(50)
+  categoryId    String?  @db.VarChar(100)
+  imageUrl      String?  @db.VarChar(500)
+  affiliateUrl  String   @db.VarChar(1000)
+  rating        Int      @default(5)
+  pros          String[] @default([])
+  cons          String[] @default([])
+  price         Float?
+  priceUpdated  DateTime @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  posts         PostProductReview[]
+
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model PostProductReview {
+  id              String   @id @default(cuid())
+  postId          String
+  productReviewId String
+  position        Int      @default(1)
+  createdAt       DateTime @default(now())
+
+  post            Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  productReview   ProductReview  @relation(fields: [productReviewId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, productReviewId])
+  @@index([postId])
 }
 
 model TelegramConfig {

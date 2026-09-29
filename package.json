@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:seed-admin": "node scripts/seed-admin.mjs",
+    "db:seed-products": "node scripts/seed-products.mjs",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
     "test": "vitest run",
