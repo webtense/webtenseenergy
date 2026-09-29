@@ -105,7 +105,7 @@ export function ContactoPage() {
                 <div>
                   <p className="font-semibold text-foreground">WhatsApp / Teléfono</p>
                   <a
-                    href="https://wa.me/34691521367"
+                    href="https://wa.me/34937205688"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1.5 block text-xl font-bold text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors"

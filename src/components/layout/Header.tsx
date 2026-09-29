@@ -78,7 +78,7 @@ export function Header() {
 
         <div className="hidden sm:flex items-center gap-3">
           <a
-            href="https://wa.me/34691521367"
+            href="https://wa.me/34937205688"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden xl:inline-flex items-center gap-1.5 text-sm font-semibold text-foreground/55 transition hover:text-primary-600 dark:hover:text-primary-400"

@@ -128,7 +128,7 @@ export function Footer() {
                 info@webtenseenergy.com
               </a>
               <a
-                href="https://wa.me/34691521367"
+                href="https://wa.me/34937205688"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-primary-400 transition-colors"

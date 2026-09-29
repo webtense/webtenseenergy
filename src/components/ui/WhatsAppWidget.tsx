@@ -20,7 +20,7 @@ export function WhatsAppWidget() {
         href={
           process.env.NEXT_PUBLIC_WHATSAPP
             ? `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP.replace(/\s+/g, '')}`
-            : 'https://wa.me/34691521367'
+            : 'https://wa.me/34937205688'
         } // Placeholder phone number
         target="_blank"
         rel="noopener noreferrer"
