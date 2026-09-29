@@ -6,6 +6,8 @@ import { getPublishedPostBySlug, type BlogLocale } from '@/lib/content-posts';
 import { withBasePath } from '@/lib/paths';
 import { getSiteUrl, SITE_NAME } from '@/lib/seo';
 import { ActionBanner } from '@/components/shared/ActionBanner';
+import { ProductCard } from '@/components/ProductCard';
+import { db } from '@/lib/db';
 
 type BlogPostPageProps = {
   slug: string;
@@ -38,6 +40,19 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
   const post = await getPublishedPostBySlug(slug, locale);
 
   if (!post) notFound();
+
+  // Cargar reviews asociadas al post
+  const dbPost = await db.post.findUnique({
+    where: { slug },
+    include: {
+      productReviews: {
+        include: { productReview: true },
+        orderBy: { position: 'asc' },
+      },
+    },
+  });
+
+  const productReviews = dbPost?.productReviews || [];
 
   const categoryStyle = CATEGORY_STYLES[post.category] ?? FALLBACK_STYLE;
   const icon = CATEGORY_ICONS[post.category] ?? '📄';
@@ -181,8 +196,36 @@ export async function BlogPostPage({ slug, basePath, locale }: BlogPostPageProps
       <div className="mx-auto max-w-3xl px-5 mt-10 lg:max-w-6xl">
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-12 lg:items-start">
           {/* Artículo */}
-          <div className="article-body">
-            <div dangerouslySetInnerHTML={{ __html: safeContent }} />
+          <div>
+            <div className="article-body">
+              <div dangerouslySetInnerHTML={{ __html: safeContent }} />
+            </div>
+
+            {/* Productos Recomendados */}
+            {productReviews.length > 0 && (
+              <section className="mt-12 pt-8 border-t border-zinc-100 dark:border-white/5">
+                <h3 className="section-title mb-6">💡 Productos Recomendados</h3>
+                <div className="space-y-4">
+                  {productReviews.map((item) => (
+                    <ProductCard
+                      key={item.id}
+                      id={item.productReview.id}
+                      title={item.productReview.title}
+                      asin={item.productReview.asin}
+                      imageUrl={item.productReview.imageUrl}
+                      affiliateUrl={item.productReview.affiliateUrl}
+                      rating={item.productReview.rating}
+                      pros={item.productReview.pros}
+                      cons={item.productReview.cons}
+                      price={item.productReview.price}
+                    />
+                  ))}
+                </div>
+                <p className="mt-4 text-xs text-foreground/40">
+                  * Los enlaces de Amazon incluyen enlaces de afiliado. Sin coste adicional para ti.
+                </p>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}
