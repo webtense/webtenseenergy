@@ -124,7 +124,10 @@ export default function ROIDashboard() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percentage }) => `${name} ${percentage}%`}
+                  label={({ name }) => {
+                    const item = data.sources.find((s) => s.name === name);
+                    return item ? `${name} ${item.percentage}%` : name;
+                  }}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="revenue"
