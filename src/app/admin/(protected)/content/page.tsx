@@ -30,7 +30,7 @@ export default async function AdminContentPage() {
         </p>
       </div>
       <AdminBlogManager
-        initialPosts={posts.map((post) => ({
+        initialPosts={posts.map((post: typeof posts[0]) => ({
           id: post.id,
           slug: post.slug,
           status: post.status,
