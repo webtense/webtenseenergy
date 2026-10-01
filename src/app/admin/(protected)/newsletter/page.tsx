@@ -36,26 +36,26 @@ export default async function AdminNewsletterPage() {
 
   return (
     <AdminNewsletterManager
-      initialCampaigns={campaigns.map((campaign) => ({
+      initialCampaigns={campaigns.map((campaign: typeof campaigns[0]) => ({
         ...campaign,
         scheduledFor: campaign.scheduledFor?.toISOString() || null,
         sentAt: campaign.sentAt?.toISOString() || null,
         createdAt: campaign.createdAt.toISOString(),
         updatedAt: campaign.updatedAt.toISOString(),
-        blocks: campaign.blocks.map((block) => ({
+        blocks: campaign.blocks.map((block: typeof campaign.blocks[0]) => ({
           ...block,
           createdAt: block.createdAt.toISOString(),
           updatedAt: block.updatedAt.toISOString(),
         })),
       }))}
-      initialSubscribers={subscribers.map((subscriber) => ({
+      initialSubscribers={subscribers.map((subscriber: typeof subscribers[0]) => ({
         ...subscriber,
         consentedAt: subscriber.consentedAt?.toISOString() || null,
         unsubscribedAt: subscriber.unsubscribedAt?.toISOString() || null,
         createdAt: subscriber.createdAt.toISOString(),
         updatedAt: subscriber.updatedAt.toISOString(),
       }))}
-      initialJobs={jobs.map((job) => ({
+      initialJobs={jobs.map((job: typeof jobs[0]) => ({
         ...job,
         runAt: job.runAt.toISOString(),
         finishedAt: job.finishedAt?.toISOString() || null,
@@ -69,7 +69,7 @@ export default async function AdminNewsletterPage() {
           updatedAt: job.campaign.updatedAt.toISOString(),
         },
       }))}
-      initialEvents={events.map((event) => ({
+      initialEvents={events.map((event: typeof events[0]) => ({
         ...event,
         createdAt: event.createdAt.toISOString(),
         subscriber: {
@@ -94,7 +94,7 @@ export default async function AdminNewsletterPage() {
           },
         },
       }))}
-      initialLogs={logs.map((log) => ({
+      initialLogs={logs.map((log: typeof logs[0]) => ({
         ...log,
         sentAt: log.sentAt?.toISOString() || null,
         createdAt: log.createdAt.toISOString(),
