@@ -294,7 +294,7 @@ export default async function AdminContactsPage() {
             updatedAt: note.updatedAt.toISOString(),
           })),
         }))}
-        initialStudies={studies.map((study) => ({
+        initialStudies={studies.map((study: typeof studies[0]) => ({
           ...study,
           createdAt: study.createdAt.toISOString(),
           updatedAt: study.updatedAt.toISOString(),
