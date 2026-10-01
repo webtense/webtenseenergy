@@ -281,7 +281,7 @@ export default async function AdminContactsPage() {
     <div className="space-y-6">
       <AdminPeoplePanel initialPeople={people} />
       <AdminContactsManager
-        initialLeads={leads.map((lead) => ({
+        initialLeads={leads.map((lead: typeof leads[0]) => ({
           ...lead,
           createdAt: lead.createdAt.toISOString(),
           updatedAt: lead.updatedAt.toISOString(),
