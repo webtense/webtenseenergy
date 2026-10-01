@@ -136,7 +136,7 @@ export default function ROIDashboard() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `€${value.toFixed(2)}`} />
+                <Tooltip formatter={(value: any) => value ? `€${(value as number).toFixed(2)}` : '-'} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -149,7 +149,7 @@ export default function ROIDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => `€${value.toFixed(0)}`} />
+                <Tooltip formatter={(value: any) => value ? `€${(value as number).toFixed(0)}` : '-'} />
                 <Legend />
                 <Line
                   type="monotone"
