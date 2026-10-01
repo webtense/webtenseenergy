@@ -37,7 +37,7 @@ export default async function AdminOffersPage() {
         <article className="rounded-3xl border border-white/10 bg-zinc-900/90 p-6">
           <h3 className="text-xl font-semibold text-white">Ofertas recientes</h3>
           <div className="mt-4 space-y-3">
-            {offers.map((offer) => (
+            {offers.map((offer: typeof offers[0]) => (
               <div
                 key={offer.id}
                 className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3"
@@ -57,7 +57,7 @@ export default async function AdminOffersPage() {
         <article className="rounded-3xl border border-white/10 bg-zinc-900/90 p-6">
           <h3 className="text-xl font-semibold text-white">Logs de Telegram</h3>
           <div className="mt-4 space-y-3">
-            {logs.map((log) => (
+            {logs.map((log: typeof logs[0]) => (
               <div
                 key={log.id}
                 className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3"
