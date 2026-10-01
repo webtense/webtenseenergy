@@ -24,12 +24,12 @@ export default async function AdminSystemPage() {
 
   return (
     <AdminSystemManager
-      users={users.map((user) => ({
+      users={users.map((user: typeof users[0]) => ({
         ...user,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       }))}
-      auditLogs={auditLogs.map((log) => ({
+      auditLogs={auditLogs.map((log: typeof logs[0]) => ({
         ...log,
         createdAt: log.createdAt.toISOString(),
       }))}
@@ -42,7 +42,7 @@ export default async function AdminSystemPage() {
             }
           : null
       }
-      recentEmailErrors={recentEmailErrors.map((log) => ({
+      recentEmailErrors={recentEmailErrors.map((log: typeof logs[0]) => ({
         ...log,
         sentAt: log.sentAt?.toISOString() || null,
         createdAt: log.createdAt.toISOString(),

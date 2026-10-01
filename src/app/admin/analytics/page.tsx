@@ -134,7 +134,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">🏆 Páginas Principales</h2>
             <div className="space-y-4">
-              {data.topPages.map((page) => (
+              {data.topPages.map((page: typeof pages[0]) => (
                 <div key={page.page} className="border-b border-gray-200 pb-3">
                   <p className="font-semibold text-gray-900 text-sm line-clamp-1">{page.page}</p>
                   <div className="flex items-center justify-between mt-2">
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">📍 Fuentes de Tráfico</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {data.trafficSources.map((source) => (
+            {data.trafficSources.map((source: typeof sources[0]) => (
               <div key={source.source} className="text-center p-4 border border-gray-200 rounded-lg">
                 <p className="font-semibold text-gray-900">{source.source}</p>
                 <p className="text-2xl font-bold text-blue-600 mt-2">{source.sessions}</p>

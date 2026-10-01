@@ -138,7 +138,7 @@ export default function CRMPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {contacts.map((contact) => (
+                  {contacts.map((contact: typeof contacts[0]) => (
                     <tr key={contact.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <p className="font-semibold text-gray-900">{contact.nombre}</p>

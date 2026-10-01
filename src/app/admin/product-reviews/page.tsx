@@ -75,11 +75,11 @@ export default function ProductReviewsAdminPage() {
       // Parsear arrays
       const pros = formData.pros
         .split("\n")
-        .map((p) => p.trim())
+        .map((p: typeof ps[0]) => p.trim())
         .filter(Boolean);
       const cons = formData.cons
         .split("\n")
-        .map((c) => c.trim())
+        .map((c: typeof cs[0]) => c.trim())
         .filter(Boolean);
 
       const payload = {
@@ -236,7 +236,7 @@ export default function ProductReviewsAdminPage() {
                 onChange={handleInputChange}
                 className="input"
               >
-                {[1, 2, 3, 4, 5].map((n) => (
+                {[1, 2, 3, 4, 5].map((n: typeof ns[0]) => (
                   <option key={n} value={n}>
                     {"⭐".repeat(n)} ({n}/5)
                   </option>
@@ -361,7 +361,7 @@ export default function ProductReviewsAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y dark:divide-slate-700">
-                {products.map((product) => (
+                {products.map((product: typeof products[0]) => (
                   <tr
                     key={product.id}
                     className="hover:bg-gray-50 dark:hover:bg-slate-800"

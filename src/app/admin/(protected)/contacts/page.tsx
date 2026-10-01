@@ -231,7 +231,7 @@ function buildPeopleSummary(params: {
   }
 
   return Array.from(people.values())
-    .map((person) => ({
+    .map((person: typeof persons[0]) => ({
       ...person,
       phones: Array.from(person.phones),
       companies: Array.from(person.companies),
