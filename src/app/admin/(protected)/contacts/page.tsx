@@ -134,7 +134,7 @@ function buildPeopleSummary(params: {
     }
   };
 
-  for (const lead of params.leads) {
+  for (const lead of params.leads as LeadWithNotes[]) {
     const person = ensurePerson(lead.email, lead.name);
     person.displayName = person.displayName === person.email ? lead.name : person.displayName;
     if (lead.phone) person.phones.add(lead.phone);
