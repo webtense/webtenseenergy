@@ -26,7 +26,7 @@ export default async function AdminOffersPage() {
           </p>
         </div>
         <AdminDealsManager
-          initialDeals={deals.map((deal) => ({
+          initialDeals={deals.map((deal: typeof deals[0]) => ({
             ...deal,
             sentAt: deal.sentAt?.toISOString() || null,
             updatedAt: deal.updatedAt.toISOString(),
