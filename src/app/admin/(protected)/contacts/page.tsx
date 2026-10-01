@@ -303,17 +303,17 @@ export default async function AdminContactsPage() {
           wonAt: study.wonAt?.toISOString() || null,
           lostAt: study.lostAt?.toISOString() || null,
         }))}
-        initialSubscribers={subscribers.map((subscriber) => ({
+        initialSubscribers={subscribers.map((subscriber: typeof subscribers[0]) => ({
           ...subscriber,
           consentedAt: subscriber.consentedAt?.toISOString() || null,
           unsubscribedAt: subscriber.unsubscribedAt?.toISOString() || null,
           createdAt: subscriber.createdAt.toISOString(),
           updatedAt: subscriber.updatedAt.toISOString(),
-          consents: subscriber.consents.map((consent) => ({
+          consents: subscriber.consents.map((consent: typeof subscriber.consents[0]) => ({
             ...consent,
             acceptedAt: consent.acceptedAt.toISOString(),
           })),
-          events: subscriber.events.map((event) => ({
+          events: subscriber.events.map((event: typeof subscriber.events[0]) => ({
             ...event,
             createdAt: event.createdAt.toISOString(),
             sendJob: {
@@ -332,14 +332,14 @@ export default async function AdminContactsPage() {
             },
           })),
         }))}
-        recentCampaigns={campaigns.map((campaign) => ({
+        recentCampaigns={campaigns.map((campaign: typeof campaigns[0]) => ({
           ...campaign,
           scheduledFor: campaign.scheduledFor?.toISOString() || null,
           sentAt: campaign.sentAt?.toISOString() || null,
           createdAt: campaign.createdAt.toISOString(),
           updatedAt: campaign.updatedAt.toISOString(),
         }))}
-        recentEmailLogs={emailLogs.map((log) => ({
+        recentEmailLogs={emailLogs.map((log: typeof emailLogs[0]) => ({
           ...log,
           sentAt: log.sentAt?.toISOString() || null,
           createdAt: log.createdAt.toISOString(),
