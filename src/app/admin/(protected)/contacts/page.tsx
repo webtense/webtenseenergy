@@ -288,7 +288,7 @@ export default async function AdminContactsPage() {
           contactedAt: lead.contactedAt?.toISOString() || null,
           wonAt: lead.wonAt?.toISOString() || null,
           lostAt: lead.lostAt?.toISOString() || null,
-          notes: lead.notes.map((note) => ({
+          notes: lead.notes.map((note: typeof lead.notes[0]) => ({
             ...note,
             createdAt: note.createdAt.toISOString(),
             updatedAt: note.updatedAt.toISOString(),
