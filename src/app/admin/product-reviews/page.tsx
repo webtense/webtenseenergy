@@ -75,11 +75,11 @@ export default function ProductReviewsAdminPage() {
       // Parsear arrays
       const pros = formData.pros
         .split("\n")
-        .map((p: typeof ps[0]) => p.trim())
+        .map((p) => p.trim())
         .filter(Boolean);
       const cons = formData.cons
         .split("\n")
-        .map((c: typeof cs[0]) => c.trim())
+        .map((c) => c.trim())
         .filter(Boolean);
 
       const payload = {

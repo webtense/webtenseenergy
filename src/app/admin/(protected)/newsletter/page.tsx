@@ -94,7 +94,7 @@ export default async function AdminNewsletterPage() {
           },
         },
       }))}
-      initialLogs={logs.map((log: typeof logs[0]) => ({
+      initialLogs={logs.map((log) => ({
         ...log,
         sentAt: log.sentAt?.toISOString() || null,
         createdAt: log.createdAt.toISOString(),
