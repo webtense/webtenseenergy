@@ -29,7 +29,7 @@ export default async function AdminSystemPage() {
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       }))}
-      auditLogs={auditLogs.map((log: typeof logs[0]) => ({
+      auditLogs={auditLogs.map((log: typeof auditLogs[0]) => ({
         ...log,
         createdAt: log.createdAt.toISOString(),
       }))}
@@ -42,7 +42,7 @@ export default async function AdminSystemPage() {
             }
           : null
       }
-      recentEmailErrors={recentEmailErrors.map((log: typeof logs[0]) => ({
+      recentEmailErrors={recentEmailErrors.map((log: typeof recentEmailErrors[0]) => ({
         ...log,
         sentAt: log.sentAt?.toISOString() || null,
         createdAt: log.createdAt.toISOString(),
