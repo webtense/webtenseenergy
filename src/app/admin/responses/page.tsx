@@ -96,7 +96,7 @@ export default function ResponsesPage() {
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {responses.map((resp: typeof resps[0]) => (
+              {responses.map((resp: typeof responses[0]) => (
                 <div key={resp.mensaje_id} className="px-6 py-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

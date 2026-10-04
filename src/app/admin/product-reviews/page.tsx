@@ -236,7 +236,7 @@ export default function ProductReviewsAdminPage() {
                 onChange={handleInputChange}
                 className="input"
               >
-                {[1, 2, 3, 4, 5].map((n: typeof ns[0]) => (
+                {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
                     {"⭐".repeat(n)} ({n}/5)
                   </option>
