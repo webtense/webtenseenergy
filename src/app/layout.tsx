@@ -4,7 +4,9 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { WhatsAppWidget } from '@/components/ui/WhatsAppWidget';
+import { AutoUpdate } from '@/components/AutoUpdate';
 import { buildOrganizationSchema, buildWebsiteSchema, getSiteUrl, SITE_NAME } from '@/lib/seo';
+import { VERSION } from '@/lib/version';
 
 const siteUrl = getSiteUrl();
 
@@ -54,6 +56,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: organizationSchema }}
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: websiteSchema }} />
+        <script data-version={VERSION} />
+        <AutoUpdate />
         <Header />
         <main className="flex-1 pb-28 md:pb-0">{children}</main>
         <MobileBottomNav />
